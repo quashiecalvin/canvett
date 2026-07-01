@@ -11,7 +11,7 @@ const navItems = [
 
 export default function Sidebar({ activePage, onNavigate }) {
   return (
-    <aside className="w-[200px] h-screen bg-bg-surface border-r border-border flex flex-col shrink-0">
+    <aside className="w-50 h-screen bg-bg-surface border-r border-border flex flex-col shrink-0">
       <div className="p-4 border-b border-border flex items-center gap-2">
         <div className="w-7 h-7 rounded-[7px] bg-accent flex items-center justify-center shrink-0">
           <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
