@@ -1,0 +1,45 @@
+@import "tailwindcss";
+
+@theme {
+  --color-bg-base: #0F1B2D;
+  --color-accent: #185FA5;
+  --color-accent-2: #2563EB;
+  --color-accent-light: #85B7EB;
+  --color-accent-tint: #E6F1FB;
+  --color-score-amber: #F59E0B;
+  --color-bg-page: #F8FAFC;
+  --color-bg-subtle: #F4F5F7;
+  --color-bg-surface: #FFFFFF;
+  --color-text-primary: #0F1B2D;
+  --color-text-body: #374151;
+  --color-text-muted: #6B7280;
+  --color-text-hint: #9CA3AF;
+  --color-border: #E2E4E9;
+  --color-border-strong: #D1D5DB;
+  --color-success: #059669;
+  --color-success-tint: #D1FAE5;
+  --color-success-text: #065F46;
+  --color-danger: #EF4444;
+  --color-danger-tint: #FEE2E2;
+  --color-danger-text: #991B1B;
+  --color-warning-tint: #FEF3C7;
+  --color-warning-text: #92400E;
+  --color-info-tint: #EFF6FF;
+  --color-info-text: #1D4ED8;
+  --color-purple-tint: #EEEDFE;
+  --color-purple-text: #3C3489;
+  --color-avatar-bg: #B5D4F4;
+  --color-avatar-text: #0C447C;
+  --color-disabled-bg: #F3F4F6;
+
+  --font-sans: 'Inter', sans-serif;
+  --font-outfit: 'Outfit', sans-serif;
+
+  --radius-subtle: 4px;
+  --radius-btn: 8px;
+  --radius-card: 10px;
+  --radius-modal: 12px;
+  --radius-pill: 20px;
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;600&display=swap');
