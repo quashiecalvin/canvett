@@ -1,13 +1,14 @@
 import { useState } from 'react'
 import AppLayout from './components/layout/AppLayout'
 import Dashboard from './pages/Dashboard'
+import JobPostings from './pages/JobPostings'
 
 export default function App() {
   const [activePage, setActivePage] = useState('dashboard')
 
   return (
     <AppLayout activePage={activePage} onNavigate={setActivePage}>
-      {activePage === 'dashboard' && <Dashboard />}
+      {activePage === 'dashboard' && <Dashboard />} {activePage === 'jobs' && <JobPostings />}
     </AppLayout>
   )
 }
