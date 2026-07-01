@@ -7,7 +7,7 @@ const styles = {
 
 export default function StatusBadge({ status }) {
   return (
-    <span className={`inline-flex items-center px-[10px] py-[3px] rounded-pill text-[11px] font-medium ${styles[status] || styles.Closed}`}>
+    <span className={`inline-flex items-center px-2 py-1 rounded-pill text-[11px] font-medium ${styles[status] || styles.Closed}`}>
       {status}
     </span>
   )

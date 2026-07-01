@@ -39,7 +39,7 @@ export default function Sidebar({ activePage, onNavigate }) {
                 <button
                   key={id}
                   onClick={() => onNavigate(id)}
-                  className={`flex items-center gap-2 px-4 py-[9px] text-[15px] w-full text-left border-r-2 transition-colors
+                  className={`flex items-center gap-2 px-4 py-2 text-[15px] w-full text-left border-r-2 transition-colors
                     ${active
                       ? 'bg-accent-tint text-accent border-accent font-medium'
                       : 'text-text-body border-transparent hover:bg-bg-subtle font-normal'
