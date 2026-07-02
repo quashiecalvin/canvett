@@ -1,0 +1,19 @@
+from sqlalchemy import Column, Integer, String, DateTime, ARRAY, Text
+from sqlalchemy.sql import func
+from database.connection import Base
+
+
+class Job(Base):
+    __tablename__ = "jobs"
+
+    id = Column(Integer, primary_key=True, index=True)
+    title = Column(String, nullable=False)
+    department = Column(String, nullable=False)
+    employment_type = Column(String, nullable=False)
+    location = Column(String, nullable=False)
+    description = Column(Text, nullable=False)
+    required_skills = Column(ARRAY(String), nullable=False)
+    status = Column(String, default="Active")
+    posted_date = Column(DateTime(timezone=True), server_default=func.now())
+    applicant_count = Column(Integer, default=0)
+    ranked_count = Column(Integer, default=0)
