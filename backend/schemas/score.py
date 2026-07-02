@@ -10,3 +10,14 @@ class ScoreOut(BaseModel):
     education_score: float
     matched_skills: list[str]
     unmatched_skills: list[str]
+
+class RankedCandidate(BaseModel):
+    candidate_id: int
+    name: str
+    filename: str
+    overall_score: float
+    skills_score: float
+    experience_score: float
+    education_score: float
+    matched_skills: list[str]
+    unmatched_skills: list[str]
