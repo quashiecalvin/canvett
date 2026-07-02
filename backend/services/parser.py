@@ -6,7 +6,7 @@ def parse_pdf(file_path: str) -> str:
     reader = PdfReader(file_path)
     text = ""
     for page in reader.pages:
-        text += page.extract_text() or ""
+        text += (page.extract_text(extraction_mode="layout") or "") + "\n"
     return text.strip()
 
 
@@ -25,3 +25,11 @@ def parse_resume(file_path: str) -> str:
         return parse_docx(file_path)
     else:
         raise ValueError("Unsupported file type. Only PDF and DOCX are allowed.")
+
+
+def extract_name(resume_text: str) -> str:
+    for line in resume_text.split("\n"):
+        cleaned = line.strip()
+        if cleaned:
+            return cleaned.title()
+    return "Unknown Candidate"

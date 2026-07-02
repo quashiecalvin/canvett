@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 
 from database.session import get_db
 from database import models_job, models_candidate
-from services.parser import parse_resume
+from services.parser import parse_resume, extract_name
 from services.scoring import score_candidate
 from schemas.score import ScoreOut, RankedCandidate
 
@@ -32,7 +32,7 @@ def upload_resume(
     resume_text = parse_resume(file_path)
 
     candidate = models_candidate.Candidate(
-        name=file.filename.rsplit(".", 1)[0],
+        name=extract_name(resume_text),
         filename=file.filename,
         resume_text=resume_text,
         job_id=job_id,
