@@ -8,7 +8,7 @@ from database.session import get_db
 from database import models_job, models_candidate
 from services.parser import parse_resume
 from services.scoring import score_candidate
-from schemas.score import ScoreOut
+from schemas.score import ScoreOut, RankedCandidate
 
 router = APIRouter(prefix="/candidates", tags=["Candidates"])
 
@@ -58,3 +58,34 @@ def upload_resume(
     db.refresh(score)
 
     return score
+
+
+@router.get("/ranking/{job_id}", response_model=list[RankedCandidate])
+def get_ranking(job_id: int, db: Session = Depends(get_db)):
+    results = (
+        db.query(models_candidate.Score, models_candidate.Candidate)
+        .join(
+            models_candidate.Candidate,
+            models_candidate.Score.candidate_id == models_candidate.Candidate.id,
+        )
+        .filter(models_candidate.Score.job_id == job_id)
+        .order_by(models_candidate.Score.overall_score.desc())
+        .all()
+    )
+
+    ranked = []
+    for score, candidate in results:
+        ranked.append(
+            RankedCandidate(
+                candidate_id=candidate.id,
+                name=candidate.name,
+                filename=candidate.filename,
+                overall_score=score.overall_score,
+                skills_score=score.skills_score,
+                experience_score=score.experience_score,
+                education_score=score.education_score,
+                matched_skills=score.matched_skills,
+                unmatched_skills=score.unmatched_skills,
+            )
+        )
+    return ranked
