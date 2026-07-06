@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import ScoreCircle from '../components/ui/ScoreCircle'
 import { scoreBarColor } from '../lib/scoreColor'
 import { getRanking } from '../lib/api'
+import { useJob } from '../context/JobContext'
 import { RefreshCw, Download, Eye, Bookmark } from 'lucide-react'
 
 function initialsFromName(name) {
@@ -12,12 +13,15 @@ function initialsFromName(name) {
 }
 
 export default function CandidateRanking() {
+  const { selectedJobId, selectedJob } = useJob()
   const [candidates, setCandidates] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
   useEffect(() => {
-    getRanking(1)
+    if (!selectedJobId) return
+    setLoading(true)
+    getRanking(selectedJobId)
       .then((data) => {
         setCandidates(data)
         setLoading(false)
@@ -26,14 +30,14 @@ export default function CandidateRanking() {
         setError(err.message)
         setLoading(false)
       })
-  }, [])
+  }, [selectedJobId])
 
   return (
     <div className="p-6">
       <header className="flex items-start justify-between mb-6">
         <div>
           <h1 className="text-[22px] font-medium text-text-primary leading-[1.2]">Candidate ranking</h1>
-          <p className="text-[13px] text-text-muted mt-1">Software Engineer - Backend • {candidates.length} candidates ranked</p>
+          <p className="text-[13px] text-text-muted mt-1">{selectedJob ? selectedJob.title : 'No job selected'} • {candidates.length} candidates ranked</p>
         </div>
         <div className="flex items-center gap-3">
           <button className="flex items-center gap-2 h-10 px-4 rounded-btn border border-border-strong text-[13px] text-text-body hover:bg-bg-subtle transition-colors">
