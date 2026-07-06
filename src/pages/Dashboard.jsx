@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Plus, Code2, SquareActivity, Palette, Briefcase, Megaphone } from 'lucide-react'
 import StatusBadge from '../components/ui/StatusBadge'
+import NewJobModal from '../components/ui/NewJobModal'
 import { getStats, getJobs } from '../lib/api'
 
 const iconForDepartment = {
@@ -23,8 +24,9 @@ export default function Dashboard() {
   const [stats, setStats] = useState(null)
   const [jobs, setJobs] = useState([])
   const [loading, setLoading] = useState(true)
+  const [showModal, setShowModal] = useState(false)
 
-  useEffect(() => {
+  function loadData() {
     Promise.all([getStats(), getJobs()])
       .then(([statsData, jobsData]) => {
         setStats(statsData)
@@ -32,6 +34,10 @@ export default function Dashboard() {
         setLoading(false)
       })
       .catch(() => setLoading(false))
+  }
+
+  useEffect(() => {
+    loadData()
   }, [])
 
   const statCards = [
@@ -48,7 +54,10 @@ export default function Dashboard() {
           <h1 className="text-[22px] font-medium text-text-primary leading-[1.2]">Dashboard</h1>
           <p className="text-[13px] text-text-muted mt-1">{today}</p>
         </div>
-        <button className="flex items-center gap-2 h-10 px-4 rounded-btn bg-accent text-white text-[13px] font-medium hover:bg-accent/90 transition-colors">
+       <button
+          onClick={() => setShowModal(true)}
+          className="flex items-center gap-2 h-10 px-4 rounded-btn bg-accent text-white text-[13px] font-medium hover:bg-accent/90 transition-colors"
+        >
           <Plus size={14} />
           New job posting
         </button>
@@ -92,6 +101,13 @@ export default function Dashboard() {
           })}
         </div>
       </section>
+
+      {showModal && (
+        <NewJobModal
+          onClose={() => setShowModal(false)}
+          onCreated={loadData}
+        />
+      )}
     </div>
   )
 }
