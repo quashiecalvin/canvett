@@ -4,16 +4,19 @@ import Dashboard from './pages/Dashboard'
 import JobPostings from './pages/JobPostings'
 import UploadResumes from './pages/UploadResumes'
 import CandidateRanking from './pages/CandidateRanking'
+import { JobProvider } from './context/JobContext'
 
 export default function App() {
   const [activePage, setActivePage] = useState('dashboard')
 
   return (
-    <AppLayout activePage={activePage} onNavigate={setActivePage}>
-      {activePage === 'dashboard' && <Dashboard />} 
-      {activePage === 'jobs' && <JobPostings />}
-      {activePage === 'upload' && <UploadResumes />}
-      {activePage === 'ranking' && <CandidateRanking />}
-    </AppLayout>
+    <JobProvider>
+      <AppLayout activePage={activePage} onNavigate={setActivePage}>
+        {activePage === 'dashboard' && <Dashboard />}
+        {activePage === 'jobs' && <JobPostings />}
+        {activePage === 'upload' && <UploadResumes />}
+        {activePage === 'ranking' && <CandidateRanking />}
+      </AppLayout>
+    </JobProvider>
   )
 }

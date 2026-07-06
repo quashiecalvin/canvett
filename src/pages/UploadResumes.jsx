@@ -1,14 +1,17 @@
 import { useState, useRef } from 'react'
-import { ChevronDown, CloudUpload, Folder, CheckCircle2, File, X } from 'lucide-react'
+import { CloudUpload, Folder, CheckCircle2, File, X } from 'lucide-react'
 import { uploadResume } from '../lib/api'
+import { useJob } from '../context/JobContext'
+import JobSelector from '../components/ui/JobSelector'
 
 function formatTime(date) {
   return date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
 }
 
-const JOB_ID = 1
+
 
 export default function UploadResumes() {
+  const { selectedJobId } = useJob()
   const [files, setFiles] = useState([])
   const fileInputRef = useRef(null)
 
@@ -29,7 +32,7 @@ export default function UploadResumes() {
       setFiles((prev) => [...prev, entry])
 
       try {
-        await uploadResume(JOB_ID, file)
+        await uploadResume(selectedJobId, file)
         setFiles((prev) =>
           prev.map((f) => (f.id === entry.id ? { ...f, status: 'parsed' } : f))
         )
@@ -54,10 +57,7 @@ export default function UploadResumes() {
           <h1 className="text-[22px] font-medium text-text-primary leading-[1.2]">Upload resumes</h1>
           <p className="text-[13px] text-text-muted mt-1">Add candidate resumes to rank against a job posting</p>
         </div>
-        <button className="flex items-center gap-2 h-10 px-4 rounded-btn border border-border-strong text-[13px] text-text-body hover:bg-bg-subtle transition-colors">
-          Software Engineer - Backend
-          <ChevronDown size={14} className="text-text-hint" />
-        </button>
+        <JobSelector />
       </header>
 
       <div
