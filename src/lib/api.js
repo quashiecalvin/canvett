@@ -24,3 +24,9 @@ export async function uploadResume(jobId, file) {
   if (!res.ok) throw new Error("Failed to upload resume")
   return res.json()
 }
+
+export async function getStats() {
+  const res = await fetch(`${BASE_URL}/stats`)
+  if (!res.ok) throw new Error("Failed to fetch stats")
+  return res.json()
+}
