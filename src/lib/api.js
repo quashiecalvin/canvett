@@ -40,3 +40,15 @@ export async function createJob(jobData) {
   if (!res.ok) throw new Error("Failed to create job")
   return res.json()
 }
+
+export async function getTopCandidates() {
+  const res = await fetch(`${BASE_URL}/stats/top-candidates`)
+  if (!res.ok) throw new Error("Failed to fetch top candidates")
+  return res.json()
+}
+
+export async function getActivity() {
+  const res = await fetch(`${BASE_URL}/stats/activity`)
+  if (!res.ok) throw new Error("Failed to fetch activity")
+  return res.json()
+}

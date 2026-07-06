@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react'
 import { Plus, Code2, SquareActivity, Palette, Briefcase, Megaphone } from 'lucide-react'
 import StatusBadge from '../components/ui/StatusBadge'
+import ScorePill from '../components/ui/ScorePill'
 import NewJobModal from '../components/ui/NewJobModal'
-import { getStats, getJobs } from '../lib/api'
+import { getStats, getJobs, getTopCandidates, getActivity } from '../lib/api'
+import { timeAgo } from '../lib/time'
 
 const iconForDepartment = {
   Engineering: Code2,
@@ -23,14 +25,18 @@ export default function Dashboard() {
 
   const [stats, setStats] = useState(null)
   const [jobs, setJobs] = useState([])
+  const [topCandidates, setTopCandidates] = useState([])
+  const [activity, setActivity] = useState([])
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
 
   function loadData() {
-    Promise.all([getStats(), getJobs()])
-      .then(([statsData, jobsData]) => {
+    Promise.all([getStats(), getJobs(), getTopCandidates(), getActivity()])
+      .then(([statsData, jobsData, topData, activityData]) => {
         setStats(statsData)
         setJobs(jobsData)
+        setTopCandidates(topData)
+        setActivity(activityData)
         setLoading(false)
       })
       .catch(() => setLoading(false))
@@ -54,7 +60,7 @@ export default function Dashboard() {
           <h1 className="text-[22px] font-medium text-text-primary leading-[1.2]">Dashboard</h1>
           <p className="text-[13px] text-text-muted mt-1">{today}</p>
         </div>
-       <button
+        <button
           onClick={() => setShowModal(true)}
           className="flex items-center gap-2 h-10 px-4 rounded-btn bg-accent text-white text-[13px] font-medium hover:bg-accent/90 transition-colors"
         >
@@ -90,7 +96,7 @@ export default function Dashboard() {
                 </div>
                 <div className="flex-1">
                   <h3 className="text-[15px] font-medium text-text-primary leading-[1.4]">{job.title}</h3>
-                  <p className="text-[12px] text-text-muted mt-0.5">{job.department} • {job.location}</p>
+                  <p className="text-[12px] text-text-muted mt-0.5">{job.department} • Posted {timeAgo(job.posted_date)}</p>
                 </div>
                 <div className="flex flex-col items-end gap-1">
                   <StatusBadge status={job.status} />
@@ -101,6 +107,53 @@ export default function Dashboard() {
           })}
         </div>
       </section>
+
+      <div className="grid grid-cols-2 gap-4 mb-6">
+        <div>
+          <h2 className="text-[18px] font-medium text-text-primary mb-4 leading-[1.3]">Recent activity</h2>
+          <div className="bg-bg-surface border border-border rounded-card p-4">
+            {activity.length === 0 ? (
+              <p className="text-[13px] text-text-muted">No recent activity.</p>
+            ) : (
+              <div className="flex flex-col gap-4">
+                {activity.map((a) => (
+                  <div key={a.id} className="flex gap-3">
+                    <div className="w-1.5 h-1.5 rounded-full bg-accent mt-1.5 shrink-0" />
+                    <div>
+                      <p className="text-[13px] text-text-body leading-[1.4]">{a.description}</p>
+                      <p className="text-[11px] text-text-muted mt-0.5">{timeAgo(a.created_at)}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div>
+          <h2 className="text-[18px] font-medium text-text-primary mb-4 leading-[1.3]">Top candidates</h2>
+          <div className="bg-bg-surface border border-border rounded-card p-4">
+            {topCandidates.length === 0 ? (
+              <p className="text-[13px] text-text-muted">No candidates ranked yet.</p>
+            ) : (
+              <div className="flex flex-col gap-3">
+                {topCandidates.map((c) => (
+                  <div key={c.candidate_id} className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-full bg-purple-tint flex items-center justify-center text-[11px] font-medium text-purple-text shrink-0">
+                      {c.name.split(' ').map((p) => p[0]).slice(0, 2).join('').toUpperCase()}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[13px] font-medium text-text-primary leading-[1.4] truncate">{c.name}</p>
+                      <p className="text-[11px] text-text-muted">{c.job_title}</p>
+                    </div>
+                    <ScorePill score={Math.round(c.overall_score)} />
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
 
       {showModal && (
         <NewJobModal

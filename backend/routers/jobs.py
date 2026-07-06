@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 
 from database.session import get_db
 from database import models_job
+from services.activity import log_activity
 from schemas.job import JobCreate, JobOut
 
 router = APIRouter(prefix="/jobs", tags=["Jobs"])
@@ -14,6 +15,7 @@ def create_job(job: JobCreate, db: Session = Depends(get_db)):
     db.add(new_job)
     db.commit()
     db.refresh(new_job)
+    log_activity(db, f"New job posting created: {new_job.title}")
     return new_job
 
 
