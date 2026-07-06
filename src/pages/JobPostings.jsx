@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react'
-import { Plus, Search, ChevronDown, Filter, ArrowUpDown, Code2, SquareActivity, Palette, Briefcase, Megaphone, MoreVertical } from 'lucide-react'
+import { Plus, Search, Filter, ArrowUpDown, Code2, SquareActivity, Palette, Briefcase, Megaphone } from 'lucide-react'
 import FilterDropdown from '../components/ui/FilterDropdown'
 import StatusBadge from '../components/ui/StatusBadge'
 import NewJobModal from '../components/ui/NewJobModal'
-import { getJobs } from '../lib/api'
+import { getJobs, deleteJob } from '../lib/api'
+import JobActionsMenu from '../components/ui/JobActionsMenu'
 
 const iconForDepartment = {
   Engineering: Code2,
@@ -33,6 +34,15 @@ export default function JobPostings() {
         setError(err.message)
         setLoading(false)
       })
+  }
+  async function handleDelete(jobId) {
+    if (!confirm('Delete this job posting? This will also remove its candidates and rankings.')) return
+    try {
+      await deleteJob(jobId)
+      loadJobs()
+    } catch {
+      alert('Failed to delete the job posting.')
+    }
   }
 
   useEffect(() => {
@@ -124,9 +134,10 @@ export default function JobPostings() {
                 <div className="w-20 flex justify-center">
                   <StatusBadge status={job.status} />
                 </div>
-                <button className="text-text-hint hover:text-text-body transition-colors">
-                  <MoreVertical size={18} />
-                </button>
+                <JobActionsMenu
+                  onViewCandidates={() => alert('View candidates - coming soon')}
+                  onDelete={() => handleDelete(job.id)}
+                />
               </div>
             </div>
           )
