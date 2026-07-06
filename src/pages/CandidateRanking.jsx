@@ -3,6 +3,7 @@ import ScoreCircle from '../components/ui/ScoreCircle'
 import { scoreBarColor } from '../lib/scoreColor'
 import { getRanking } from '../lib/api'
 import { useJob } from '../context/JobContext'
+import { exportToCsv } from '../lib/csv'
 import { RefreshCw, Download, Eye, Bookmark } from 'lucide-react'
 
 function initialsFromName(name) {
@@ -18,7 +19,7 @@ export default function CandidateRanking() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
-  useEffect(() => {
+  function loadRanking() {
     if (!selectedJobId) return
     setLoading(true)
     getRanking(selectedJobId)
@@ -30,7 +31,27 @@ export default function CandidateRanking() {
         setError(err.message)
         setLoading(false)
       })
+  }
+
+  useEffect(() => {
+    loadRanking()
   }, [selectedJobId])
+
+  function handleExport() {
+    const rows = candidates.map((c, i) => ({
+      rank: i + 1,
+      name: c.name,
+      filename: c.filename,
+      overall_score: c.overall_score,
+      skills_score: c.skills_score,
+      experience_score: c.experience_score,
+      education_score: c.education_score,
+      matched_skills: c.matched_skills.join('; '),
+      unmatched_skills: c.unmatched_skills.join('; '),
+    }))
+    const jobName = selectedJob ? selectedJob.title.replace(/\s+/g, '_') : 'ranking'
+    exportToCsv(`${jobName}_ranking.csv`, rows)
+  }
 
   return (
     <div className="p-6">
@@ -40,11 +61,18 @@ export default function CandidateRanking() {
           <p className="text-[13px] text-text-muted mt-1">{selectedJob ? selectedJob.title : 'No job selected'} • {candidates.length} candidates ranked</p>
         </div>
         <div className="flex items-center gap-3">
-          <button className="flex items-center gap-2 h-10 px-4 rounded-btn border border-border-strong text-[13px] text-text-body hover:bg-bg-subtle transition-colors">
+          <button
+            onClick={loadRanking}
+            className="flex items-center gap-2 h-10 px-4 rounded-btn border border-border-strong text-[13px] text-text-body hover:bg-bg-subtle transition-colors"
+          >
             <RefreshCw size={14} />
             Re-rank
           </button>
-          <button className="flex items-center gap-2 h-10 px-4 rounded-btn bg-accent text-white text-[13px] font-medium hover:bg-accent/90 transition-colors">
+          <button
+            onClick={handleExport}
+            disabled={candidates.length === 0}
+            className="flex items-center gap-2 h-10 px-4 rounded-btn bg-accent text-white text-[13px] font-medium hover:bg-accent/90 transition-colors disabled:opacity-50"
+          >
             <Download size={14} />
             Export
           </button>
