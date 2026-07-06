@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from database.session import get_db
-from database import models_job
+from database import models_job, models_candidate
 from services.activity import log_activity
 from schemas.job import JobCreate, JobOut
 
@@ -30,3 +30,17 @@ def get_job(job_id: int, db: Session = Depends(get_db)):
     if job is None:
         raise HTTPException(status_code=404, detail="Job not found")
     return job
+
+
+@router.delete("/{job_id}")
+def delete_job(job_id: int, db: Session = Depends(get_db)):
+    job = db.query(models_job.Job).filter(models_job.Job.id == job_id).first()
+    if job is None:
+        raise HTTPException(status_code=404, detail="Job not found")
+
+    db.query(models_candidate.Score).filter(models_candidate.Score.job_id == job_id).delete()
+    db.query(models_candidate.Candidate).filter(models_candidate.Candidate.job_id == job_id).delete()
+    db.delete(job)
+    db.commit()
+
+    return {"message": "Job deleted"}

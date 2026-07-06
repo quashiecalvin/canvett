@@ -52,3 +52,11 @@ export async function getActivity() {
   if (!res.ok) throw new Error("Failed to fetch activity")
   return res.json()
 }
+
+export async function deleteJob(jobId) {
+  const res = await fetch(`${BASE_URL}/jobs/${jobId}`, {
+    method: "DELETE",
+  })
+  if (!res.ok) throw new Error("Failed to delete job")
+  return res.json()
+}
