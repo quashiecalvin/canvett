@@ -8,6 +8,7 @@ from database.session import get_db
 from database import models_job, models_candidate
 from services.parser import parse_resume, extract_name
 from services.scoring import score_candidate
+from services.activity import log_activity
 from schemas.score import ScoreOut, RankedCandidate
 
 router = APIRouter(prefix="/candidates", tags=["Candidates"])
@@ -56,6 +57,8 @@ def upload_resume(
     db.add(score)
     db.commit()
     db.refresh(score)
+
+    log_activity(db, f"Resume uploaded and ranked for {job.title}: {candidate.name}")
 
     return score
 
