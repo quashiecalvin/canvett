@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Plus, Search, ChevronDown, Filter, ArrowUpDown, Code2, SquareActivity, Palette, Briefcase, Megaphone, MoreVertical } from 'lucide-react'
 import StatusBadge from '../components/ui/StatusBadge'
+import NewJobModal from '../components/ui/NewJobModal'
 import { getJobs } from '../lib/api'
 
 const iconForDepartment = {
@@ -16,8 +17,9 @@ export default function JobPostings() {
   const [jobs, setJobs] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [showModal, setShowModal] = useState(false)
 
-  useEffect(() => {
+  function loadJobs() {
     getJobs()
       .then((data) => {
         setJobs(data)
@@ -27,6 +29,10 @@ export default function JobPostings() {
         setError(err.message)
         setLoading(false)
       })
+  }
+
+  useEffect(() => {
+    loadJobs()
   }, [])
 
   return (
@@ -37,7 +43,10 @@ export default function JobPostings() {
             <h1 className="text-[22px] font-medium text-text-primary leading-[1.2]">Job postings</h1>
             <p className="text-[13px] text-text-muted mt-1">Manage your open roles and track applicants</p>
           </div>
-          <button className="flex items-center gap-2 h-10 px-4 rounded-btn bg-accent text-white text-[13px] font-medium hover:bg-accent/90 transition-colors">
+          <button
+            onClick={() => setShowModal(true)}
+            className="flex items-center gap-2 h-10 px-4 rounded-btn bg-accent text-white text-[13px] font-medium hover:bg-accent/90 transition-colors"
+          >
             <Plus size={14} />
             New job posting
           </button>
@@ -102,7 +111,14 @@ export default function JobPostings() {
             </div>
           )
         })}
-      </div>
+   </div>
+
+      {showModal && (
+        <NewJobModal
+          onClose={() => setShowModal(false)}
+          onCreated={loadJobs}
+        />
+      )}
     </div>
   )
 }
