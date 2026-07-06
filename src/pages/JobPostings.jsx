@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Plus, Search, ChevronDown, Filter, ArrowUpDown, Code2, SquareActivity, Palette, Briefcase, Megaphone, MoreVertical } from 'lucide-react'
+import FilterDropdown from '../components/ui/FilterDropdown'
 import StatusBadge from '../components/ui/StatusBadge'
 import NewJobModal from '../components/ui/NewJobModal'
 import { getJobs } from '../lib/api'
@@ -18,6 +19,9 @@ export default function JobPostings() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [showModal, setShowModal] = useState(false)
+  const [search, setSearch] = useState('')
+  const [statusFilter, setStatusFilter] = useState('All')
+  const [sortOrder, setSortOrder] = useState('Newest')
 
   function loadJobs() {
     getJobs()
@@ -34,6 +38,16 @@ export default function JobPostings() {
   useEffect(() => {
     loadJobs()
   }, [])
+
+  const filteredJobs = jobs
+    .filter((job) => job.title.toLowerCase().includes(search.toLowerCase()))
+    .filter((job) => statusFilter === 'All' || job.status === statusFilter)
+    .sort((a, b) => {
+      if (sortOrder === 'Newest') return new Date(b.posted_date) - new Date(a.posted_date)
+      if (sortOrder === 'Oldest') return new Date(a.posted_date) - new Date(b.posted_date)
+      if (sortOrder === 'Highest applicants') return b.applicant_count - a.applicant_count
+      return 0
+    })
 
   return (
     <div>
@@ -57,20 +71,26 @@ export default function JobPostings() {
             <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-hint" />
             <input
               type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
               placeholder="Search job postings..."
               className="w-full h-10 pl-9 pr-3 rounded-btn border border-border-strong text-[13px] text-text-body placeholder:text-text-hint focus:outline-none focus:border-accent focus:border-[1.5px]"
             />
           </div>
-          <button className="flex items-center gap-2 h-10 px-4 rounded-btn border border-border-strong text-[13px] text-text-body hover:bg-bg-subtle transition-colors">
-            <Filter size={14} />
-            Status: All
-            <ChevronDown size={14} className="text-text-hint" />
-          </button>
-          <button className="flex items-center gap-2 h-10 px-4 rounded-btn border border-border-strong text-[13px] text-text-body hover:bg-bg-subtle transition-colors">
-            <ArrowUpDown size={14} />
-            Newest
-            <ChevronDown size={14} className="text-text-hint" />
-          </button>
+          <FilterDropdown
+            icon={Filter}
+            label="Status"
+            value={statusFilter}
+            options={['All', 'Active', 'In review', 'Closed']}
+            onChange={setStatusFilter}
+          />
+          <FilterDropdown
+            icon={ArrowUpDown}
+            label="Sort"
+            value={sortOrder}
+            options={['Newest', 'Oldest', 'Highest applicants']}
+            onChange={setSortOrder}
+          />
         </div>
       </div>
 
@@ -81,7 +101,7 @@ export default function JobPostings() {
           <p className="text-[13px] text-text-muted">No job postings yet.</p>
         )}
 
-        {jobs.map((job) => {
+        {filteredJobs.map((job) => {
           const Icon = iconForDepartment[job.department] || Briefcase
           return (
             <div key={job.id} className="bg-bg-surface border border-border rounded-card p-4 flex items-center gap-4">
