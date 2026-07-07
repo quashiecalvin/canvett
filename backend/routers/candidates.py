@@ -42,7 +42,13 @@ def upload_resume(
     db.commit()
     db.refresh(candidate)
 
-    result = score_candidate(resume_text, job.description, job.required_skills)
+    result = score_candidate(
+        resume_text,
+        job.description,
+        job.required_skills,
+        job.experience_requirement,
+        job.education_requirement,
+    )
 
     score = models_candidate.Score(
         candidate_id=candidate.id,
