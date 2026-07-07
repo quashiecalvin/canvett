@@ -21,7 +21,19 @@ def create_job(job: JobCreate, db: Session = Depends(get_db)):
 
 @router.get("/", response_model=list[JobOut])
 def list_jobs(db: Session = Depends(get_db)):
-    return db.query(models_job.Job).order_by(models_job.Job.posted_date.desc()).all()
+    jobs = db.query(models_job.Job).order_by(models_job.Job.posted_date.desc()).all()
+    for job in jobs:
+        job.applicant_count = (
+            db.query(models_candidate.Candidate)
+            .filter(models_candidate.Candidate.job_id == job.id)
+            .count()
+        )
+        job.ranked_count = (
+            db.query(models_candidate.Score)
+            .filter(models_candidate.Score.job_id == job.id)
+            .count()
+        )
+    return jobs
 
 
 @router.get("/{job_id}", response_model=JobOut)
