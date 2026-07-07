@@ -56,3 +56,18 @@ def delete_job(job_id: int, db: Session = Depends(get_db)):
     db.commit()
 
     return {"message": "Job deleted"}
+
+
+@router.put("/{job_id}", response_model=JobOut)
+def update_job(job_id: int, updated: JobCreate, db: Session = Depends(get_db)):
+    job = db.query(models_job.Job).filter(models_job.Job.id == job_id).first()
+    if job is None:
+        raise HTTPException(status_code=404, detail="Job not found")
+
+    for field, value in updated.model_dump().items():
+        setattr(job, field, value)
+
+    db.commit()
+    db.refresh(job)
+    log_activity(db, f"Job posting updated: {job.title}")
+    return job

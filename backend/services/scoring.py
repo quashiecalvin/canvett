@@ -1,4 +1,5 @@
-from services.nlp_engine import model, compute_similarity
+from services.nlp_engine import model, compute_similarity, calibrate, best_line_similarity
+from services.segmenter import segment_resume
 from sentence_transformers import util
 
 
@@ -33,17 +34,20 @@ def match_skills(resume_text: str, required_skills: list[str], threshold: float 
     }
 
 
-def score_candidate(resume_text: str, job_description: str, required_skills: list[str]):
-    # Skills dimension
+def score_candidate(resume_text: str, job_description: str, required_skills: list[str], experience_requirement: str = None, education_requirement: str = None):
     skills_result = match_skills(resume_text, required_skills)
     skills_score = skills_result["skills_score"]
 
-    # Experience and education dimensions (baseline proxy for v1)
-    base_similarity = compute_similarity(job_description, resume_text) * 100
-    experience_score = round(base_similarity, 1)
-    education_score = round(base_similarity, 1)
+    sections = segment_resume(resume_text)
 
-    # Overall: weighted blend (skills weighted highest)
+    experience_target = experience_requirement or job_description
+    experience_source = sections.get("experience") or resume_text
+    experience_score = round(calibrate(best_line_similarity(experience_target, experience_source)), 1)
+
+    education_target = education_requirement or job_description
+    education_source = sections.get("education") or resume_text
+    education_score = round(calibrate(best_line_similarity(education_target, education_source)), 1)
+
     overall_score = round(
         (skills_score * 0.5)
         + (experience_score * 0.3)

@@ -13,6 +13,8 @@ class Job(Base):
     location = Column(String, nullable=False)
     description = Column(Text, nullable=False)
     required_skills = Column(ARRAY(String), nullable=False)
+    experience_requirement = Column(Text, nullable=True)
+    education_requirement = Column(Text, nullable=True)
     status = Column(String, default="Active")
     posted_date = Column(DateTime(timezone=True), server_default=func.now())
     applicant_count = Column(Integer, default=0)
