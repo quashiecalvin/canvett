@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 from database.session import get_db
 from database import models_job, models_candidate
 from services.parser import parse_resume, extract_name
-from services.scoring import score_candidate
+from services.scoring import score_candidate, get_config
 from services.activity import log_activity
 from schemas.score import ScoreOut, RankedCandidate
 
@@ -48,6 +48,7 @@ def upload_resume(
         job.required_skills,
         job.experience_requirement,
         job.education_requirement,
+        get_config(db),
     )
 
     score = models_candidate.Score(
@@ -121,6 +122,7 @@ def rerank(job_id: int, db: Session = Depends(get_db)):
             job.required_skills,
             job.experience_requirement,
             job.education_requirement,
+            get_config(db),
         )
         score = (
             db.query(models_candidate.Score)

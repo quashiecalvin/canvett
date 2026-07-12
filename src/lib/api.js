@@ -98,3 +98,22 @@ export async function getAnalytics() {
   if (!res.ok) throw new Error("Failed to fetch analytics")
   return res.json()
 }
+
+export async function getSettings() {
+  const res = await fetch(`${BASE_URL}/settings`)
+  if (!res.ok) throw new Error("Failed to fetch settings")
+  return res.json()
+}
+
+export async function updateSettings(settings) {
+  const res = await fetch(`${BASE_URL}/settings`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(settings),
+  })
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}))
+    throw new Error(err.detail || "Failed to update settings")
+  }
+  return res.json()
+}
