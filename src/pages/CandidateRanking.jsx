@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import ScoreCircle from '../components/ui/ScoreCircle'
 import { scoreBarColor } from '../lib/scoreColor'
 import { getRanking, rerankJob, deleteCandidate } from '../lib/api'
@@ -21,7 +21,7 @@ export default function CandidateRanking() {
   const [error, setError] = useState(null)
   const [detailCandidateId, setDetailCandidateId] = useState(null)
 
-  function loadRanking() {
+const loadRanking = useCallback(() => {
     if (!selectedJobId) return
     setLoading(true)
     getRanking(selectedJobId)
@@ -33,7 +33,7 @@ export default function CandidateRanking() {
         setError(err.message)
         setLoading(false)
       })
-  }
+  }, [selectedJobId])
 
   async function handleRerank() {
     if (!selectedJobId) return
@@ -57,8 +57,9 @@ export default function CandidateRanking() {
   }
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     loadRanking()
-  }, [selectedJobId])
+  }, [loadRanking])
 
   function handleExport() {
     const rows = candidates.map((c, i) => ({
