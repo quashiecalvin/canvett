@@ -5,6 +5,7 @@ import { createJob, updateJob } from '../../lib/api'
 
 const EMPLOYMENT_TYPES = ['Full-time', 'Part-time', 'Contract']
 const DEPARTMENTS = ['Engineering', 'Analytics', 'Design', 'Product', 'Marketing', 'Operations']
+const STATUSES = ['Active', 'In review', 'Closed']
 
 export default function NewJobModal({ onClose, onCreated, job }) {
   const isEdit = Boolean(job)
@@ -17,6 +18,7 @@ export default function NewJobModal({ onClose, onCreated, job }) {
     description: job?.description || '',
     experience_requirement: job?.experience_requirement || '',
     education_requirement: job?.education_requirement || '',
+    status: job?.status || 'Active',
   })
   const [skills, setSkills] = useState(job?.required_skills || [])
   const [submitting, setSubmitting] = useState(false)
@@ -113,6 +115,18 @@ export default function NewJobModal({ onClose, onCreated, job }) {
               className="w-full h-10 px-3 rounded-btn border border-border-strong text-[13px] text-text-body placeholder:text-text-hint focus:outline-none focus:border-accent focus:border-[1.5px]"
             />
           </div>
+          {isEdit && (
+            <div>
+              <label className="block text-[12px] font-medium text-text-body mb-1.5">Status</label>
+              <select
+                value={form.status}
+                onChange={(e) => update('status', e.target.value)}
+                className="w-full h-10 px-3 rounded-btn border border-border-strong text-[13px] text-text-body focus:outline-none focus:border-accent focus:border-[1.5px] bg-bg-surface"
+              >
+                {STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
+              </select>
+            </div>
+          )}
 
           <div>
             <label className="block text-[12px] font-medium text-text-body mb-1.5">Job description</label>
