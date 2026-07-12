@@ -22,7 +22,11 @@ export default function CandidateRanking() {
   const [detailCandidateId, setDetailCandidateId] = useState(null)
 
 const loadRanking = useCallback(() => {
-    if (!selectedJobId) return
+    if (!selectedJobId) {
+      setCandidates([])
+      setLoading(false)
+      return
+    }
     setLoading(true)
     getRanking(selectedJobId)
       .then((data) => {
@@ -105,8 +109,15 @@ const loadRanking = useCallback(() => {
 
       {loading && <p className="text-[13px] text-text-muted">Loading candidates...</p>}
       {error && <p className="text-[13px] text-danger-text">Error: {error}</p>}
-      {!loading && !error && candidates.length === 0 && (
-        <p className="text-[13px] text-text-muted">No candidates ranked yet. Upload some resumes to get started.</p>
+      {!loading && !error && !selectedJobId && (
+        <p className="text-[13px] text-text-muted">
+          No job postings yet. Create a job posting first, then upload resumes to see candidates ranked here.
+        </p>
+      )}
+      {!loading && !error && selectedJobId && candidates.length === 0 && (
+        <p className="text-[13px] text-text-muted">
+          No candidates ranked yet for this job. Upload some resumes to get started.
+        </p>
       )}
 
       <div className="flex flex-col gap-3">
