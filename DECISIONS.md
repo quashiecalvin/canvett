@@ -175,3 +175,36 @@ The following were consciously scoped out rather than overlooked:
 - **Role and years-of-experience extraction for display on candidate cards.** The card currently shows the source filename, which serves as traceability back to the uploaded document.
 
 - **Analytics and settings screens.** These fall outside the scope defined for the project, which centres on the ranking workflow: create a posting, upload resumes, review an explainable ranking.
+
+---
+
+## 5. Analytics
+
+### 5.1 Purpose: diagnostic rather than decorative
+
+**Decision.** The analytics screen presents three charts, each chosen to answer a specific question the recruiter can act on, rather than to display data for its own sake. All three are computed from data the system already holds; none require additional tracking.
+
+**The three charts and what each is for.**
+
+**Candidate score distribution** aggregates every scored candidate across all postings into three quality bands (strong, moderate, weak). It answers: *is the organisation attracting well-matched candidates at all?* A pool dominated by weak matches indicates a problem upstream of the ranking itself — the adverts may be reaching the wrong audience, or the requirements may be miscalibrated.
+
+**Candidates per job posting** shows applicant volume for each role. It answers: *which roles are attracting attention, and which are being overlooked?* A posting with very few applicants may need re-advertising, a clearer title, or wider distribution.
+
+**Average match score per job** shows the mean score of candidates for each role, colour-coded by quality. It answers: *are any roles attracting consistently poor matches?* A posting whose average sits well below the others prompts review: the stated requirements may be unrealistic, the required skills too narrow, or the description unclear enough that unsuitable candidates apply.
+
+### 5.2 The diagnostic value of reading the charts together
+
+The second and third charts are most useful in combination, because volume and quality together identify *which* problem a posting has:
+
+- **High volume, low average score** — many people are applying, but they are the wrong people. This points to a targeting or job-description problem: the advert is reaching an audience, but not the right one.
+- **Low volume, high average score** — few applicants, but those who apply are well matched. This points to a reach problem, not a quality one: the advert is not getting in front of enough of the right people.
+
+These two situations call for entirely different remedies, and neither chart alone distinguishes them.
+
+### 5.3 Rationale
+
+This positions Canvett as more than a passive ranking tool. Beyond identifying the best candidate for a given role, the analytics give the recruiter evidence with which to review and improve their own process — the framing of requirements, the clarity of job descriptions, and the reach of their advertising. The system supports the recruiter's judgement about *the hiring process itself*, not only about individual candidates.
+
+### 5.4 Scope
+
+Deliberately excluded are any charts requiring time-series data (trends over weeks or months), for the reasons given in section 4: the system does not track the historical data such charts would need, and presenting figures that were not genuinely computed would undermine the transparency the project is built on.

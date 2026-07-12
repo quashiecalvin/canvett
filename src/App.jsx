@@ -5,6 +5,7 @@ import JobPostings from './pages/JobPostings'
 import UploadResumes from './pages/UploadResumes'
 import CandidateRanking from './pages/CandidateRanking'
 import { JobProvider } from './context/JobContext'
+import Analytics from './pages/Analytics'
 
 export default function App() {
   const [activePage, setActivePage] = useState('dashboard')
@@ -16,6 +17,7 @@ export default function App() {
         {activePage === 'jobs' && <JobPostings onNavigate={setActivePage} />}
         {activePage === 'upload' && <UploadResumes />}
         {activePage === 'ranking' && <CandidateRanking />}
+        {activePage === 'analytics' && <Analytics />}
       </AppLayout>
     </JobProvider>
   )
