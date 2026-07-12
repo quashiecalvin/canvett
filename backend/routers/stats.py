@@ -1,30 +1,74 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from sqlalchemy import func
-
+from datetime import datetime, timedelta, timezone
 from database.session import get_db
 from database import models_job, models_candidate, models_activity
-
 router = APIRouter(prefix="/stats", tags=["Stats"])
 
 
 @router.get("/")
 def get_stats(db: Session = Depends(get_db)):
+    now = datetime.now(timezone.utc)
+    week_ago = now - timedelta(days=7)
+    month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+    last_month_end = month_start - timedelta(seconds=1)
+    last_month_start = last_month_end.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+
     active_postings = (
         db.query(models_job.Job)
         .filter(models_job.Job.status == "Active")
         .count()
     )
+    postings_this_week = (
+        db.query(models_job.Job)
+        .filter(models_job.Job.posted_date >= week_ago)
+        .count()
+    )
+
     total_applicants = db.query(models_candidate.Candidate).count()
+    applicants_this_week = (
+        db.query(models_candidate.Candidate)
+        .filter(models_candidate.Candidate.created_at >= week_ago)
+        .count()
+    )
+
     resumes_ranked = db.query(models_candidate.Score).count()
+    ranked_this_week = (
+        db.query(models_candidate.Score)
+        .filter(models_candidate.Score.created_at >= week_ago)
+        .count()
+    )
+
     avg_score = db.query(func.avg(models_candidate.Score.overall_score)).scalar()
     avg_score = round(avg_score, 1) if avg_score is not None else 0
 
+    this_month_avg = (
+        db.query(func.avg(models_candidate.Score.overall_score))
+        .filter(models_candidate.Score.created_at >= month_start)
+        .scalar()
+    )
+    last_month_avg = (
+        db.query(func.avg(models_candidate.Score.overall_score))
+        .filter(models_candidate.Score.created_at >= last_month_start)
+        .filter(models_candidate.Score.created_at <= last_month_end)
+        .scalar()
+    )
+
+    if this_month_avg is not None and last_month_avg is not None:
+        score_delta = round(this_month_avg - last_month_avg, 1)
+    else:
+        score_delta = None
+
     return {
         "active_postings": active_postings,
+        "postings_this_week": postings_this_week,
         "total_applicants": total_applicants,
+        "applicants_this_week": applicants_this_week,
         "resumes_ranked": resumes_ranked,
+        "ranked_this_week": ranked_this_week,
         "avg_match_score": avg_score,
+        "score_delta": score_delta,
     }
 
 

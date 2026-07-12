@@ -46,11 +46,38 @@ export default function Dashboard() {
     loadData()
   }, [])
 
+  function weekDelta(n, noun) {
+    if (!n) return null
+    return { text: `${n} ${noun} this week`, positive: true }
+  }
+
   const statCards = [
-    { label: 'Active postings', value: stats?.active_postings ?? 0 },
-    { label: 'Total applicants', value: stats?.total_applicants ?? 0 },
-    { label: 'Resumes ranked', value: stats?.resumes_ranked ?? 0 },
-    { label: 'Avg match score', value: stats ? `${stats.avg_match_score}%` : '0%' },
+    {
+      label: 'Active postings',
+      value: stats?.active_postings ?? 0,
+      delta: weekDelta(stats?.postings_this_week, 'postings'),
+    },
+    {
+      label: 'Total applicants',
+      value: stats?.total_applicants ?? 0,
+      delta: weekDelta(stats?.applicants_this_week, 'new'),
+    },
+    {
+      label: 'Resumes ranked',
+      value: stats?.resumes_ranked ?? 0,
+      delta: weekDelta(stats?.ranked_this_week, 'ranked'),
+    },
+    {
+      label: 'Avg match score',
+      value: stats ? `${stats.avg_match_score}%` : '0%',
+      delta:
+        stats?.score_delta != null
+          ? {
+              text: `${stats.score_delta >= 0 ? '↑' : '↓'} ${Math.abs(stats.score_delta)}% vs last month`,
+              positive: stats.score_delta >= 0,
+            }
+          : null,
+    },
   ]
 
   return (
@@ -70,10 +97,15 @@ export default function Dashboard() {
       </header>
 
       <div className="grid grid-cols-4 gap-4 mb-6">
-        {statCards.map(({ label, value }) => (
+        {statCards.map(({ label, value, delta }) => (
           <div key={label} className="bg-bg-subtle rounded-btn px-4 py-3">
             <p className="text-[10px] font-medium uppercase tracking-[0.07em] text-text-hint">{label}</p>
             <p className="text-[22px] font-medium text-text-primary mt-1 leading-[1.2]">{value}</p>
+            {delta && (
+              <p className={`text-[11px] mt-1 ${delta.positive ? 'text-success' : 'text-danger-text'}`}>
+                {delta.text}
+              </p>
+            )}
           </div>
         ))}
       </div>
