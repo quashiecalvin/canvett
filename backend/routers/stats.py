@@ -73,3 +73,36 @@ def recent_activity(db: Session = Depends(get_db)):
         }
         for a in activities
     ]
+
+
+@router.get("/analytics")
+def analytics(db: Session = Depends(get_db)):
+    scores = db.query(models_candidate.Score).all()
+
+    bands = {"Strong (75-100%)": 0, "Moderate (50-74%)": 0, "Weak (below 50%)": 0}
+    for s in scores:
+        if s.overall_score >= 75:
+            bands["Strong (75-100%)"] += 1
+        elif s.overall_score >= 50:
+            bands["Moderate (50-74%)"] += 1
+        else:
+            bands["Weak (below 50%)"] += 1
+
+    score_distribution = [{"band": k, "count": v} for k, v in bands.items()]
+
+    jobs = db.query(models_job.Job).all()
+    per_job = []
+    for job in jobs:
+        job_scores = [s.overall_score for s in scores if s.job_id == job.id]
+        per_job.append({
+            "job_title": job.title,
+            "candidates": len(job_scores),
+            "avg_score": round(sum(job_scores) / len(job_scores), 1) if job_scores else 0,
+        })
+
+    per_job.sort(key=lambda j: j["candidates"], reverse=True)
+
+    return {
+        "score_distribution": score_distribution,
+        "per_job": per_job,
+    }

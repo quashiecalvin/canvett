@@ -92,3 +92,9 @@ export async function getCandidateDetail(candidateId) {
   if (!res.ok) throw new Error("Failed to fetch candidate details")
   return res.json()
 }
+
+export async function getAnalytics() {
+  const res = await fetch(`${BASE_URL}/stats/analytics`)
+  if (!res.ok) throw new Error("Failed to fetch analytics")
+  return res.json()
+}
