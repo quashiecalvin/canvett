@@ -60,3 +60,35 @@ export async function deleteJob(jobId) {
   if (!res.ok) throw new Error("Failed to delete job")
   return res.json()
 }
+
+export async function updateJob(jobId, jobData) {
+  const res = await fetch(`${BASE_URL}/jobs/${jobId}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(jobData),
+  })
+  if (!res.ok) throw new Error("Failed to update job")
+  return res.json()
+}
+
+export async function rerankJob(jobId) {
+  const res = await fetch(`${BASE_URL}/candidates/rerank/${jobId}`, {
+    method: "POST",
+  })
+  if (!res.ok) throw new Error("Failed to re-rank")
+  return res.json()
+}
+
+export async function deleteCandidate(candidateId) {
+  const res = await fetch(`${BASE_URL}/candidates/${candidateId}`, {
+    method: "DELETE",
+  })
+  if (!res.ok) throw new Error("Failed to delete candidate")
+  return res.json()
+}
+
+export async function getCandidateDetail(candidateId) {
+  const res = await fetch(`${BASE_URL}/candidates/${candidateId}/detail`)
+  if (!res.ok) throw new Error("Failed to fetch candidate details")
+  return res.json()
+}

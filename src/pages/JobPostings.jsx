@@ -4,6 +4,7 @@ import FilterDropdown from '../components/ui/FilterDropdown'
 import StatusBadge from '../components/ui/StatusBadge'
 import NewJobModal from '../components/ui/NewJobModal'
 import { getJobs, deleteJob } from '../lib/api'
+import { useJob } from '../context/JobContext'
 import JobActionsMenu from '../components/ui/JobActionsMenu'
 
 const iconForDepartment = {
@@ -15,11 +16,13 @@ const iconForDepartment = {
   Operations: Briefcase,
 }
 
-export default function JobPostings() {
+export default function JobPostings({ onNavigate }) {
+  const { setSelectedJobId } = useJob()
   const [jobs, setJobs] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [showModal, setShowModal] = useState(false)
+  const [editingJob, setEditingJob] = useState(null)
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('All')
   const [sortOrder, setSortOrder] = useState('Newest')
@@ -68,7 +71,7 @@ export default function JobPostings() {
             <p className="text-[13px] text-text-muted mt-1">Manage your open roles and track applicants</p>
           </div>
           <button
-            onClick={() => setShowModal(true)}
+            onClick={() => { setEditingJob(null); setShowModal(true) }}
             className="flex items-center gap-2 h-10 px-4 rounded-btn bg-accent text-white text-[13px] font-medium hover:bg-accent/90 transition-colors"
           >
             <Plus size={14} />
@@ -134,8 +137,9 @@ export default function JobPostings() {
                 <div className="w-20 flex justify-center">
                   <StatusBadge status={job.status} />
                 </div>
-                <JobActionsMenu
-                  onViewCandidates={() => alert('View candidates - coming soon')}
+               <JobActionsMenu
+                  onViewCandidates={() => { setSelectedJobId(job.id); onNavigate('ranking') }}
+                  onEdit={() => { setEditingJob(job); setShowModal(true) }}
                   onDelete={() => handleDelete(job.id)}
                 />
               </div>
@@ -146,7 +150,8 @@ export default function JobPostings() {
 
       {showModal && (
         <NewJobModal
-          onClose={() => setShowModal(false)}
+          job={editingJob}
+          onClose={() => { setShowModal(false); setEditingJob(null) }}
           onCreated={loadJobs}
         />
       )}

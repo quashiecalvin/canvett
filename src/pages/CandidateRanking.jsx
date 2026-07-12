@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react'
 import ScoreCircle from '../components/ui/ScoreCircle'
 import { scoreBarColor } from '../lib/scoreColor'
-import { getRanking } from '../lib/api'
+import { getRanking, rerankJob, deleteCandidate } from '../lib/api'
 import { useJob } from '../context/JobContext'
 import { exportToCsv } from '../lib/csv'
-import { RefreshCw, Download, Eye, Bookmark } from 'lucide-react'
+import CandidateDetailModal from '../components/ui/CandidateDetailModal'
+import { RefreshCw, Download, Eye, Trash2, AlertTriangle } from 'lucide-react'
 
 function initialsFromName(name) {
   const cleaned = name.replace(/[_-]/g, ' ').trim()
@@ -18,6 +19,7 @@ export default function CandidateRanking() {
   const [candidates, setCandidates] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [detailCandidateId, setDetailCandidateId] = useState(null)
 
   function loadRanking() {
     if (!selectedJobId) return
@@ -31,6 +33,27 @@ export default function CandidateRanking() {
         setError(err.message)
         setLoading(false)
       })
+  }
+
+  async function handleRerank() {
+    if (!selectedJobId) return
+    setLoading(true)
+    try {
+      await rerankJob(selectedJobId)
+      loadRanking()
+    } catch {
+      setLoading(false)
+    }
+  }
+
+  async function handleDeleteCandidate(candidateId) {
+    if (!confirm('Remove this candidate from the ranking?')) return
+    try {
+      await deleteCandidate(candidateId)
+      loadRanking()
+    } catch {
+      alert('Failed to remove candidate.')
+    }
   }
 
   useEffect(() => {
@@ -62,7 +85,7 @@ export default function CandidateRanking() {
         </div>
         <div className="flex items-center gap-3">
           <button
-            onClick={loadRanking}
+            onClick={handleRerank}
             className="flex items-center gap-2 h-10 px-4 rounded-btn border border-border-strong text-[13px] text-text-body hover:bg-bg-subtle transition-colors"
           >
             <RefreshCw size={14} />
@@ -124,15 +147,22 @@ export default function CandidateRanking() {
                 ))}
               </div>
 
-              <div className="grid grid-cols-3 gap-6 mt-3">
+             <div className="grid grid-cols-3 gap-6 mt-3">
                 {[
-                  { label: 'Skills match', value: c.skills_score },
-                  { label: 'Experience', value: c.experience_score },
-                  { label: 'Education', value: c.education_score },
-                ].map(({ label, value }) => (
-                  <div key={label}>
+                  { key: 'skills', label: 'Skills match', value: c.skills_score },
+                  { key: 'experience', label: 'Experience', value: c.experience_score },
+                  { key: 'education', label: 'Education', value: c.education_score },
+                ].map(({ key, label, value }) => (
+                  <div key={key}>
                     <div className="flex items-center justify-between mb-1.5">
-                      <span className="text-[11px] text-text-muted">{label}</span>
+                      <span className="text-[11px] text-text-muted flex items-center gap-1">
+                        {label}
+                        {key === 'experience' && !c.duration_verified && (
+                          <span title="Experience duration could not be verified — CV did not follow the standard template">
+                            <AlertTriangle size={11} className="text-warning-text" />
+                          </span>
+                        )}
+                      </span>
                       <span className="text-[11px] font-medium text-text-body">{Math.round(value)}%</span>
                     </div>
                     <div className="h-1.5 rounded-full bg-bg-subtle overflow-hidden">
@@ -152,17 +182,30 @@ export default function CandidateRanking() {
                 <span className="text-[10px] text-text-muted mt-1">match score</span>
               </div>
               <div className="flex gap-2">
-                <button className="w-8 h-8 rounded-btn border border-border flex items-center justify-center text-text-muted hover:bg-bg-subtle transition-colors">
+                <button
+                  onClick={() => setDetailCandidateId(c.candidate_id)}
+                  className="w-8 h-8 rounded-btn border border-border flex items-center justify-center text-text-muted hover:bg-bg-subtle transition-colors"
+                >
                   <Eye size={16} />
                 </button>
-                <button className="w-8 h-8 rounded-btn border border-border flex items-center justify-center text-text-muted hover:bg-bg-subtle transition-colors">
-                  <Bookmark size={16} />
+               <button
+                  onClick={() => handleDeleteCandidate(c.candidate_id)}
+                  className="w-8 h-8 rounded-btn border border-border flex items-center justify-center text-text-muted hover:bg-danger-tint hover:text-danger-text transition-colors"
+                >
+                  <Trash2 size={16} />
                 </button>
               </div>
             </div>
           </div>
         ))}
-      </div>
+     </div>
+
+      {detailCandidateId && (
+        <CandidateDetailModal
+          candidateId={detailCandidateId}
+          onClose={() => setDetailCandidateId(null)}
+        />
+      )}
     </div>
   )
 }

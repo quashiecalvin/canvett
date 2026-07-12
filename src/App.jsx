@@ -13,7 +13,7 @@ export default function App() {
     <JobProvider>
       <AppLayout activePage={activePage} onNavigate={setActivePage}>
         {activePage === 'dashboard' && <Dashboard />}
-        {activePage === 'jobs' && <JobPostings />}
+        {activePage === 'jobs' && <JobPostings onNavigate={setActivePage} />}
         {activePage === 'upload' && <UploadResumes />}
         {activePage === 'ranking' && <CandidateRanking />}
       </AppLayout>

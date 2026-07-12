@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
-import { MoreVertical, Users, Trash2 } from 'lucide-react'
+import { MoreVertical, Users, Pencil, Trash2 } from 'lucide-react'
 
-export default function JobActionsMenu({ onViewCandidates, onDelete }) {
+export default function JobActionsMenu({ onViewCandidates, onEdit, onDelete }) {
   const [open, setOpen] = useState(false)
   const ref = useRef(null)
 
@@ -30,6 +30,13 @@ export default function JobActionsMenu({ onViewCandidates, onDelete }) {
           >
             <Users size={14} />
             View candidates
+          </button>
+          <button
+            onClick={() => { onEdit(); setOpen(false) }}
+            className="flex items-center gap-2 w-full text-left px-4 py-2 text-[13px] text-text-body hover:bg-bg-subtle transition-colors"
+          >
+            <Pencil size={14} />
+            Edit posting
           </button>
           <button
             onClick={() => { onDelete(); setOpen(false) }}

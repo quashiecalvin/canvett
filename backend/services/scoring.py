@@ -1,6 +1,9 @@
 from services.nlp_engine import model, compute_similarity, calibrate, best_line_similarity
 from services.segmenter import segment_resume
+from services.duration import extract_total_years, extract_required_years
 from sentence_transformers import util
+
+UNVERIFIED_FACTOR = 0.7
 
 
 def match_skills(resume_text: str, required_skills: list[str], threshold: float = 0.5):
@@ -40,10 +43,22 @@ def score_candidate(resume_text: str, job_description: str, required_skills: lis
 
     sections = segment_resume(resume_text)
 
+    # Experience: semantic relevance, adjusted by duration when verifiable
     experience_target = experience_requirement or job_description
     experience_source = sections.get("experience") or resume_text
-    experience_score = round(calibrate(best_line_similarity(experience_target, experience_source)), 1)
+    experience_relevance = calibrate(best_line_similarity(experience_target, experience_source))
 
+    candidate_years = extract_total_years(sections.get("experience") or "")
+    required_years = extract_required_years(experience_requirement or "")
+
+    duration_verified = candidate_years is not None and required_years is not None
+    if duration_verified and required_years > 0:
+        duration_ratio = min(candidate_years / required_years, 1.0)
+        experience_score = round(experience_relevance * duration_ratio, 1)
+    else:
+        experience_score = round(experience_relevance * UNVERIFIED_FACTOR, 1)
+
+    # Education: semantic relevance via best-line matching
     education_target = education_requirement or job_description
     education_source = sections.get("education") or resume_text
     education_score = round(calibrate(best_line_similarity(education_target, education_source)), 1)
@@ -62,4 +77,5 @@ def score_candidate(resume_text: str, job_description: str, required_skills: lis
         "education_score": education_score,
         "matched_skills": skills_result["matched_skills"],
         "unmatched_skills": skills_result["unmatched_skills"],
+        "duration_verified": duration_verified,
     }
