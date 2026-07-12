@@ -13,6 +13,10 @@ class JobCreate(BaseModel):
     education_requirement: str
 
 
+class JobUpdate(JobCreate):
+    status: str
+
+
 class JobOut(JobCreate):
     id: int
     status: str

@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from database.session import get_db
 from database import models_job, models_candidate
 from services.activity import log_activity
-from schemas.job import JobCreate, JobOut
+from schemas.job import JobCreate, JobUpdate, JobOut
 
 router = APIRouter(prefix="/jobs", tags=["Jobs"])
 
@@ -59,7 +59,7 @@ def delete_job(job_id: int, db: Session = Depends(get_db)):
 
 
 @router.put("/{job_id}", response_model=JobOut)
-def update_job(job_id: int, updated: JobCreate, db: Session = Depends(get_db)):
+def update_job(job_id: int, updated: JobUpdate, db: Session = Depends(get_db)):
     job = db.query(models_job.Job).filter(models_job.Job.id == job_id).first()
     if job is None:
         raise HTTPException(status_code=404, detail="Job not found")
