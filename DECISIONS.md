@@ -208,3 +208,81 @@ This positions Canvett as more than a passive ranking tool. Beyond identifying t
 ### 5.4 Scope
 
 Deliberately excluded are any charts requiring time-series data (trends over weeks or months), for the reasons given in section 4: the system does not track the historical data such charts would need, and presenting figures that were not genuinely computed would undermine the transparency the project is built on.
+
+---
+
+## 6. Configurable Scoring Weights
+
+### 6.1 How the weights work
+
+The system produces three independent scores for each candidate — skills, experience, and education — but a recruiter needs a single figure by which to rank. The three are combined using explicit weights that determine how much each dimension contributes:
+A candidate scoring 80 on skills, 60 on experience, and 90 on education receives:
+Their overall match is 76%. Education was their strongest individual dimension, but because it carries the lowest weight it contributed only 18 of those points, while their skills contributed 40.
+
+### 6.2 Why the defaults are 50 / 30 / 20
+
+**Skills is weighted highest (50%)** because it is the most concrete and reliable of the three. It is a direct, verifiable check of whether the candidate possesses what the role requires, and it is typically what determines whether a person can actually perform the job.
+
+**Experience is weighted second (30%).** It is a strong signal of fit but a softer one: it depends on semantic similarity, which measures topical relevance rather than requirement satisfaction, and on duration extraction, which depends on template compliance.
+
+**Education is weighted lowest (20%)** because it generally functions as a baseline qualification rather than a differentiator. Most applicants for a given role hold a broadly relevant degree, so education rarely separates one candidate from another.
+
+### 6.3 Why the weights are configurable rather than fixed
+
+**Decision.** The weights are exposed to the recruiter as adjustable settings rather than fixed in code.
+
+**Reasoning.** The weights encode a judgement about what matters most when hiring, and that judgement legitimately differs between organisations and between roles.
+
+An organisation hiring a **senior architect** may reasonably weight experience far more heavily than skills, since at that level the depth of prior work matters more than a checklist of technologies (for example, 30 / 50 / 20).
+
+A **graduate scheme** faces the opposite situation: applicants have little professional experience by definition, so weighting experience heavily would penalise every candidate equally and separate nobody. Such a scheme might weight education and skills more heavily and experience far less (for example, 40 / 20 / 40).
+
+Leaving the weights hard-coded would embed a single hiring philosophy into the system and impose it on every organisation and every role. Exposing them returns that judgement to the human making the decision.
+
+**Relationship to the project's aims.** This is the logical conclusion of the project's central argument. It is not sufficient for the recruiter merely to *see* how a score was composed; where the composition itself encodes a value judgement, the recruiter should be able to *set* it.
+
+**Trade-off.** A recruiter can, in principle, configure the weights poorly. This is accepted: the alternative is to make the decision for them silently, which is precisely the behaviour the project sets out to avoid.
+
+### 6.4 The unverified-experience factor as a setting
+
+The discount applied when a candidate's experience duration cannot be verified (default 0.7, meaning they retain 70% of their relevance score) is likewise exposed as a setting.
+
+How harshly to treat non-compliance with the CV template is an organisational judgement, not a technical one. An organisation that has clearly communicated the template and expects strict adherence might set the factor to 50%. One hiring in a market where CV conventions vary widely might set it to 90%. The system should not impose that judgement.
+
+---
+
+## 7. The Job Description
+
+**Decision.** Job postings carry a free-text description in addition to the structured fields (required skills, experience requirement, education requirement).
+
+**Reasoning.** Scoring is driven entirely by the structured fields, which are precise but terse. The description serves a different purpose: it is the human-readable record of the role.
+
+This matters for institutional continuity. A recruiter who inherits a posting, or who revisits it months later when the role is reopened, can understand the role's *intent* rather than only its criteria. "2+ years with React" states a requirement; the description explains why — that the person will be translating designs into accessible interfaces and integrating with backend APIs.
+
+The separation is deliberate: **structured fields for the machine, prose for the human.**
+
+---
+
+## 8. Job Status Lifecycle
+
+**Decision.** A job's status (Active, In review, Closed) is set manually by the recruiter through the edit form. The system never changes it automatically.
+
+**Reasoning.** Rules such as "close a posting automatically after thirty days" or "move to review once fifty applicants are reached" would make assumptions on the recruiter's behalf about their own hiring process. Whether a role is still open, under review, or filled is a matter of fact known only to the organisation. A decision-support tool should not infer it.
+
+---
+
+## 9. Dashboard Statistics
+
+**Decision.** The dashboard displays four figures, each accompanied by a supporting statistic where one can be genuinely computed: postings created this week, new applicants this week, resumes ranked this week, and the change in average match score against the previous month.
+
+**Labelling.** The supporting statistics are worded to state exactly what they count ("4 posted this week") rather than implying a change in the figure above them ("↑ 4 this week"). The two are not always the same thing: the number of *active* postings and the number of postings *created* this week measure different things, and presenting the latter as a delta on the former would mislead. Only the month-on-month score comparison is a true delta, and it alone retains the directional arrow.
+
+**Honesty in the absence of data.** Where a comparison cannot be computed — for instance, when there are no scores from the previous month — nothing is displayed. The system does not fabricate a figure to fill the space.
+
+---
+
+## 10. Scope: Canvett is Recruiter-Facing
+
+Canvett is used by the recruiter, not by applicants. It does not publish job adverts and does not receive applications. The organisation advertises the role through its usual channels and receives CVs by its usual means; the recruiter then uploads those CVs into Canvett to be parsed, scored, and ranked.
+
+A job posting within Canvett is therefore an internal record of the role's criteria — the basis against which candidates are assessed — rather than the public advertisement itself. Applicants interact with the system only indirectly, through the standard CV template they are asked to follow.
