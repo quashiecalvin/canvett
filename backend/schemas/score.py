@@ -10,6 +10,8 @@ class ScoreOut(BaseModel):
     education_score: float
     matched_skills: list[str]
     unmatched_skills: list[str]
+    duration_verified: bool = True
+
 
 class RankedCandidate(BaseModel):
     candidate_id: int
@@ -21,3 +23,4 @@ class RankedCandidate(BaseModel):
     education_score: float
     matched_skills: list[str]
     unmatched_skills: list[str]
+    duration_verified: bool = True

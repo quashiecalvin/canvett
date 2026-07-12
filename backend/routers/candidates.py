@@ -59,6 +59,7 @@ def upload_resume(
         education_score=result["education_score"],
         matched_skills=result["matched_skills"],
         unmatched_skills=result["unmatched_skills"],
+        duration_verified=result["duration_verified"],
     )
     db.add(score)
     db.commit()
@@ -95,6 +96,86 @@ def get_ranking(job_id: int, db: Session = Depends(get_db)):
                 education_score=score.education_score,
                 matched_skills=score.matched_skills,
                 unmatched_skills=score.unmatched_skills,
+                duration_verified=score.duration_verified,
             )
         )
     return ranked
+
+
+@router.post("/rerank/{job_id}")
+def rerank(job_id: int, db: Session = Depends(get_db)):
+    job = db.query(models_job.Job).filter(models_job.Job.id == job_id).first()
+    if job is None:
+        raise HTTPException(status_code=404, detail="Job not found")
+
+    candidates = (
+        db.query(models_candidate.Candidate)
+        .filter(models_candidate.Candidate.job_id == job_id)
+        .all()
+    )
+
+    for candidate in candidates:
+        result = score_candidate(
+            candidate.resume_text,
+            job.description,
+            job.required_skills,
+            job.experience_requirement,
+            job.education_requirement,
+        )
+        score = (
+            db.query(models_candidate.Score)
+            .filter(models_candidate.Score.candidate_id == candidate.id)
+            .filter(models_candidate.Score.job_id == job_id)
+            .first()
+        )
+        if score:
+            score.overall_score = result["overall_score"]
+            score.skills_score = result["skills_score"]
+            score.experience_score = result["experience_score"]
+            score.education_score = result["education_score"]
+            score.matched_skills = result["matched_skills"]
+            score.unmatched_skills = result["unmatched_skills"]
+            score.duration_verified = result["duration_verified"]
+
+    db.commit()
+    log_activity(db, f"Candidates re-ranked for {job.title}")
+    return {"message": "Re-ranked", "count": len(candidates)}
+
+
+@router.delete("/{candidate_id}")
+def delete_candidate(candidate_id: int, db: Session = Depends(get_db)):
+    candidate = db.query(models_candidate.Candidate).filter(models_candidate.Candidate.id == candidate_id).first()
+    if candidate is None:
+        raise HTTPException(status_code=404, detail="Candidate not found")
+
+    db.query(models_candidate.Score).filter(models_candidate.Score.candidate_id == candidate_id).delete()
+    db.delete(candidate)
+    db.commit()
+    return {"message": "Candidate deleted"}
+
+
+@router.get("/{candidate_id}/detail")
+def get_candidate_detail(candidate_id: int, db: Session = Depends(get_db)):
+    candidate = db.query(models_candidate.Candidate).filter(models_candidate.Candidate.id == candidate_id).first()
+    if candidate is None:
+        raise HTTPException(status_code=404, detail="Candidate not found")
+
+    score = (
+        db.query(models_candidate.Score)
+        .filter(models_candidate.Score.candidate_id == candidate_id)
+        .first()
+    )
+
+    return {
+        "id": candidate.id,
+        "name": candidate.name,
+        "filename": candidate.filename,
+        "resume_text": candidate.resume_text,
+        "overall_score": score.overall_score if score else 0,
+        "skills_score": score.skills_score if score else 0,
+        "experience_score": score.experience_score if score else 0,
+        "education_score": score.education_score if score else 0,
+        "matched_skills": score.matched_skills if score else [],
+        "unmatched_skills": score.unmatched_skills if score else [],
+        "duration_verified": score.duration_verified if score else True,
+    }

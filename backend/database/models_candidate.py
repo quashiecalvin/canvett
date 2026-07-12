@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Text, Float, ARRAY, ForeignKey
+from sqlalchemy import Column, Integer, String, Text, Float, ARRAY, ForeignKey, Boolean
 from database.connection import Base
 
 
@@ -24,3 +24,4 @@ class Score(Base):
     education_score = Column(Float, nullable=False)
     matched_skills = Column(ARRAY(String), nullable=False)
     unmatched_skills = Column(ARRAY(String), nullable=False)
+    duration_verified = Column(Boolean, default=True)

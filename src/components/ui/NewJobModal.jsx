@@ -1,20 +1,24 @@
 import { useState } from 'react'
 import { X } from 'lucide-react'
 import SkillsInput from './SkillsInput'
-import { createJob } from '../../lib/api'
+import { createJob, updateJob } from '../../lib/api'
 
 const EMPLOYMENT_TYPES = ['Full-time', 'Part-time', 'Contract']
 const DEPARTMENTS = ['Engineering', 'Analytics', 'Design', 'Product', 'Marketing', 'Operations']
 
-export default function NewJobModal({ onClose, onCreated }) {
+export default function NewJobModal({ onClose, onCreated, job }) {
+  const isEdit = Boolean(job)
+
   const [form, setForm] = useState({
-    title: '',
-    department: 'Engineering',
-    employment_type: 'Full-time',
-    location: '',
-    description: '',
+    title: job?.title || '',
+    department: job?.department || 'Engineering',
+    employment_type: job?.employment_type || 'Full-time',
+    location: job?.location || '',
+    description: job?.description || '',
+    experience_requirement: job?.experience_requirement || '',
+    education_requirement: job?.education_requirement || '',
   })
-  const [skills, setSkills] = useState([])
+  const [skills, setSkills] = useState(job?.required_skills || [])
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState(null)
 
@@ -23,18 +27,30 @@ export default function NewJobModal({ onClose, onCreated }) {
   }
 
   async function handleSubmit() {
-    if (!form.title || !form.location || !form.description || skills.length === 0) {
+    if (
+      !form.title ||
+      !form.location ||
+      !form.description ||
+      !form.experience_requirement ||
+      !form.education_requirement ||
+      skills.length === 0
+    ) {
       setError('Please fill in all fields and add at least one skill.')
       return
     }
     setSubmitting(true)
     setError(null)
     try {
-      await createJob({ ...form, required_skills: skills })
+      const payload = { ...form, required_skills: skills }
+      if (isEdit) {
+        await updateJob(job.id, payload)
+      } else {
+        await createJob(payload)
+      }
       onCreated()
       onClose()
     } catch {
-      setError('Failed to create job. Please try again.')
+      setError(`Failed to ${isEdit ? 'update' : 'create'} job. Please try again.`)
       setSubmitting(false)
     }
   }
@@ -46,7 +62,7 @@ export default function NewJobModal({ onClose, onCreated }) {
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between px-6 py-4 border-b border-border">
-          <h2 className="text-[18px] font-medium text-text-primary">New job posting</h2>
+          <h2 className="text-[18px] font-medium text-text-primary">{isEdit ? 'Edit job posting' : 'New job posting'}</h2>
           <button onClick={onClose} className="text-text-hint hover:text-text-body transition-colors">
             <X size={20} />
           </button>
@@ -110,6 +126,28 @@ export default function NewJobModal({ onClose, onCreated }) {
           </div>
 
           <div>
+            <label className="block text-[12px] font-medium text-text-body mb-1.5">Experience requirement</label>
+            <textarea
+              value={form.experience_requirement}
+              onChange={(e) => update('experience_requirement', e.target.value)}
+              placeholder="e.g. 2+ years building web applications with React and modern JavaScript"
+              rows={2}
+              className="w-full px-3 py-2 rounded-btn border border-border-strong text-[13px] text-text-body placeholder:text-text-hint focus:outline-none focus:border-accent focus:border-[1.5px] resize-none"
+            />
+          </div>
+
+          <div>
+            <label className="block text-[12px] font-medium text-text-body mb-1.5">Education requirement</label>
+            <textarea
+              value={form.education_requirement}
+              onChange={(e) => update('education_requirement', e.target.value)}
+              placeholder="e.g. BSc in Computer Science, Information Technology, or a related field"
+              rows={2}
+              className="w-full px-3 py-2 rounded-btn border border-border-strong text-[13px] text-text-body placeholder:text-text-hint focus:outline-none focus:border-accent focus:border-[1.5px] resize-none"
+            />
+          </div>
+
+          <div>
             <label className="block text-[12px] font-medium text-text-body mb-1.5">Required skills</label>
             <SkillsInput skills={skills} setSkills={setSkills} />
           </div>
@@ -129,7 +167,7 @@ export default function NewJobModal({ onClose, onCreated }) {
             disabled={submitting}
             className="h-10 px-4 rounded-btn bg-accent text-white text-[13px] font-medium hover:bg-accent/90 transition-colors disabled:opacity-50"
           >
-            {submitting ? 'Creating...' : 'Create job posting'}
+            {submitting ? 'Saving...' : isEdit ? 'Save changes' : 'Create job posting'}
           </button>
         </div>
       </div>
