@@ -1,4 +1,5 @@
 import { LayoutDashboard, Briefcase, Upload, Users, BarChart2, Settings } from 'lucide-react'
+import { useSettings } from '../../context/SettingsContext'
 
 const navItems = [
   { icon: LayoutDashboard, label: 'Dashboard', id: 'dashboard', group: 'MAIN' },
@@ -10,6 +11,10 @@ const navItems = [
 ]
 
 export default function Sidebar({ activePage, onNavigate }) {
+  const { settings } = useSettings()
+  const name = settings?.recruiter_name || 'Recruiter'
+  const role = settings?.recruiter_role || 'HR Manager'
+
   return (
     <aside className="w-50 h-screen bg-bg-surface border-r border-border flex flex-col shrink-0">
       <div className="p-4 border-b border-border flex items-center gap-2">
@@ -56,11 +61,11 @@ export default function Sidebar({ activePage, onNavigate }) {
 
       <div className="p-4 border-t border-border flex items-center gap-2">
         <div className="w-8 h-8 rounded-full bg-avatar-bg flex items-center justify-center text-[11px] font-medium text-avatar-text shrink-0">
-          CQ
+          {name.split(' ').map((p) => p[0]).slice(0, 2).join('').toUpperCase()}
         </div>
-        <div className="flex flex-col">
-          <span className="text-[13px] font-medium text-text-primary leading-tight">Calvin Quashie</span>
-          <span className="text-[11px] text-text-muted leading-tight">HR Manager</span>
+        <div className="flex flex-col min-w-0">
+          <span className="text-[13px] font-medium text-text-primary leading-tight truncate">{name}</span>
+          <span className="text-[11px] text-text-muted leading-tight truncate">{role}</span>
         </div>
       </div>
     </aside>

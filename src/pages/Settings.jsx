@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Save, RotateCcw, AlertTriangle } from 'lucide-react'
 import { getSettings, updateSettings } from '../lib/api'
+import { useSettings } from '../context/SettingsContext'
 
 const DEFAULTS = {
   skills_weight: 0.5,
@@ -8,7 +9,26 @@ const DEFAULTS = {
   education_weight: 0.2,
   unverified_factor: 0.7,
   skill_threshold: 0.5,
+  recruiter_name: 'Recruiter',
+  recruiter_role: 'HR Manager',
 }
+const SKILL_PRESETS = [
+  {
+    label: 'Strict',
+    value: 0.65,
+    blurb: 'Only count a skill when the candidate has described it almost exactly as the role does. Fewer false matches, but genuine ones worded differently may be missed.',
+  },
+  {
+    label: 'Balanced',
+    value: 0.5,
+    blurb: 'Recommended. Counts clearly equivalent wording, such as "Postgres" for "PostgreSQL", while rejecting loosely related terms.',
+  },
+  {
+    label: 'Lenient',
+    value: 0.35,
+    blurb: 'Counts a skill when the wording is broadly related. Catches more genuine matches, but may credit skills the candidate does not actually have.',
+  },
+]
 
 function Section({ title, description, children }) {
   return (
@@ -41,6 +61,7 @@ function WeightSlider({ label, value, onChange }) {
 }
 
 export default function Settings() {
+  const { refreshSettings } = useSettings()
   const [form, setForm] = useState(DEFAULTS)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -48,7 +69,7 @@ export default function Settings() {
   const [error, setError] = useState(null)
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+     
     getSettings()
       .then((data) => {
         setForm(data)
@@ -72,6 +93,7 @@ export default function Settings() {
     setError(null)
     try {
       await updateSettings(form)
+      await refreshSettings()
       setMessage('Settings saved. Re-rank a job to apply the new configuration to existing candidates.')
     } catch (e) {
       setError(e.message)
@@ -121,6 +143,34 @@ export default function Settings() {
 
       <div className="flex flex-col gap-4">
         <Section
+          title="Profile"
+          description="Your name and role, shown in the sidebar."
+        >
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-[12px] font-medium text-text-body mb-1.5">Name</label>
+              <input
+                type="text"
+                value={form.recruiter_name}
+                onChange={(e) => update('recruiter_name', e.target.value)}
+                placeholder="e.g. Calvin Quashie"
+                className="w-full h-10 px-3 rounded-btn border border-border-strong text-[13px] text-text-body placeholder:text-text-hint focus:outline-none focus:border-accent focus:border-[1.5px]"
+              />
+            </div>
+            <div>
+              <label className="block text-[12px] font-medium text-text-body mb-1.5">Role</label>
+              <input
+                type="text"
+                value={form.recruiter_role}
+                onChange={(e) => update('recruiter_role', e.target.value)}
+                placeholder="e.g. HR Manager"
+                className="w-full h-10 px-3 rounded-btn border border-border-strong text-[13px] text-text-body placeholder:text-text-hint focus:outline-none focus:border-accent focus:border-[1.5px]"
+              />
+            </div>
+          </div>
+        </Section>
+
+        <Section
           title="Scoring weights"
           description="How much each dimension contributes to a candidate's overall match score. The three weights must add up to 100%."
         >
@@ -158,22 +208,29 @@ export default function Settings() {
         </Section>
 
         <Section
-          title="Skill match threshold"
-          description="How closely a candidate's wording must match a required skill for it to count when no exact match is found. A higher value is stricter."
+          title="Skill wording tolerance"
+          description="When a required skill isn't found word-for-word in a CV, the system checks whether the candidate has described it differently — for example, writing 'Postgres' when the role asks for 'PostgreSQL'. This setting controls how forgiving that check is."
         >
-          <div className="flex items-center gap-4">
-            <input
-              type="range"
-              min="0"
-              max="100"
-              step="5"
-              value={Math.round(form.skill_threshold * 100)}
-              onChange={(e) => update('skill_threshold', Number(e.target.value) / 100)}
-              className="flex-1 accent-accent"
-            />
-            <span className="text-[13px] font-medium text-text-primary w-12 text-right">
-              {form.skill_threshold.toFixed(2)}
-            </span>
+          <div className="flex flex-col gap-2">
+            {SKILL_PRESETS.map(({ label, value, blurb }) => {
+              const active = Math.abs(form.skill_threshold - value) < 0.001
+              return (
+                <button
+                  key={label}
+                  onClick={() => update('skill_threshold', value)}
+                  className={`text-left px-4 py-3 rounded-btn border transition-colors
+                    ${active
+                      ? 'border-accent bg-accent-tint'
+                      : 'border-border hover:bg-bg-subtle'
+                    }`}
+                >
+                  <span className={`text-[13px] font-medium ${active ? 'text-accent' : 'text-text-primary'}`}>
+                    {label}
+                  </span>
+                  <p className="text-[12px] text-text-muted mt-0.5">{blurb}</p>
+                </button>
+              )
+            })}
           </div>
         </Section>
 
