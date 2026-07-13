@@ -14,6 +14,8 @@ class SettingsUpdate(BaseModel):
     education_weight: float
     unverified_factor: float
     skill_threshold: float
+    recruiter_name: str
+    recruiter_role: str
 
 
 def _get_or_create(db: Session):
@@ -35,6 +37,8 @@ def get_settings(db: Session = Depends(get_db)):
         "education_weight": s.education_weight,
         "unverified_factor": s.unverified_factor,
         "skill_threshold": s.skill_threshold,
+        "recruiter_name": s.recruiter_name,
+        "recruiter_role": s.recruiter_role,
     }
 
 
@@ -53,6 +57,8 @@ def update_settings(updated: SettingsUpdate, db: Session = Depends(get_db)):
     s.education_weight = updated.education_weight
     s.unverified_factor = updated.unverified_factor
     s.skill_threshold = updated.skill_threshold
+    s.recruiter_name = updated.recruiter_name
+    s.recruiter_role = updated.recruiter_role
     db.commit()
     db.refresh(s)
 

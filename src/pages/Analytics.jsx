@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell,
+  PieChart, Pie, Legend,
 } from 'recharts'
 import { getAnalytics } from '../lib/api'
 
@@ -54,23 +55,37 @@ export default function Analytics() {
         <div className="flex flex-col gap-4">
           <ChartCard
             title="Candidate score distribution"
-            subtitle="How your candidates spread across match quality bands"
+            subtitle="What proportion of your candidate pool falls into each match quality band"
           >
-            <ResponsiveContainer width="100%" height={240}>
-              <BarChart data={data.score_distribution} margin={{ top: 8, right: 8, left: -16, bottom: 8 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#E2E4E9" vertical={false} />
-                <XAxis dataKey="band" tick={{ fontSize: 11, fill: '#6B7280' }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fontSize: 11, fill: '#6B7280' }} axisLine={false} tickLine={false} allowDecimals={false} />
+            <ResponsiveContainer width="100%" height={260}>
+              <PieChart>
+                <Pie
+                  data={data.score_distribution.filter((b) => b.count > 0)}
+                  dataKey="count"
+                  nameKey="band"
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={55}
+                  outerRadius={90}
+                  paddingAngle={2}
+                >
+                  {data.score_distribution
+                    .filter((b) => b.count > 0)
+                    .map((entry) => (
+                      <Cell key={entry.band} fill={BAND_COLORS[entry.band] || '#185FA5'} />
+                    ))}
+                </Pie>
                 <Tooltip
                   contentStyle={{ fontSize: 12, borderRadius: 8, border: '1px solid #E2E4E9' }}
-                  cursor={{ fill: '#F4F5F7' }}
+                  formatter={(value, name) => [`${value} candidate${value === 1 ? '' : 's'}`, name]}
                 />
-                <Bar dataKey="count" name="Candidates" radius={[4, 4, 0, 0]}>
-                  {data.score_distribution.map((entry) => (
-                    <Cell key={entry.band} fill={BAND_COLORS[entry.band] || '#185FA5'} />
-                  ))}
-                </Bar>
-              </BarChart>
+                <Legend
+                  verticalAlign="bottom"
+                  height={36}
+                  iconType="circle"
+                  wrapperStyle={{ fontSize: 12 }}
+                />
+              </PieChart>
             </ResponsiveContainer>
           </ChartCard>
 
