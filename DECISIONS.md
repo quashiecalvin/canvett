@@ -286,3 +286,49 @@ The separation is deliberate: **structured fields for the machine, prose for the
 Canvett is used by the recruiter, not by applicants. It does not publish job adverts and does not receive applications. The organisation advertises the role through its usual channels and receives CVs by its usual means; the recruiter then uploads those CVs into Canvett to be parsed, scored, and ranked.
 
 A job posting within Canvett is therefore an internal record of the role's criteria — the basis against which candidates are assessed — rather than the public advertisement itself. Applicants interact with the system only indirectly, through the standard CV template they are asked to follow.
+
+---
+
+## 11. Presenting Technical Parameters to Non-Technical Users
+
+**Decision.** The skill-matching threshold — a cosine similarity value between 0 and 1 — is presented to the recruiter not as a number, but as three named presets: Strict, Balanced (the recommended default), and Lenient. Each preset explains in plain language what it does and what it risks.
+
+**Reasoning.** The underlying value is a cosine similarity threshold, which governs how close a candidate's wording must be to a required skill for it to count when no exact match is found. A candidate writing "Postgres" against a requirement for "PostgreSQL" should be credited; one writing "Java" against a requirement for "JavaScript" should not.
+
+The difficulty is that the number itself is meaningless to a recruiter. Displaying "0.5" communicates nothing. Displaying it as "50%" is worse than meaningless — it is actively misleading, because cosine similarity does not distribute intuitively: a raw value of 0.5 between two texts represents a fairly strong match, not a "half match." Presenting it as a percentage invites the reader to interpret it as a proportion, which it is not.
+
+Exposing a control that the user cannot reason about is not genuine transparency. It is the appearance of control without the substance of it.
+
+The presets resolve this. The recruiter chooses a *behaviour* — how forgiving the matching should be — rather than a position on an abstract scale they have no basis to judge. Each option states its trade-off explicitly: strict matching risks missing genuine skills worded differently; lenient matching risks crediting skills the candidate does not have. Both failure modes are stated, because both are real.
+
+**Principle.** The recruiter understands hiring, not embedding spaces. Where a system parameter is technical, it should be surfaced in the terms of the user's domain, or not surfaced at all.
+
+---
+
+## 12. Recruiter Profile
+
+**Decision.** The recruiter's name and role are editable in the settings and stored in the database, rather than being hard-coded in the interface.
+
+**Reasoning.** The sidebar displays the current user's name and role. Leaving these hard-coded would present as an unfinished feature. Making them editable and persistent costs little and makes the interface honest: what is displayed is genuinely configurable, not a placeholder pretending to be a user account.
+
+---
+
+## 13. Authentication and Multi-User Support: Out of Scope
+
+**Decision.** The system has no login, no user accounts, and no multi-user support. It is built as a single-recruiter tool.
+
+**Reasoning.** Authentication, session management, and multi-tenancy are standard, well-understood infrastructure concerns. They are substantial to build correctly, and they contribute nothing to the project's actual contribution, which concerns explainable resume ranking. Building them would consume effort without advancing the research question.
+
+This is consistent with the scope defined at the outset, which explicitly excludes large-scale deployment, multi-organisation tenancy, and long-term production maintenance.
+
+The recruiter profile described above should not be mistaken for an account: it is a display setting, not an authenticated identity. Adding authentication would be a straightforward extension for any real deployment, and is noted as such rather than attempted here.
+
+---
+
+## 14. Shared State Through React Context
+
+**Decision.** Application state that is read in more than one place — the currently selected job, and the system settings — is held in React Context providers rather than fetched independently by each component.
+
+**Reasoning.** When the sidebar fetched the recruiter's profile independently, saving a change in the settings page updated the database but not the sidebar, which held its own stale copy until the page was reloaded. The same problem would arise anywhere two components depend on the same data.
+
+Holding such state in a context means there is a single source of truth: when the settings page saves, it refreshes the context, and every component reading from it updates immediately. The alternative — forcing a full page reload after saving — would work, but is heavy-handed and discards unrelated interface state.
