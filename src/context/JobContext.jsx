@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from 'react'
+import { createContext, useContext, useState, useEffect, useCallback } from 'react'
 import { getJobs } from '../lib/api'
 
 const JobContext = createContext(null)
@@ -7,21 +7,27 @@ export function JobProvider({ children }) {
   const [jobs, setJobs] = useState([])
   const [selectedJobId, setSelectedJobId] = useState(null)
 
-  useEffect(() => {
-    getJobs()
+  const refreshJobs = useCallback(() => {
+    return getJobs()
       .then((data) => {
         setJobs(data)
-        if (data.length > 0) {
-          setSelectedJobId(data[0].id)
-        }
+        setSelectedJobId((current) => {
+          if (data.length === 0) return null
+          const stillExists = data.some((j) => j.id === current)
+          return stillExists ? current : data[0].id
+        })
       })
       .catch(() => {})
   }, [])
 
+  useEffect(() => {
+    refreshJobs()
+  }, [refreshJobs])
+
   const selectedJob = jobs.find((j) => j.id === selectedJobId) || null
 
   return (
-    <JobContext.Provider value={{ jobs, selectedJobId, setSelectedJobId, selectedJob }}>
+    <JobContext.Provider value={{ jobs, selectedJobId, setSelectedJobId, selectedJob, refreshJobs }}>
       {children}
     </JobContext.Provider>
   )

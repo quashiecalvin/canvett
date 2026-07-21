@@ -17,7 +17,7 @@ const iconForDepartment = {
 }
 
 export default function JobPostings({ onNavigate }) {
-  const { setSelectedJobId } = useJob()
+  const { setSelectedJobId, refreshJobs } = useJob()
   const [jobs, setJobs] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -43,12 +43,14 @@ export default function JobPostings({ onNavigate }) {
     try {
       await deleteJob(jobId)
       loadJobs()
+      refreshJobs()
     } catch {
       alert('Failed to delete the job posting.')
     }
   }
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     loadJobs()
   }, [])
 
@@ -152,7 +154,7 @@ export default function JobPostings({ onNavigate }) {
         <NewJobModal
           job={editingJob}
           onClose={() => { setShowModal(false); setEditingJob(null) }}
-          onCreated={loadJobs}
+          onCreated={() => { loadJobs(); refreshJobs() }}
         />
       )}
     </div>
