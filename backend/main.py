@@ -3,7 +3,7 @@ import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from routers import jobs, candidates, stats, settings
+from routers import jobs, candidates, stats, settings, auth
 
 app = FastAPI(title="Canvett API")
 
@@ -21,6 +21,7 @@ app.include_router(jobs.router)
 app.include_router(candidates.router)
 app.include_router(stats.router)
 app.include_router(settings.router)
+app.include_router(auth.router)
 
 
 @app.get("/")
