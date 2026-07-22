@@ -42,3 +42,21 @@
   --radius-pill: 20px;
 }
 
+
+@keyframes auth-glow-drift {
+  0%   { transform: translate(-15%, -20%) scale(1); }
+  50%  { transform: translate(10%, 15%) scale(1.15); }
+  100% { transform: translate(-15%, -20%) scale(1); }
+}
+.auth-glow {
+  top: 0;
+  left: 0;
+  animation: auth-glow-drift 18s ease-in-out infinite;
+}
+
+@keyframes glow-a { 0%,100% { transform: translate(-10%,-15%) scale(1); } 50% { transform: translate(8%,10%) scale(1.2); } }
+@keyframes glow-b { 0%,100% { transform: translate(5%,5%) scale(1); } 50% { transform: translate(-8%,-8%) scale(1.15); } }
+@keyframes glow-c { 0%,100% { transform: translate(-5%,0) scale(1); } 50% { transform: translate(6%,8%) scale(1.1); } }
+.auth-glow-a { animation: glow-a 20s ease-in-out infinite; }
+.auth-glow-b { animation: glow-b 24s ease-in-out infinite; }
+.auth-glow-c { animation: glow-c 28s ease-in-out infinite; }

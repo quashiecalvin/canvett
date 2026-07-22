@@ -117,3 +117,51 @@ export async function updateSettings(settings) {
   }
   return res.json()
 }
+
+// ---------- Authentication ----------
+
+function authHeaders() {
+  const token = localStorage.getItem("canvett_token")
+  return token ? { Authorization: `Bearer ${token}` } : {}
+}
+
+export async function register(details) {
+  const res = await fetch(`${BASE_URL}/auth/register`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(details),
+  })
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}))
+    throw new Error(errorMessage(err) || "Registration failed")
+  }
+  return res.json()
+}
+
+export async function login(email, password) {
+  const res = await fetch(`${BASE_URL}/auth/login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password }),
+  })
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}))
+    throw new Error(errorMessage(err) || "Login failed")
+  }
+  return res.json()
+}
+
+export async function getMe() {
+  const res = await fetch(`${BASE_URL}/auth/me`, { headers: authHeaders() })
+  if (!res.ok) throw new Error("Not authenticated")
+  return res.json()
+}
+
+function errorMessage(err) {
+  if (!err || !err.detail) return null
+  if (typeof err.detail === "string") return err.detail
+  if (Array.isArray(err.detail) && err.detail[0]?.msg) {
+    return err.detail[0].msg.replace(/^Value error, /, "")
+  }
+  return null
+}
