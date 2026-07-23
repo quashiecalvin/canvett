@@ -1,3 +1,4 @@
+import io
 from pypdf import PdfReader
 from docx import Document
 
@@ -23,6 +24,16 @@ def parse_resume(file_path: str) -> str:
         return parse_pdf(file_path)
     elif file_path.lower().endswith(".docx"):
         return parse_docx(file_path)
+    else:
+        raise ValueError("Unsupported file type. Only PDF and DOCX are allowed.")
+
+
+def parse_resume_bytes(filename: str, contents: bytes) -> str:
+    buffer = io.BytesIO(contents)
+    if filename.lower().endswith(".pdf"):
+        return parse_pdf(buffer)
+    elif filename.lower().endswith(".docx"):
+        return parse_docx(buffer)
     else:
         raise ValueError("Unsupported file type. Only PDF and DOCX are allowed.")
 

@@ -1,13 +1,13 @@
 const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000"
 
 export async function getJobs() {
-  const res = await fetch(`${BASE_URL}/jobs`)
+  const res = await fetch(`${BASE_URL}/jobs`, { headers: authHeaders() })
   if (!res.ok) throw new Error("Failed to fetch jobs")
   return res.json()
 }
 
 export async function getRanking(jobId) {
-  const res = await fetch(`${BASE_URL}/candidates/ranking/${jobId}`)
+  const res = await fetch(`${BASE_URL}/candidates/ranking/${jobId}`, { headers: authHeaders() })
   if (!res.ok) throw new Error("Failed to fetch ranking")
   return res.json()
 }
@@ -19,6 +19,7 @@ export async function uploadResume(jobId, file) {
 
   const res = await fetch(`${BASE_URL}/candidates/upload`, {
     method: "POST",
+    headers: authHeaders(),
     body: formData,
   })
   if (!res.ok) throw new Error("Failed to upload resume")
@@ -26,7 +27,7 @@ export async function uploadResume(jobId, file) {
 }
 
 export async function getStats() {
-  const res = await fetch(`${BASE_URL}/stats`)
+  const res = await fetch(`${BASE_URL}/stats`, { headers: authHeaders() })
   if (!res.ok) throw new Error("Failed to fetch stats")
   return res.json()
 }
@@ -34,7 +35,7 @@ export async function getStats() {
 export async function createJob(jobData) {
   const res = await fetch(`${BASE_URL}/jobs`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...authHeaders() },
     body: JSON.stringify(jobData),
   })
   if (!res.ok) throw new Error("Failed to create job")
@@ -42,13 +43,13 @@ export async function createJob(jobData) {
 }
 
 export async function getTopCandidates() {
-  const res = await fetch(`${BASE_URL}/stats/top-candidates`)
+  const res = await fetch(`${BASE_URL}/stats/top-candidates`, { headers: authHeaders() })
   if (!res.ok) throw new Error("Failed to fetch top candidates")
   return res.json()
 }
 
 export async function getActivity() {
-  const res = await fetch(`${BASE_URL}/stats/activity`)
+  const res = await fetch(`${BASE_URL}/stats/activity`, { headers: authHeaders() })
   if (!res.ok) throw new Error("Failed to fetch activity")
   return res.json()
 }
@@ -56,6 +57,7 @@ export async function getActivity() {
 export async function deleteJob(jobId) {
   const res = await fetch(`${BASE_URL}/jobs/${jobId}`, {
     method: "DELETE",
+    headers: authHeaders(),
   })
   if (!res.ok) throw new Error("Failed to delete job")
   return res.json()
@@ -64,7 +66,7 @@ export async function deleteJob(jobId) {
 export async function updateJob(jobId, jobData) {
   const res = await fetch(`${BASE_URL}/jobs/${jobId}`, {
     method: "PUT",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...authHeaders() },
     body: JSON.stringify(jobData),
   })
   if (!res.ok) throw new Error("Failed to update job")
@@ -74,6 +76,7 @@ export async function updateJob(jobId, jobData) {
 export async function rerankJob(jobId) {
   const res = await fetch(`${BASE_URL}/candidates/rerank/${jobId}`, {
     method: "POST",
+    headers: authHeaders(),
   })
   if (!res.ok) throw new Error("Failed to re-rank")
   return res.json()
@@ -82,25 +85,26 @@ export async function rerankJob(jobId) {
 export async function deleteCandidate(candidateId) {
   const res = await fetch(`${BASE_URL}/candidates/${candidateId}`, {
     method: "DELETE",
+    headers: authHeaders(),
   })
   if (!res.ok) throw new Error("Failed to delete candidate")
   return res.json()
 }
 
 export async function getCandidateDetail(candidateId) {
-  const res = await fetch(`${BASE_URL}/candidates/${candidateId}/detail`)
+  const res = await fetch(`${BASE_URL}/candidates/${candidateId}/detail`, { headers: authHeaders() })
   if (!res.ok) throw new Error("Failed to fetch candidate details")
   return res.json()
 }
 
 export async function getAnalytics() {
-  const res = await fetch(`${BASE_URL}/stats/analytics`)
+  const res = await fetch(`${BASE_URL}/stats/analytics`, { headers: authHeaders() })
   if (!res.ok) throw new Error("Failed to fetch analytics")
   return res.json()
 }
 
 export async function getSettings() {
-  const res = await fetch(`${BASE_URL}/settings`)
+  const res = await fetch(`${BASE_URL}/settings`, { headers: authHeaders() })
   if (!res.ok) throw new Error("Failed to fetch settings")
   return res.json()
 }
@@ -108,7 +112,7 @@ export async function getSettings() {
 export async function updateSettings(settings) {
   const res = await fetch(`${BASE_URL}/settings`, {
     method: "PUT",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...authHeaders() },
     body: JSON.stringify(settings),
   })
   if (!res.ok) {
@@ -164,4 +168,57 @@ function errorMessage(err) {
     return err.detail[0].msg.replace(/^Value error, /, "")
   }
   return null
+}
+
+// ---------- Seeker: public job board ----------
+
+export async function getPublicJobs() {
+  const res = await fetch(`${BASE_URL}/public/jobs/`)
+  if (!res.ok) throw new Error("Failed to fetch jobs")
+  return res.json()
+}
+
+export async function getPublicJob(jobId) {
+  const res = await fetch(`${BASE_URL}/public/jobs/${jobId}`)
+  if (!res.ok) throw new Error("This job is no longer available")
+  return res.json()
+}
+
+// ---------- Seeker: applications ----------
+
+export async function applyWithUpload(jobId, file) {
+  const formData = new FormData()
+  formData.append("file", file)
+
+  const res = await fetch(`${BASE_URL}/applications/upload/${jobId}`, {
+    method: "POST",
+    headers: authHeaders(),
+    body: formData,
+  })
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}))
+    throw new Error(errorMessage(err) || "Failed to submit application")
+  }
+  return res.json()
+}
+
+export async function applyWithForm(jobId, details) {
+  const res = await fetch(`${BASE_URL}/applications/form/${jobId}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...authHeaders() },
+    body: JSON.stringify(details),
+  })
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}))
+    throw new Error(errorMessage(err) || "Failed to submit application")
+  }
+  return res.json()
+}
+
+export async function getMyApplications() {
+  const res = await fetch(`${BASE_URL}/applications/mine`, {
+    headers: authHeaders(),
+  })
+  if (!res.ok) throw new Error("Failed to fetch your applications")
+  return res.json()
 }

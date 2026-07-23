@@ -44,13 +44,37 @@ export default function CandidateDetailModal({ candidateId, onClose }) {
               </div>
               <div className="flex-1">
                 <h3 className="text-[18px] font-medium text-text-primary">{detail.name}</h3>
-                <p className="text-[12px] text-text-muted mt-0.5">{detail.filename}</p>
+                <p className="text-[12px] text-text-muted mt-0.5">
+                  {detail.source === "portal"
+                    ? (detail.application_method === "form" ? "Applied online using the form" : "Applied online with a CV")
+                    : "Added by you"}
+                </p>
               </div>
               <div className="flex flex-col items-center shrink-0">
                 <ScoreCircle score={Math.round(detail.overall_score)} />
                 <span className="text-[10px] text-text-muted mt-1">match score</span>
               </div>
             </div>
+
+            {(detail.contact_email || detail.contact_phone) && (
+              <div>
+                <h4 className="text-[13px] font-medium text-text-primary mb-3">Contact details</h4>
+                <div className="flex flex-col gap-2 rounded-lg border border-border bg-bg-subtle px-4 py-3">
+                  {detail.contact_email && (
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-[11px] uppercase tracking-[0.05em] text-text-hint w-14 shrink-0">Email</span>
+                      <a href={`mailto:${detail.contact_email}`} className="text-[13px] text-accent hover:underline underline-offset-2 break-all">{detail.contact_email}</a>
+                    </div>
+                  )}
+                  {detail.contact_phone && (
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-[11px] uppercase tracking-[0.05em] text-text-hint w-14 shrink-0">Phone</span>
+                      <a href={`tel:${detail.contact_phone}`} className="text-[13px] text-accent hover:underline underline-offset-2">{detail.contact_phone}</a>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
 
             <div>
               <h4 className="text-[13px] font-medium text-text-primary mb-3">Score breakdown</h4>

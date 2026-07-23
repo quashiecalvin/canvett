@@ -12,4 +12,5 @@ class User(Base):
     password_hash = Column(String, nullable=False)
     full_name = Column(String, nullable=False)
     role = Column(String, nullable=False)
+    company_name = Column(String, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())

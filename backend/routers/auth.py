@@ -32,6 +32,7 @@ def register(payload: UserRegister, db: Session = Depends(get_db)):
         password_hash=hash_password(payload.password),
         full_name=payload.full_name.strip(),
         role=payload.role,
+        company_name=(payload.company_name or "").strip() or None,
     )
     db.add(user)
     db.commit()

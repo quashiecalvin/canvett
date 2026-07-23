@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Plus, Search, Filter, ArrowUpDown, Code2, SquareActivity, Palette, Briefcase, Megaphone } from 'lucide-react'
 import FilterDropdown from '../components/ui/FilterDropdown'
 import StatusBadge from '../components/ui/StatusBadge'
@@ -16,7 +17,8 @@ const iconForDepartment = {
   Operations: Briefcase,
 }
 
-export default function JobPostings({ onNavigate }) {
+export default function JobPostings() {
+  const navigate = useNavigate()
   const { setSelectedJobId, refreshJobs } = useJob()
   const [jobs, setJobs] = useState([])
   const [loading, setLoading] = useState(true)
@@ -140,7 +142,7 @@ export default function JobPostings({ onNavigate }) {
                   <StatusBadge status={job.status} />
                 </div>
                <JobActionsMenu
-                  onViewCandidates={() => { setSelectedJobId(job.id); onNavigate('ranking') }}
+                  onViewCandidates={() => { setSelectedJobId(job.id); navigate('/ranking') }}
                   onEdit={() => { setEditingJob(job); setShowModal(true) }}
                   onDelete={() => handleDelete(job.id)}
                 />

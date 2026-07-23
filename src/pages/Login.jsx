@@ -21,7 +21,7 @@ export default function Login() {
     try {
       const data = await loginRequest(email, password)
       login(data.access_token, data.user)
-      navigate(data.user.role === 'recruiter' ? '/dashboard' : '/jobs', { replace: true })
+      navigate(data.user.role === 'recruiter' ? '/dashboard' : '/seeker/jobs', { replace: true })
     } catch (err) {
       setError(err.message)
       setSubmitting(false)

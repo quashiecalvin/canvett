@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form
 from sqlalchemy.orm import Session
 
 from database.session import get_db
-from database import models_job, models_candidate
+from database import models_job, models_candidate, models_application
 from services.parser import parse_resume, extract_name
 from services.scoring import score_candidate, get_config
 from services.activity import log_activity
@@ -84,6 +84,13 @@ def get_ranking(job_id: int, db: Session = Depends(get_db)):
         .all()
     )
 
+    portal_ids = {
+        row[0]
+        for row in db.query(models_application.Application.candidate_id)
+        .filter(models_application.Application.job_id == job_id)
+        .all()
+    }
+
     ranked = []
     for score, candidate in results:
         ranked.append(
@@ -98,6 +105,7 @@ def get_ranking(job_id: int, db: Session = Depends(get_db)):
                 matched_skills=score.matched_skills,
                 unmatched_skills=score.unmatched_skills,
                 duration_verified=score.duration_verified,
+                source="portal" if candidate.id in portal_ids else "recruiter",
             )
         )
     return ranked
@@ -168,8 +176,18 @@ def get_candidate_detail(candidate_id: int, db: Session = Depends(get_db)):
         .first()
     )
 
+    application = (
+        db.query(models_application.Application)
+        .filter(models_application.Application.candidate_id == candidate_id)
+        .first()
+    )
+
     return {
         "id": candidate.id,
+        "source": "portal" if application else "recruiter",
+        "contact_email": application.contact_email if application else None,
+        "contact_phone": application.contact_phone if application else None,
+        "application_method": application.method if application else None,
         "name": candidate.name,
         "filename": candidate.filename,
         "resume_text": candidate.resume_text,
