@@ -144,7 +144,9 @@ const loadRanking = useCallback(() => {
                   </span>
                 )}
               </div>
-              <p className="text-[12px] text-text-muted mt-0.5">{c.filename}</p>
+              <p className="text-[12px] text-text-muted mt-0.5">
+                {c.source === "portal" ? "Applied online" : "Added by you"}
+              </p>
 
               <div className="flex flex-wrap gap-1.5 mt-2">
                 {c.matched_skills.map(skill => (

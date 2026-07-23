@@ -24,3 +24,4 @@ class RankedCandidate(BaseModel):
     matched_skills: list[str]
     unmatched_skills: list[str]
     duration_verified: bool = True
+    source: str = "recruiter"

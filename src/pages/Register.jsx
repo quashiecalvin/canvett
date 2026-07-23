@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { User, Mail, Lock } from 'lucide-react'
+import { User, Mail, Lock, Building2 } from 'lucide-react'
 import { register as registerRequest } from '../lib/api'
 import { useAuth } from '../context/AuthContext'
 import AuthShell from './auth/AuthShell'
@@ -9,7 +9,7 @@ export default function Register() {
   const navigate = useNavigate()
   const { login } = useAuth()
 
-  const [form, setForm] = useState({ full_name: '', email: '', password: '', role: 'seeker' })
+  const [form, setForm] = useState({ full_name: '', email: '', password: '', role: 'seeker', company_name: '' })
   const [error, setError] = useState(null)
   const [submitting, setSubmitting] = useState(false)
 
@@ -22,9 +22,10 @@ export default function Register() {
     setError(null)
     setSubmitting(true)
     try {
-      const data = await registerRequest(form)
+      const payload = form.role === 'recruiter' ? form : { ...form, company_name: null }
+      const data = await registerRequest(payload)
       login(data.access_token, data.user)
-      navigate(data.user.role === 'recruiter' ? '/dashboard' : '/jobs', { replace: true })
+      navigate(data.user.role === 'recruiter' ? '/dashboard' : '/seeker/jobs', { replace: true })
     } catch (err) {
       setError(err.message)
       setSubmitting(false)
@@ -79,6 +80,20 @@ export default function Register() {
               required autoComplete="name" placeholder="Your full name" className={inputClass} />
           </div>
         </div>
+
+        {form.role === 'recruiter' && (
+          <div>
+            <label className="block text-[12.5px] font-medium text-white/70 mb-2">Company name</label>
+            <div className="relative">
+              <Building2 size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/30" />
+              <input type="text" value={form.company_name} onChange={(e) => update('company_name', e.target.value)}
+                required autoComplete="organization" placeholder="Your organisation" className={inputClass} />
+            </div>
+            <p className="text-[12px] text-white/40 mt-2">
+              Shown to job seekers on every role you post.
+            </p>
+          </div>
+        )}
 
         <div>
           <label className="block text-[12.5px] font-medium text-white/70 mb-2">Email address</label>
