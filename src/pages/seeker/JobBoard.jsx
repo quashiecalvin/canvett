@@ -1,22 +1,33 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { MapPin, Building2, Briefcase, Search } from 'lucide-react'
+import { Search, Filter, Code2, SquareActivity, Palette, Briefcase, Megaphone, MapPin, ArrowRight } from 'lucide-react'
+import FilterDropdown from '../../components/ui/FilterDropdown'
 import { getPublicJobs } from '../../lib/api'
+
+const iconForDepartment = {
+  Engineering: Code2,
+  Analytics: SquareActivity,
+  Design: Palette,
+  Product: Briefcase,
+  Marketing: Megaphone,
+  Operations: Briefcase,
+}
 
 function timeAgo(iso) {
   const days = Math.floor((Date.now() - new Date(iso)) / 86400000)
-  if (days === 0) return 'Posted today'
-  if (days === 1) return 'Posted yesterday'
-  if (days < 30) return `Posted ${days} days ago`
+  if (days === 0) return 'today'
+  if (days === 1) return 'yesterday'
+  if (days < 30) return `${days} days ago`
   const months = Math.floor(days / 30)
-  return `Posted ${months} month${months > 1 ? 's' : ''} ago`
+  return `${months} month${months > 1 ? 's' : ''} ago`
 }
 
 export default function JobBoard() {
   const [jobs, setJobs] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
-  const [query, setQuery] = useState('')
+  const [search, setSearch] = useState('')
+  const [department, setDepartment] = useState('All')
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -26,103 +37,132 @@ export default function JobBoard() {
       .finally(() => setLoading(false))
   }, [])
 
-  const term = query.trim().toLowerCase()
-  const visible = term
-    ? jobs.filter((job) =>
-        [job.title, job.company, job.location, job.department]
-          .filter(Boolean)
-          .some((field) => field.toLowerCase().includes(term))
-      )
-    : jobs
+  const departments = ['All', ...new Set(jobs.map((j) => j.department).filter(Boolean))]
+
+  const term = search.trim().toLowerCase()
+  const filtered = jobs.filter((job) => {
+    const matchesDept = department === 'All' || job.department === department
+    if (!matchesDept) return false
+    if (!term) return true
+    return [job.title, job.company, job.location, job.department]
+      .filter(Boolean)
+      .some((field) => field.toLowerCase().includes(term))
+  })
 
   return (
-    <div>
-      <div className="mb-6">
-        <h1 className="font-display text-2xl font-semibold text-text-primary sm:text-3xl">
-          Browse Jobs
-        </h1>
-        <p className="mt-1 text-sm text-text-muted">
-          Open roles from employers hiring through Canvett.
+    <div className="p-6 flex flex-col gap-5">
+      <div>
+        <h1 className="text-[22px] font-medium text-text-primary leading-[1.2]">Browse jobs</h1>
+        <p className="text-[13px] text-text-muted mt-1">
+          Open roles from employers hiring through Canvett
         </p>
       </div>
 
-      <div className="relative mb-6">
-        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-hint" />
-        <input
-          type="text"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search by title, company or location"
-          className="w-full rounded-lg border border-border bg-bg-surface py-2.5 pl-10 pr-4 text-sm text-text-body placeholder:text-text-hint focus:border-accent focus:outline-none"
-        />
+      <div className="flex flex-col sm:flex-row gap-2.5">
+        <div className="relative flex-1">
+          <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-hint" />
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search by title, company or location"
+            className="w-full h-9 pl-9 pr-3 rounded-btn border border-border bg-bg-surface text-[13px] text-text-body placeholder:text-text-hint focus:outline-none focus:border-accent"
+          />
+        </div>
+        {departments.length > 2 && (
+          <FilterDropdown
+            icon={Filter}
+            label="Department"
+            value={department}
+            options={departments}
+            onChange={setDepartment}
+          />
+        )}
       </div>
 
-      {loading && <p className="text-sm text-text-muted">Loading jobs...</p>}
+      {loading && <p className="text-[13px] text-text-muted">Loading roles...</p>}
 
       {error && (
-        <div className="rounded-lg border border-border bg-danger-tint px-4 py-3 text-sm text-danger">
-          {error}
+        <div className="bg-danger-tint border border-danger/25 rounded-card px-4 py-3">
+          <p className="text-[13px] text-danger">{error}</p>
         </div>
       )}
 
-      {!loading && !error && visible.length === 0 && (
-        <div className="rounded-lg border border-border bg-bg-surface px-4 py-10 text-center">
-          <p className="text-sm text-text-muted">
-            {jobs.length === 0
-              ? 'There are no open roles at the moment. Please check back soon.'
-              : 'No roles match your search.'}
+      {!loading && !error && (
+        <>
+          <p className="text-[12px] text-text-muted">
+            {filtered.length} {filtered.length === 1 ? 'role' : 'roles'}
+            {department !== 'All' && ` in ${department}`}
           </p>
-        </div>
+
+          {filtered.length === 0 ? (
+            <div className="bg-bg-surface border border-border rounded-card px-4 py-12 text-center">
+              <Search size={20} className="mx-auto text-text-hint" />
+              <p className="text-[13px] text-text-body mt-3">
+                {jobs.length === 0
+                  ? 'There are no open roles at the moment.'
+                  : 'No roles match your search.'}
+              </p>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-2.5">
+              {filtered.map((job) => {
+                const Icon = iconForDepartment[job.department] || Briefcase
+                return (
+                  <button
+                    key={job.id}
+                    onClick={() => navigate(`/seeker/jobs/${job.id}`)}
+                    className="group bg-bg-surface border border-border rounded-card p-4 flex items-start gap-4 text-left transition-colors hover:border-accent-light focus:outline-none focus:border-accent"
+                  >
+                    <div className="w-10 h-10 rounded-btn bg-accent-tint flex items-center justify-center text-accent shrink-0">
+                      <Icon size={20} />
+                    </div>
+
+                    <div className="flex-1 min-w-0">
+                      <h2 className="text-[15px] font-medium text-text-primary leading-[1.3] truncate">
+                        {job.title}
+                      </h2>
+                      <p className="text-[12px] text-text-muted mt-0.5 truncate">
+                        {job.company} • {job.department} • Posted {timeAgo(job.posted_date)}
+                      </p>
+
+                      <div className="flex flex-wrap items-center gap-1.5 mt-2.5">
+                        <span className="inline-flex items-center gap-1 text-[11px] text-text-muted">
+                          <MapPin size={11} />
+                          {job.location}
+                        </span>
+                        <span className="text-[11px] text-text-hint">•</span>
+                        <span className="text-[11px] text-text-muted">{job.employment_type}</span>
+                      </div>
+
+                      <div className="flex flex-wrap gap-1.5 mt-2.5">
+                        {(job.required_skills || []).slice(0, 5).map((skill) => (
+                          <span
+                            key={skill}
+                            className="bg-accent-tint text-accent text-[11px] font-medium px-2 py-0.5 rounded-btn"
+                          >
+                            {skill}
+                          </span>
+                        ))}
+                        {(job.required_skills || []).length > 5 && (
+                          <span className="bg-bg-subtle text-text-muted text-[11px] font-medium px-2 py-0.5 rounded-btn">
+                            +{job.required_skills.length - 5}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    <ArrowRight
+                      size={16}
+                      className="text-text-hint shrink-0 mt-1 transition-transform group-hover:translate-x-0.5 group-hover:text-accent"
+                    />
+                  </button>
+                )
+              })}
+            </div>
+          )}
+        </>
       )}
-
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-        {visible.map((job) => (
-          <button
-            key={job.id}
-            onClick={() => navigate(`/seeker/jobs/${job.id}`)}
-            className="flex flex-col rounded-xl border border-border bg-bg-surface p-5 text-left transition-shadow hover:shadow-md focus:border-accent focus:outline-none"
-          >
-            <h2 className="font-display text-lg font-semibold leading-snug text-text-primary">
-              {job.title}
-            </h2>
-
-            <div className="mt-3 flex flex-col gap-1.5 text-sm text-text-muted">
-              <span className="flex items-center gap-2">
-                <Building2 className="h-4 w-4 shrink-0" />
-                <span className="truncate">{job.company}</span>
-              </span>
-              <span className="flex items-center gap-2">
-                <MapPin className="h-4 w-4 shrink-0" />
-                <span className="truncate">{job.location}</span>
-              </span>
-              <span className="flex items-center gap-2">
-                <Briefcase className="h-4 w-4 shrink-0" />
-                <span className="truncate">{job.employment_type}</span>
-              </span>
-            </div>
-
-            <div className="mt-4 flex flex-wrap gap-1.5">
-              {(job.required_skills || []).slice(0, 4).map((skill) => (
-                <span
-                  key={skill}
-                  className="rounded-md bg-accent-tint px-2 py-1 text-xs font-medium text-accent"
-                >
-                  {skill}
-                </span>
-              ))}
-              {(job.required_skills || []).length > 4 && (
-                <span className="rounded-md bg-bg-subtle px-2 py-1 text-xs font-medium text-text-muted">
-                  +{job.required_skills.length - 4} more
-                </span>
-              )}
-            </div>
-
-            <p className="mt-4 border-t border-border pt-3 text-xs text-text-hint">
-              {timeAgo(job.posted_date)}
-            </p>
-          </button>
-        ))}
-      </div>
     </div>
   )
 }

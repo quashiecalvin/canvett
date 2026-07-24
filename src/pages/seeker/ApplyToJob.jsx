@@ -142,7 +142,7 @@ export default function ApplyToJob() {
   const cardClass = "rounded-xl border border-border bg-bg-surface p-5 sm:p-6"
 
   return (
-    <div className="max-w-3xl">
+    <div className="p-6 max-w-3xl">
       <button
         onClick={() => (path ? setPath(null) : navigate(`/seeker/jobs/${id}`))}
         className="mb-5 flex items-center gap-1.5 text-[13px] font-medium text-text-muted transition-colors hover:text-text-body"
