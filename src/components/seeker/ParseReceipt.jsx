@@ -8,7 +8,7 @@ export default function ParseReceipt({ receipt, jobTitle }) {
   const unmatched = receipt.unmatched_skills || []
 
   return (
-    <div className="max-w-2xl">
+    <div className="p-6 max-w-2xl">
       <div className="rounded-xl border border-border bg-bg-surface p-5 sm:p-7">
         <div className="flex items-start gap-3">
           <CheckCircle2 size={22} className="mt-0.5 shrink-0 text-success" />

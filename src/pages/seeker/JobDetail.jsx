@@ -1,15 +1,25 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
-import { ArrowLeft, MapPin, Building2, Briefcase, GraduationCap, Clock, Layers } from 'lucide-react'
+import { ArrowLeft, MapPin, Building2, Briefcase, GraduationCap, Clock, Layers,
+  Code2, SquareActivity, Palette, Megaphone } from 'lucide-react'
 import { getPublicJob } from '../../lib/api'
+
+const iconForDepartment = {
+  Engineering: Code2,
+  Analytics: SquareActivity,
+  Design: Palette,
+  Product: Briefcase,
+  Marketing: Megaphone,
+  Operations: Briefcase,
+}
 
 function timeAgo(iso) {
   const days = Math.floor((Date.now() - new Date(iso)) / 86400000)
-  if (days === 0) return 'Posted today'
-  if (days === 1) return 'Posted yesterday'
-  if (days < 30) return `Posted ${days} days ago`
+  if (days === 0) return 'today'
+  if (days === 1) return 'yesterday'
+  if (days < 30) return `${days} days ago`
   const months = Math.floor(days / 30)
-  return `Posted ${months} month${months > 1 ? 's' : ''} ago`
+  return `${months} month${months > 1 ? 's' : ''} ago`
 }
 
 export default function JobDetail() {
@@ -28,18 +38,15 @@ export default function JobDetail() {
   }, [id])
 
   if (loading) {
-    return <p className="text-sm text-text-muted">Loading role...</p>
+    return <div className="p-6"><p className="text-[13px] text-text-muted">Loading role...</p></div>
   }
 
   if (error) {
     return (
-      <div className="max-w-xl">
-        <div className="rounded-lg border border-border bg-bg-surface px-4 py-10 text-center">
-          <p className="text-[14px] text-text-body">{error}</p>
-          <Link
-            to="/seeker/jobs"
-            className="mt-4 inline-block text-[13px] font-medium text-accent hover:underline underline-offset-2"
-          >
+      <div className="p-6">
+        <div className="bg-bg-surface border border-border rounded-card px-4 py-12 text-center max-w-md">
+          <p className="text-[13px] text-text-body">{error}</p>
+          <Link to="/seeker/jobs" className="text-[13px] font-medium text-accent hover:underline underline-offset-2 mt-3 inline-block">
             Back to all jobs
           </Link>
         </div>
@@ -47,96 +54,100 @@ export default function JobDetail() {
     )
   }
 
-  const meta = [
-    { icon: Building2, value: job.company },
-    { icon: MapPin, value: job.location },
-    { icon: Briefcase, value: job.employment_type },
-    { icon: Layers, value: job.department },
-  ].filter((m) => m.value)
+  const Icon = iconForDepartment[job.department] || Briefcase
+
+  const facts = [
+    { icon: Building2, label: 'Company', value: job.company },
+    { icon: MapPin, label: 'Location', value: job.location },
+    { icon: Briefcase, label: 'Type', value: job.employment_type },
+    { icon: Layers, label: 'Department', value: job.department },
+    { icon: Clock, label: 'Posted', value: timeAgo(job.posted_date) },
+  ].filter((f) => f.value)
 
   return (
-    <div className="max-w-3xl">
+    <div className="p-6 flex flex-col gap-5">
       <button
         onClick={() => navigate('/seeker/jobs')}
-        className="mb-5 flex items-center gap-1.5 text-[13px] font-medium text-text-muted transition-colors hover:text-text-body"
+        className="flex items-center gap-1.5 text-[13px] font-medium text-text-muted hover:text-text-body transition-colors self-start"
       >
         <ArrowLeft size={15} />
         All jobs
       </button>
 
-      <div className="rounded-xl border border-border bg-bg-surface p-5 sm:p-7">
-        <h1 className="font-outfit text-[22px] font-semibold leading-tight tracking-[-0.3px] text-text-primary sm:text-[26px]">
-          {job.title}
-        </h1>
-
-        <div className="mt-3 flex flex-wrap gap-x-5 gap-y-2">
-          {meta.map(({ icon: Icon, value }) => (
-            <span key={value} className="flex items-center gap-1.5 text-[13.5px] text-text-muted">
-              <Icon size={15} className="shrink-0" />
-              {value}
-            </span>
-          ))}
+      <div className="flex items-start gap-4">
+        <div className="w-12 h-12 rounded-btn bg-accent-tint flex items-center justify-center text-accent shrink-0">
+          <Icon size={24} />
         </div>
-
-        <p className="mt-3 flex items-center gap-1.5 text-[12.5px] text-text-hint">
-          <Clock size={13} />
-          {timeAgo(job.posted_date)}
-        </p>
-
-        <div className="mt-6 border-t border-border pt-6">
-          <h2 className="text-[13px] font-semibold uppercase tracking-[0.05em] text-text-hint">
-            About this role
-          </h2>
-          <p className="mt-3 whitespace-pre-line text-[14.5px] leading-relaxed text-text-body">
-            {job.description}
+        <div className="min-w-0">
+          <h1 className="text-[22px] font-medium text-text-primary leading-[1.2]">{job.title}</h1>
+          <p className="text-[13px] text-text-muted mt-1">
+            {job.company} • {job.location} • {job.employment_type}
           </p>
-        </div>
-
-        <div className="mt-6 border-t border-border pt-6">
-          <h2 className="text-[13px] font-semibold uppercase tracking-[0.05em] text-text-hint">
-            Required skills
-          </h2>
-          <div className="mt-3 flex flex-wrap gap-2">
-            {(job.required_skills || []).map((skill) => (
-              <span
-                key={skill}
-                className="rounded-md bg-accent-tint px-2.5 py-1 text-[12.5px] font-medium text-accent"
-              >
-                {skill}
-              </span>
-            ))}
-          </div>
-        </div>
-
-        <div className="mt-6 grid gap-5 border-t border-border pt-6 sm:grid-cols-2">
-          <div>
-            <h2 className="flex items-center gap-1.5 text-[13px] font-semibold uppercase tracking-[0.05em] text-text-hint">
-              <Briefcase size={13} />
-              Experience
-            </h2>
-            <p className="mt-2 text-[14px] leading-relaxed text-text-body">
-              {job.experience_requirement}
-            </p>
-          </div>
-          <div>
-            <h2 className="flex items-center gap-1.5 text-[13px] font-semibold uppercase tracking-[0.05em] text-text-hint">
-              <GraduationCap size={13} />
-              Education
-            </h2>
-            <p className="mt-2 text-[14px] leading-relaxed text-text-body">
-              {job.education_requirement}
-            </p>
-          </div>
         </div>
       </div>
 
-      <div className="sticky bottom-0 mt-5 border-t border-border bg-bg-page py-4 sm:static sm:border-0 sm:bg-transparent sm:py-0">
-        <button
-          onClick={() => navigate(`/seeker/jobs/${job.id}/apply`)}
-          className="h-12 w-full rounded-btn bg-accent text-[14.5px] font-semibold text-white transition-all hover:bg-accent-2 active:scale-[0.99] sm:w-auto sm:px-8"
-        >
-          Apply for this role
-        </button>
+      <div className="grid gap-5 lg:grid-cols-[1fr_300px] items-start">
+        <div className="flex flex-col gap-4">
+          <div className="bg-bg-surface border border-border rounded-card p-5">
+            <h2 className="text-[13px] font-medium text-text-primary mb-3">About this role</h2>
+            <p className="text-[13.5px] leading-relaxed text-text-body whitespace-pre-line">
+              {job.description}
+            </p>
+          </div>
+
+          <div className="bg-bg-surface border border-border rounded-card p-5">
+            <h2 className="text-[13px] font-medium text-text-primary mb-3">Required skills</h2>
+            <div className="flex flex-wrap gap-1.5">
+              {(job.required_skills || []).map((skill) => (
+                <span key={skill} className="bg-accent-tint text-accent text-[12px] font-medium px-2.5 py-1 rounded-btn">
+                  {skill}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="bg-bg-surface border border-border rounded-card p-5">
+              <h2 className="flex items-center gap-1.5 text-[13px] font-medium text-text-primary mb-2">
+                <Briefcase size={13} className="text-text-muted" />
+                Experience
+              </h2>
+              <p className="text-[13px] leading-relaxed text-text-body">{job.experience_requirement}</p>
+            </div>
+            <div className="bg-bg-surface border border-border rounded-card p-5">
+              <h2 className="flex items-center gap-1.5 text-[13px] font-medium text-text-primary mb-2">
+                <GraduationCap size={13} className="text-text-muted" />
+                Education
+              </h2>
+              <p className="text-[13px] leading-relaxed text-text-body">{job.education_requirement}</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-bg-surface border border-border rounded-card p-5 lg:sticky lg:top-6">
+          <h2 className="text-[13px] font-medium text-text-primary mb-3">At a glance</h2>
+          <div className="flex flex-col gap-2.5">
+            {facts.map(({ icon: FactIcon, label, value }) => (
+              <div key={label} className="flex items-start gap-2.5">
+                <FactIcon size={14} className="text-text-hint shrink-0 mt-0.5" />
+                <div className="min-w-0">
+                  <p className="text-[10px] uppercase tracking-[0.06em] text-text-hint">{label}</p>
+                  <p className="text-[13px] text-text-body leading-snug">{value}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <button
+            onClick={() => navigate(`/seeker/jobs/${job.id}/apply`)}
+            className="w-full h-10 mt-5 rounded-btn bg-accent text-white text-[13.5px] font-medium hover:bg-accent-2 active:scale-[0.99] transition-all"
+          >
+            Apply for this role
+          </button>
+          <p className="text-[11px] text-text-hint text-center mt-2">
+            Upload a CV or fill in a form
+          </p>
+        </div>
       </div>
     </div>
   )

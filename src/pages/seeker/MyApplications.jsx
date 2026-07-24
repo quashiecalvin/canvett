@@ -32,7 +32,7 @@ export default function MyApplications() {
   if (loading) return <p className="text-sm text-text-muted">Loading your applications...</p>
 
   return (
-    <div className="max-w-3xl">
+    <div className="p-6 max-w-3xl">
       <div className="mb-6">
         <h1 className="font-outfit text-[22px] font-semibold tracking-[-0.3px] text-text-primary sm:text-[26px]">
           My Applications
