@@ -31,6 +31,11 @@ export function AuthProvider({ children }) {
     setUser(userData)
   }, [])
 
+  const updateUser = useCallback((userData) => {
+    localStorage.setItem(USER_KEY, JSON.stringify(userData))
+    setUser(userData)
+  }, [])
+
   const logout = useCallback(() => {
     localStorage.removeItem(TOKEN_KEY)
     localStorage.removeItem(USER_KEY)
@@ -44,6 +49,7 @@ export function AuthProvider({ children }) {
     loading,
     login,
     logout,
+    updateUser,
     isAuthenticated: Boolean(token),
     isRecruiter: user?.role === 'recruiter',
     isSeeker: user?.role === 'seeker',

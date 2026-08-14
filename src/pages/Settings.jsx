@@ -116,7 +116,7 @@ export default function Settings() {
   }
 
   return (
-    <div className="p-6 max-w-3xl">
+    <div className="p-6">
       <header className="flex items-start justify-between mb-6">
         <div>
           <h1 className="text-[22px] font-medium text-text-primary leading-[1.2]">Settings</h1>

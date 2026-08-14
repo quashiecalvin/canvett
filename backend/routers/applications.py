@@ -70,7 +70,7 @@ def _create_application(db, job, user, resume_text, method, phone=None):
     db.commit()
     db.refresh(application)
 
-    log_activity(db, f"New application received for {job.title}")
+    log_activity(db, f"New application received for {job.title}", job.recruiter_id)
 
     return {
         "application_id": application.id,

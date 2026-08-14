@@ -222,3 +222,30 @@ export async function getMyApplications() {
   if (!res.ok) throw new Error("Failed to fetch your applications")
   return res.json()
 }
+
+// ---------- Profile ----------
+
+export async function updateProfile(details) {
+  const res = await fetch(`${BASE_URL}/auth/me`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json", ...authHeaders() },
+    body: JSON.stringify(details),
+  })
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}))
+    throw new Error(errorMessage(err) || "Failed to update profile")
+  }
+  return res.json()
+}
+
+export async function changePassword(details) {
+  const res = await fetch(`${BASE_URL}/auth/change-password`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...authHeaders() },
+    body: JSON.stringify(details),
+  })
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}))
+    throw new Error(errorMessage(err) || "Failed to change password")
+  }
+}

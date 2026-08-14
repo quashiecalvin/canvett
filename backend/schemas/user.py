@@ -52,3 +52,27 @@ class TokenOut(BaseModel):
     access_token: str
     token_type: str = "bearer"
     user: UserOut
+
+
+class ProfileUpdate(BaseModel):
+    full_name: str
+    company_name: Optional[str] = None
+
+    @field_validator("full_name")
+    @classmethod
+    def name_not_empty(cls, v):
+        if not v or not v.strip():
+            raise ValueError("Name cannot be empty")
+        return v.strip()
+
+
+class PasswordChange(BaseModel):
+    current_password: str
+    new_password: str
+
+    @field_validator("new_password")
+    @classmethod
+    def password_length(cls, v):
+        if len(v) < 8:
+            raise ValueError("New password must be at least 8 characters")
+        return v
