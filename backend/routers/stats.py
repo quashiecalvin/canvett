@@ -3,57 +3,93 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func
 from datetime import datetime, timedelta, timezone
 from database.session import get_db
-from database import models_job, models_candidate, models_activity
+from database import models_job, models_candidate, models_activity, models_user
+from services.auth import require_recruiter
+
 router = APIRouter(prefix="/stats", tags=["Stats"])
 
 
+def _my_job_ids(db, user):
+    rows = (
+        db.query(models_job.Job.id)
+        .filter(models_job.Job.recruiter_id == user.id)
+        .all()
+    )
+    return [r[0] for r in rows]
+
+
 @router.get("/")
-def get_stats(db: Session = Depends(get_db)):
+def get_stats(
+    db: Session = Depends(get_db),
+    user: models_user.User = Depends(require_recruiter),
+):
     now = datetime.now(timezone.utc)
     week_ago = now - timedelta(days=7)
     month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
     last_month_end = month_start - timedelta(seconds=1)
     last_month_start = last_month_end.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
 
+    job_ids = _my_job_ids(db, user)
+
     active_postings = (
         db.query(models_job.Job)
+        .filter(models_job.Job.recruiter_id == user.id)
         .filter(models_job.Job.status == "Active")
         .count()
     )
     postings_this_week = (
         db.query(models_job.Job)
+        .filter(models_job.Job.recruiter_id == user.id)
         .filter(models_job.Job.posted_date >= week_ago)
         .count()
     )
 
-    total_applicants = db.query(models_candidate.Candidate).count()
-    applicants_this_week = (
-        db.query(models_candidate.Candidate)
-        .filter(models_candidate.Candidate.created_at >= week_ago)
-        .count()
-    )
+    if job_ids:
+        total_applicants = (
+            db.query(models_candidate.Candidate)
+            .filter(models_candidate.Candidate.job_id.in_(job_ids))
+            .count()
+        )
+        applicants_this_week = (
+            db.query(models_candidate.Candidate)
+            .filter(models_candidate.Candidate.job_id.in_(job_ids))
+            .filter(models_candidate.Candidate.created_at >= week_ago)
+            .count()
+        )
+        resumes_ranked = (
+            db.query(models_candidate.Score)
+            .filter(models_candidate.Score.job_id.in_(job_ids))
+            .count()
+        )
+        ranked_this_week = (
+            db.query(models_candidate.Score)
+            .filter(models_candidate.Score.job_id.in_(job_ids))
+            .filter(models_candidate.Score.created_at >= week_ago)
+            .count()
+        )
+        avg_score = (
+            db.query(func.avg(models_candidate.Score.overall_score))
+            .filter(models_candidate.Score.job_id.in_(job_ids))
+            .scalar()
+        )
+        this_month_avg = (
+            db.query(func.avg(models_candidate.Score.overall_score))
+            .filter(models_candidate.Score.job_id.in_(job_ids))
+            .filter(models_candidate.Score.created_at >= month_start)
+            .scalar()
+        )
+        last_month_avg = (
+            db.query(func.avg(models_candidate.Score.overall_score))
+            .filter(models_candidate.Score.job_id.in_(job_ids))
+            .filter(models_candidate.Score.created_at >= last_month_start)
+            .filter(models_candidate.Score.created_at <= last_month_end)
+            .scalar()
+        )
+    else:
+        total_applicants = applicants_this_week = resumes_ranked = ranked_this_week = 0
+        avg_score = this_month_avg = last_month_avg = None
 
-    resumes_ranked = db.query(models_candidate.Score).count()
-    ranked_this_week = (
-        db.query(models_candidate.Score)
-        .filter(models_candidate.Score.created_at >= week_ago)
-        .count()
-    )
-
-    avg_score = db.query(func.avg(models_candidate.Score.overall_score)).scalar()
     avg_score = round(avg_score, 1) if avg_score is not None else 0
-
-    this_month_avg = (
-        db.query(func.avg(models_candidate.Score.overall_score))
-        .filter(models_candidate.Score.created_at >= month_start)
-        .scalar()
-    )
-    last_month_avg = (
-        db.query(func.avg(models_candidate.Score.overall_score))
-        .filter(models_candidate.Score.created_at >= last_month_start)
-        .filter(models_candidate.Score.created_at <= last_month_end)
-        .scalar()
-    )
 
     if this_month_avg is not None and last_month_avg is not None:
         score_delta = round(this_month_avg - last_month_avg, 1)
@@ -73,8 +109,15 @@ def get_stats(db: Session = Depends(get_db)):
 
 
 @router.get("/top-candidates")
-def top_candidates(db: Session = Depends(get_db)):
-    jobs = db.query(models_job.Job).all()
+def top_candidates(
+    db: Session = Depends(get_db),
+    user: models_user.User = Depends(require_recruiter),
+):
+    jobs = (
+        db.query(models_job.Job)
+        .filter(models_job.Job.recruiter_id == user.id)
+        .all()
+    )
 
     top = []
     for job in jobs:
@@ -102,9 +145,13 @@ def top_candidates(db: Session = Depends(get_db)):
 
 
 @router.get("/activity")
-def recent_activity(db: Session = Depends(get_db)):
+def recent_activity(
+    db: Session = Depends(get_db),
+    user: models_user.User = Depends(require_recruiter),
+):
     activities = (
         db.query(models_activity.Activity)
+        .filter(models_activity.Activity.recruiter_id == user.id)
         .order_by(models_activity.Activity.created_at.desc())
         .limit(6)
         .all()
@@ -120,8 +167,20 @@ def recent_activity(db: Session = Depends(get_db)):
 
 
 @router.get("/analytics")
-def analytics(db: Session = Depends(get_db)):
-    scores = db.query(models_candidate.Score).all()
+def analytics(
+    db: Session = Depends(get_db),
+    user: models_user.User = Depends(require_recruiter),
+):
+    job_ids = _my_job_ids(db, user)
+
+    if job_ids:
+        scores = (
+            db.query(models_candidate.Score)
+            .filter(models_candidate.Score.job_id.in_(job_ids))
+            .all()
+        )
+    else:
+        scores = []
 
     bands = {"Strong (75-100%)": 0, "Moderate (50-74%)": 0, "Weak (below 50%)": 0}
     for s in scores:
@@ -134,7 +193,11 @@ def analytics(db: Session = Depends(get_db)):
 
     score_distribution = [{"band": k, "count": v} for k, v in bands.items()]
 
-    jobs = db.query(models_job.Job).all()
+    jobs = (
+        db.query(models_job.Job)
+        .filter(models_job.Job.recruiter_id == user.id)
+        .all()
+    )
     per_job = []
     for job in jobs:
         job_scores = [s.overall_score for s in scores if s.job_id == job.id]

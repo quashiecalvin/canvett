@@ -73,15 +73,18 @@ export default function Sidebar() {
       </nav>
 
       <div className="p-4 border-t border-border">
-        <div className="flex items-center gap-2 mb-3">
+        <button
+          onClick={() => navigate("/profile")}
+          className="flex items-center gap-2 mb-3 w-full text-left rounded-btn p-1 -m-1 hover:bg-bg-subtle transition-colors"
+        >
           <div className="w-8 h-8 rounded-full bg-avatar-bg flex items-center justify-center text-[11px] font-medium text-avatar-text shrink-0">
-            {name.split(' ').map((p) => p[0]).slice(0, 2).join('').toUpperCase()}
+            {name.split(" ").map((p) => p[0]).slice(0, 2).join("").toUpperCase()}
           </div>
           <div className="flex flex-col min-w-0">
             <span className="text-[13px] font-medium text-text-primary leading-tight truncate">{name}</span>
             <span className="text-[11px] text-text-muted leading-tight truncate">{role}</span>
           </div>
-        </div>
+        </button>
         <button
           onClick={handleLogout}
           className="flex items-center gap-2 w-full px-2 py-1.5 rounded-btn text-[12px] text-text-muted hover:bg-bg-subtle hover:text-text-body transition-colors"

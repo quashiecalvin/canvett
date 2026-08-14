@@ -6,6 +6,8 @@ from sqlalchemy.orm import Session
 
 from database.session import get_db
 from database import models_job, models_candidate, models_application
+from database import models_user
+from services.auth import require_recruiter
 from services.parser import parse_resume, extract_name
 from services.scoring import score_candidate, get_config
 from services.activity import log_activity
@@ -16,15 +18,37 @@ router = APIRouter(prefix="/candidates", tags=["Candidates"])
 UPLOAD_DIR = "uploads"
 
 
+def _own_job_or_404(db, job_id, user):
+    job = (
+        db.query(models_job.Job)
+        .filter(models_job.Job.id == job_id, models_job.Job.recruiter_id == user.id)
+        .first()
+    )
+    if job is None:
+        raise HTTPException(status_code=404, detail="Job not found")
+    return job
+
+
+def _own_candidate_or_404(db, candidate_id, user):
+    candidate = (
+        db.query(models_candidate.Candidate)
+        .join(models_job.Job, models_candidate.Candidate.job_id == models_job.Job.id)
+        .filter(models_candidate.Candidate.id == candidate_id, models_job.Job.recruiter_id == user.id)
+        .first()
+    )
+    if candidate is None:
+        raise HTTPException(status_code=404, detail="Candidate not found")
+    return candidate
+
+
 @router.post("/upload", response_model=ScoreOut)
 def upload_resume(
     job_id: int = Form(...),
     file: UploadFile = File(...),
     db: Session = Depends(get_db),
+    user: models_user.User = Depends(require_recruiter),
 ):
-    job = db.query(models_job.Job).filter(models_job.Job.id == job_id).first()
-    if job is None:
-        raise HTTPException(status_code=404, detail="Job not found")
+    job = _own_job_or_404(db, job_id, user)
 
     file_path = os.path.join(UPLOAD_DIR, file.filename)
     with open(file_path, "wb") as buffer:
@@ -66,13 +90,18 @@ def upload_resume(
     db.commit()
     db.refresh(score)
 
-    log_activity(db, f"Resume uploaded and ranked for {job.title}: {candidate.name}")
+    log_activity(db, f"Resume uploaded and ranked for {job.title}: {candidate.name}", job.recruiter_id)
 
     return score
 
 
 @router.get("/ranking/{job_id}", response_model=list[RankedCandidate])
-def get_ranking(job_id: int, db: Session = Depends(get_db)):
+def get_ranking(
+    job_id: int,
+    db: Session = Depends(get_db),
+    user: models_user.User = Depends(require_recruiter),
+):
+    _own_job_or_404(db, job_id, user)
     results = (
         db.query(models_candidate.Score, models_candidate.Candidate)
         .join(
@@ -112,10 +141,12 @@ def get_ranking(job_id: int, db: Session = Depends(get_db)):
 
 
 @router.post("/rerank/{job_id}")
-def rerank(job_id: int, db: Session = Depends(get_db)):
-    job = db.query(models_job.Job).filter(models_job.Job.id == job_id).first()
-    if job is None:
-        raise HTTPException(status_code=404, detail="Job not found")
+def rerank(
+    job_id: int,
+    db: Session = Depends(get_db),
+    user: models_user.User = Depends(require_recruiter),
+):
+    job = _own_job_or_404(db, job_id, user)
 
     candidates = (
         db.query(models_candidate.Candidate)
@@ -148,16 +179,19 @@ def rerank(job_id: int, db: Session = Depends(get_db)):
             score.duration_verified = result["duration_verified"]
 
     db.commit()
-    log_activity(db, f"Candidates re-ranked for {job.title}")
+    log_activity(db, f"Candidates re-ranked for {job.title}", job.recruiter_id)
     return {"message": "Re-ranked", "count": len(candidates)}
 
 
 @router.delete("/{candidate_id}")
-def delete_candidate(candidate_id: int, db: Session = Depends(get_db)):
-    candidate = db.query(models_candidate.Candidate).filter(models_candidate.Candidate.id == candidate_id).first()
-    if candidate is None:
-        raise HTTPException(status_code=404, detail="Candidate not found")
+def delete_candidate(
+    candidate_id: int,
+    db: Session = Depends(get_db),
+    user: models_user.User = Depends(require_recruiter),
+):
+    candidate = _own_candidate_or_404(db, candidate_id, user)
 
+    db.query(models_application.Application).filter(models_application.Application.candidate_id == candidate_id).delete()
     db.query(models_candidate.Score).filter(models_candidate.Score.candidate_id == candidate_id).delete()
     db.delete(candidate)
     db.commit()
@@ -165,10 +199,12 @@ def delete_candidate(candidate_id: int, db: Session = Depends(get_db)):
 
 
 @router.get("/{candidate_id}/detail")
-def get_candidate_detail(candidate_id: int, db: Session = Depends(get_db)):
-    candidate = db.query(models_candidate.Candidate).filter(models_candidate.Candidate.id == candidate_id).first()
-    if candidate is None:
-        raise HTTPException(status_code=404, detail="Candidate not found")
+def get_candidate_detail(
+    candidate_id: int,
+    db: Session = Depends(get_db),
+    user: models_user.User = Depends(require_recruiter),
+):
+    candidate = _own_candidate_or_404(db, candidate_id, user)
 
     score = (
         db.query(models_candidate.Score)

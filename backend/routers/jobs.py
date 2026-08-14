@@ -20,7 +20,7 @@ def create_job(
     db.add(new_job)
     db.commit()
     db.refresh(new_job)
-    log_activity(db, f"New job posting created: {new_job.title}")
+    log_activity(db, f"New job posting created: {new_job.title}", user.id)
     return new_job
 
 
@@ -103,5 +103,5 @@ def update_job(
         setattr(job, field, value)
     db.commit()
     db.refresh(job)
-    log_activity(db, f"Job posting updated: {job.title}")
+    log_activity(db, f"Job posting updated: {job.title}", user.id)
     return job

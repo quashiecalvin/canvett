@@ -12,6 +12,7 @@ import UploadResumes from './pages/UploadResumes'
 import CandidateRanking from './pages/CandidateRanking'
 import Analytics from './pages/Analytics'
 import Settings from './pages/Settings'
+import Profile from './pages/Profile'
 import SeekerLayout from './components/layout/SeekerLayout'
 import JobBoard from './pages/seeker/JobBoard'
 import JobDetail from './pages/seeker/JobDetail'
@@ -30,6 +31,7 @@ function RecruiterApp() {
             <Route path="ranking" element={<CandidateRanking />} />
             <Route path="analytics" element={<Analytics />} />
             <Route path="settings" element={<Settings />} />
+            <Route path="profile" element={<Profile />} />
             <Route path="*" element={<Navigate to="dashboard" replace />} />
           </Routes>
         </AppLayout>
@@ -46,6 +48,7 @@ function SeekerApp() {
         <Route path="jobs/:id" element={<JobDetail />} />
         <Route path="jobs/:id/apply" element={<ApplyToJob />} />
         <Route path="applications" element={<MyApplications />} />
+        <Route path="profile" element={<Profile />} />
         <Route path="*" element={<Navigate to="jobs" replace />} />
       </Routes>
     </SeekerLayout>

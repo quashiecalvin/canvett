@@ -8,4 +8,5 @@ class Activity(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     description = Column(String, nullable=False)
+    recruiter_id = Column(Integer, nullable=True, index=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())

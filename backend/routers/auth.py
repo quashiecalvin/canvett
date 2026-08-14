@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from database.session import get_db
 from database import models_user
-from schemas.user import UserRegister, UserLogin, UserOut, TokenOut
+from schemas.user import UserRegister, UserLogin, UserOut, TokenOut, ProfileUpdate, PasswordChange
 from services.auth import (
     hash_password,
     verify_password,
@@ -63,3 +63,32 @@ def login(payload: UserLogin, db: Session = Depends(get_db)):
 @router.get("/me", response_model=UserOut)
 def get_me(user: models_user.User = Depends(get_current_user)):
     return user
+
+
+@router.patch("/me", response_model=UserOut)
+def update_profile(
+    payload: ProfileUpdate,
+    db: Session = Depends(get_db),
+    user: models_user.User = Depends(get_current_user),
+):
+    user.full_name = payload.full_name
+    if user.role == "recruiter":
+        user.company_name = (payload.company_name or "").strip() or None
+    db.commit()
+    db.refresh(user)
+    return user
+
+
+@router.post("/change-password", status_code=status.HTTP_204_NO_CONTENT)
+def change_password(
+    payload: PasswordChange,
+    db: Session = Depends(get_db),
+    user: models_user.User = Depends(get_current_user),
+):
+    if not verify_password(payload.current_password, user.password_hash):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Your current password is incorrect",
+        )
+    user.password_hash = hash_password(payload.new_password)
+    db.commit()
