@@ -142,33 +142,6 @@ export default function Settings() {
       </header>
 
       <div className="flex flex-col gap-4">
-        <Section
-          title="Profile"
-          description="Your name and role, shown in the sidebar."
-        >
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-[12px] font-medium text-text-body mb-1.5">Name</label>
-              <input
-                type="text"
-                value={form.recruiter_name}
-                onChange={(e) => update('recruiter_name', e.target.value)}
-                placeholder="e.g. Calvin Quashie"
-                className="w-full h-10 px-3 rounded-btn border border-border-strong text-[13px] text-text-body placeholder:text-text-hint focus:outline-none focus:border-accent focus:border-[1.5px]"
-              />
-            </div>
-            <div>
-              <label className="block text-[12px] font-medium text-text-body mb-1.5">Role</label>
-              <input
-                type="text"
-                value={form.recruiter_role}
-                onChange={(e) => update('recruiter_role', e.target.value)}
-                placeholder="e.g. HR Manager"
-                className="w-full h-10 px-3 rounded-btn border border-border-strong text-[13px] text-text-body placeholder:text-text-hint focus:outline-none focus:border-accent focus:border-[1.5px]"
-              />
-            </div>
-          </div>
-        </Section>
 
         <Section
           title="Scoring weights"

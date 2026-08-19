@@ -72,6 +72,21 @@ def update_profile(
     user: models_user.User = Depends(get_current_user),
 ):
     user.full_name = payload.full_name
+
+    new_email = payload.email.lower()
+    if new_email != user.email:
+        existing = (
+            db.query(models_user.User)
+            .filter(models_user.User.email == new_email, models_user.User.id != user.id)
+            .first()
+        )
+        if existing:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="An account with this email already exists",
+            )
+        user.email = new_email
+
     if user.role == "recruiter":
         user.company_name = (payload.company_name or "").strip() or None
     db.commit()
