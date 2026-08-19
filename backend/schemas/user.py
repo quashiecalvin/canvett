@@ -56,6 +56,7 @@ class TokenOut(BaseModel):
 
 class ProfileUpdate(BaseModel):
     full_name: str
+    email: EmailStr
     company_name: Optional[str] = None
 
     @field_validator("full_name")

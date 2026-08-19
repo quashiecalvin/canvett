@@ -17,8 +17,8 @@ export default function Sidebar() {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
 
-  const name = user?.full_name || settings?.recruiter_name || 'Recruiter'
-  const role = settings?.recruiter_role || 'Recruiter'
+  const name = user?.full_name || 'Recruiter'
+  const role = user?.role === 'recruiter' ? 'Recruiter' : 'Job Seeker'
 
   function handleLogout() {
     logout()
