@@ -8,9 +8,14 @@ MONTHS = {
     "july": 7, "august": 8, "september": 9, "october": 10, "november": 11, "december": 12,
 }
 
-# Matches "Jan 2023 - Mar 2025", "January 2023 to Present", etc.
+# Matches date ranges such as:
+#   "Jan 2023 - Mar 2025"      (year on both sides)
+#   "January 2023 to Present"  (open-ended range)
+#   "November - December 2025" (shared year: only stated once, at the end)
+# The separator may be a hyphen, en-dash, em-dash or the word "to".
+# The start year is optional; when it is missing it is borrowed from the end.
 DATE_RANGE = re.compile(
-    r"([a-z]+)\s+(\d{4})\s*(?:-|–|to)\s*([a-z]+\s+\d{4}|present|current)",
+    r"([a-z]+)\s*(\d{4})?\s*(?:-|–|—|to)\s*(?:([a-z]+)\s+(\d{4})|(present|current))",
     re.IGNORECASE,
 )
 
@@ -30,21 +35,24 @@ def extract_total_years(experience_text: str):
     found_any = False
 
     for match in DATE_RANGE.finditer(experience_text):
-        start_month_str, start_year, end_part = match.groups()
-        start = _parse_month_year(start_month_str, start_year)
-        if start is None:
-            continue
+        start_month_str, start_year, end_month_str, end_year, open_ended = match.groups()
 
-        end_part = end_part.strip().lower()
-        if end_part in ("present", "current"):
+        if open_ended:
             end = datetime.now()
-        else:
-            parts = end_part.split()
-            if len(parts) != 2:
+            # An open-ended range needs an explicit start year to be meaningful.
+            if not start_year:
                 continue
-            end = _parse_month_year(parts[0], parts[1])
+            start = _parse_month_year(start_month_str, start_year)
+        else:
+            # Closed range. If the start year is omitted it is shared with the end.
+            effective_start_year = start_year or end_year
+            start = _parse_month_year(start_month_str, effective_start_year)
+            end = _parse_month_year(end_month_str, end_year)
             if end is None:
                 continue
+
+        if start is None:
+            continue
 
         months = (end.year - start.year) * 12 + (end.month - start.month)
         if months > 0:
