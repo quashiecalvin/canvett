@@ -89,7 +89,7 @@ export default function Analytics() {
             </ResponsiveContainer>
           </ChartCard>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
             <ChartCard
               title="Candidates per job posting"
               subtitle="Which roles are attracting the most applicants"

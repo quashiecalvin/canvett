@@ -52,7 +52,7 @@ export default function UploadResumes() {
 
   return (
     <div className="p-6">
-      <header className="flex items-start justify-between mb-6">
+      <header className="flex flex-col gap-4 mb-6 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <h1 className="text-[22px] font-medium text-text-primary leading-[1.2]">Upload resumes</h1>
           <p className="text-[13px] text-text-muted mt-1">Add candidate resumes to rank against a job posting</p>

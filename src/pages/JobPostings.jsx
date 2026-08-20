@@ -69,21 +69,21 @@ export default function JobPostings() {
   return (
     <div>
       <div className="sticky top-0 z-10 bg-bg-page px-6 pt-6 pb-3">
-        <header className="flex items-start justify-between mb-6">
+        <header className="flex flex-col gap-4 mb-6 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <h1 className="text-[22px] font-medium text-text-primary leading-[1.2]">Job postings</h1>
             <p className="text-[13px] text-text-muted mt-1">Manage your open roles and track applicants</p>
           </div>
           <button
             onClick={() => { setEditingJob(null); setShowModal(true) }}
-            className="flex items-center gap-2 h-10 px-4 rounded-btn bg-accent text-white text-[13px] font-medium hover:bg-accent/90 transition-colors"
+            className="flex items-center justify-center gap-2 h-10 px-4 rounded-btn bg-accent text-white text-[13px] font-medium hover:bg-accent/90 transition-colors"
           >
             <Plus size={14} />
             New job posting
           </button>
         </header>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
           <div className="flex-1 relative">
             <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-hint" />
             <input
@@ -94,20 +94,22 @@ export default function JobPostings() {
               className="w-full h-10 pl-9 pr-3 rounded-btn border border-border-strong text-[13px] text-text-body placeholder:text-text-hint focus:outline-none focus:border-accent focus:border-[1.5px]"
             />
           </div>
-          <FilterDropdown
-            icon={Filter}
-            label="Status"
-            value={statusFilter}
-            options={['All', 'Active', 'In review', 'Closed']}
-            onChange={setStatusFilter}
-          />
-          <FilterDropdown
-            icon={ArrowUpDown}
-            label="Sort"
-            value={sortOrder}
-            options={['Newest', 'Oldest', 'Highest applicants']}
-            onChange={setSortOrder}
-          />
+          <div className="flex gap-3">
+            <FilterDropdown
+              icon={Filter}
+              label="Status"
+              value={statusFilter}
+              options={['All', 'Active', 'In review', 'Closed']}
+              onChange={setStatusFilter}
+            />
+            <FilterDropdown
+              icon={ArrowUpDown}
+              label="Sort"
+              value={sortOrder}
+              options={['Newest', 'Oldest', 'Highest applicants']}
+              onChange={setSortOrder}
+            />
+          </div>
         </div>
       </div>
 
@@ -121,27 +123,31 @@ export default function JobPostings() {
         {filteredJobs.map((job) => {
           const Icon = iconForDepartment[job.department] || Briefcase
           return (
-            <div key={job.id} className="bg-bg-surface border border-border rounded-card p-4 flex items-center gap-4">
-              <div className="w-10 h-10 rounded-btn bg-accent-tint flex items-center justify-center text-accent shrink-0">
-                <Icon size={20} />
+            <div key={job.id} className="bg-bg-surface border border-border rounded-card p-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
+              <div className="flex items-center gap-4 min-w-0 flex-1">
+                <div className="w-10 h-10 rounded-btn bg-accent-tint flex items-center justify-center text-accent shrink-0">
+                  <Icon size={20} />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <h3 className="text-[15px] font-medium text-text-primary leading-[1.4]">{job.title}</h3>
+                  <p className="text-[12px] text-text-muted mt-0.5">{job.department} • {job.employment_type} • {job.location}</p>
+                </div>
               </div>
-              <div className="flex-1 min-w-0">
-                <h3 className="text-[15px] font-medium text-text-primary leading-[1.4]">{job.title}</h3>
-                <p className="text-[12px] text-text-muted mt-0.5">{job.department} • {job.employment_type} • {job.location}</p>
-              </div>
-              <div className="flex items-center gap-8 shrink-0">
-                <div className="text-center">
-                  <p className="text-[15px] font-medium text-text-primary">{job.applicant_count}</p>
-                  <p className="text-[11px] text-text-muted">applicants</p>
+              <div className="flex items-center justify-between gap-4 shrink-0 border-t border-border pt-3 sm:border-t-0 sm:pt-0 sm:gap-8">
+                <div className="flex items-center gap-6 sm:gap-8">
+                  <div className="text-center">
+                    <p className="text-[15px] font-medium text-text-primary">{job.applicant_count}</p>
+                    <p className="text-[11px] text-text-muted">applicants</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-[15px] font-medium text-text-primary">{job.ranked_count}</p>
+                    <p className="text-[11px] text-text-muted">ranked</p>
+                  </div>
+                  <div className="w-20 flex justify-center">
+                    <StatusBadge status={job.status} />
+                  </div>
                 </div>
-                <div className="text-center">
-                  <p className="text-[15px] font-medium text-text-primary">{job.ranked_count}</p>
-                  <p className="text-[11px] text-text-muted">ranked</p>
-                </div>
-                <div className="w-20 flex justify-center">
-                  <StatusBadge status={job.status} />
-                </div>
-               <JobActionsMenu
+                <JobActionsMenu
                   onViewCandidates={() => { setSelectedJobId(job.id); navigate('/ranking') }}
                   onEdit={() => { setEditingJob(job); setShowModal(true) }}
                   onDelete={() => handleDelete(job.id)}

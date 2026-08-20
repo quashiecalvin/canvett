@@ -21,10 +21,10 @@ export default function JobSelector() {
     <div className="relative" ref={ref}>
       <button
         onClick={() => setOpen((o) => !o)}
-        className="flex items-center gap-2 h-10 px-4 rounded-btn border border-border-strong text-[13px] text-text-body hover:bg-bg-subtle transition-colors"
+        className="flex w-full items-center justify-between gap-2 h-10 px-4 rounded-btn border border-border-strong text-[13px] text-text-body whitespace-nowrap hover:bg-bg-subtle transition-colors sm:w-auto sm:justify-start"
       >
         {selectedJob ? selectedJob.title : 'Select a job'}
-        <ChevronDown size={14} className="text-text-hint" />
+        <ChevronDown size={14} className="text-text-hint shrink-0" />
       </button>
 
       {open && (

@@ -82,21 +82,21 @@ export default function Dashboard() {
 
   return (
     <div className="p-6">
-      <header className="flex items-start justify-between mb-6">
+      <header className="flex flex-col gap-4 mb-6 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <h1 className="text-[22px] font-medium text-text-primary leading-[1.2]">Dashboard</h1>
           <p className="text-[13px] text-text-muted mt-1">{today}</p>
         </div>
         <button
           onClick={() => setShowModal(true)}
-          className="flex items-center gap-2 h-10 px-4 rounded-btn bg-accent text-white text-[13px] font-medium hover:bg-accent/90 transition-colors"
+          className="flex items-center justify-center gap-2 h-10 px-4 rounded-btn bg-accent text-white text-[13px] font-medium hover:bg-accent/90 transition-colors"
         >
           <Plus size={14} />
           New job posting
         </button>
       </header>
 
-      <div className="grid grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-2 gap-4 mb-6 md:grid-cols-4">
         {statCards.map(({ label, value, delta }) => (
           <div key={label} className="bg-bg-subtle rounded-btn px-4 py-3">
             <p className="text-[10px] font-medium uppercase tracking-[0.07em] text-text-hint">{label}</p>
@@ -126,11 +126,11 @@ export default function Dashboard() {
                 <div className="w-9 h-9 rounded-btn bg-accent-tint flex items-center justify-center text-accent shrink-0">
                   <Icon size={18} />
                 </div>
-                <div className="flex-1">
-                  <h3 className="text-[15px] font-medium text-text-primary leading-[1.4]">{job.title}</h3>
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-[15px] font-medium text-text-primary leading-[1.4] truncate">{job.title}</h3>
                   <p className="text-[12px] text-text-muted mt-0.5">{job.department} • Posted {timeAgo(job.posted_date)}</p>
                 </div>
-                <div className="flex flex-col items-end gap-1">
+                <div className="flex flex-col items-end gap-1 shrink-0">
                   <StatusBadge status={job.status} />
                   <span className="text-[12px] text-text-muted">{job.applicant_count} applicants</span>
                 </div>
@@ -140,7 +140,7 @@ export default function Dashboard() {
         </div>
       </section>
 
-      <div className="grid grid-cols-2 gap-4 mb-6">
+      <div className="grid grid-cols-1 gap-4 mb-6 md:grid-cols-2">
         <div>
           <h2 className="text-[18px] font-medium text-text-primary mb-4 leading-[1.3]">Recent activity</h2>
           <div className="bg-bg-surface border border-border rounded-card p-4">

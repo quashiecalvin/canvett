@@ -83,7 +83,7 @@ const loadRanking = useCallback(() => {
 
   return (
     <div className="p-6">
-      <header className="flex items-start justify-between mb-6">
+      <header className="flex flex-col gap-4 mb-6 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <h1 className="text-[22px] font-medium text-text-primary leading-[1.2]">Candidate ranking</h1>
           <p className="text-[13px] text-text-muted mt-1">{selectedJob ? selectedJob.title : 'No job selected'} • {candidates.length} candidates ranked</p>
@@ -91,7 +91,7 @@ const loadRanking = useCallback(() => {
         <div className="flex items-center gap-3">
           <button
             onClick={handleRerank}
-            className="flex items-center gap-2 h-10 px-4 rounded-btn border border-border-strong text-[13px] text-text-body hover:bg-bg-subtle transition-colors"
+            className="flex flex-1 items-center justify-center gap-2 h-10 px-4 rounded-btn border border-border-strong text-[13px] text-text-body hover:bg-bg-subtle transition-colors sm:flex-none"
           >
             <RefreshCw size={14} />
             Re-rank
@@ -99,7 +99,7 @@ const loadRanking = useCallback(() => {
           <button
             onClick={handleExport}
             disabled={candidates.length === 0}
-            className="flex items-center gap-2 h-10 px-4 rounded-btn bg-accent text-white text-[13px] font-medium hover:bg-accent/90 transition-colors disabled:opacity-50"
+            className="flex flex-1 items-center justify-center gap-2 h-10 px-4 rounded-btn bg-accent text-white text-[13px] font-medium hover:bg-accent/90 transition-colors disabled:opacity-50 sm:flex-none"
           >
             <Download size={14} />
             Export
@@ -124,7 +124,7 @@ const loadRanking = useCallback(() => {
         {candidates.map((c, i) => (
           <div
             key={c.candidate_id}
-            className={`bg-bg-surface rounded-card p-4 flex items-start gap-4
+            className={`bg-bg-surface rounded-card p-4 flex items-start gap-3 sm:gap-4
               ${i === 0 ? 'border-[1.5px] border-accent' : 'border-[0.5px] border-border'}`}
           >
             <div className="text-[15px] font-medium text-text-muted w-6 text-center shrink-0 pt-1">
@@ -161,7 +161,7 @@ const loadRanking = useCallback(() => {
                 ))}
               </div>
 
-             <div className="grid grid-cols-3 gap-6 mt-3">
+             <div className="grid grid-cols-1 gap-2 mt-3 sm:grid-cols-3 sm:gap-6">
                 {[
                   { key: 'skills', label: 'Skills match', value: c.skills_score },
                   { key: 'experience', label: 'Experience', value: c.experience_score },
