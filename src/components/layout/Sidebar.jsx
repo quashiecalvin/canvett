@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from 'react-router-dom'
-import { LayoutDashboard, Briefcase, Upload, Users, BarChart2, Settings, LogOut } from 'lucide-react'
+import { LayoutDashboard, Briefcase, Upload, Users, BarChart2, Settings, LogOut, X } from 'lucide-react'
 import { useSettings } from '../../context/SettingsContext'
 import { useAuth } from '../../context/AuthContext'
 
@@ -12,7 +12,7 @@ const navItems = [
   { icon: Settings, label: 'Settings', to: '/settings', group: 'REPORTS' },
 ]
 
-export default function Sidebar() {
+export default function Sidebar({ open = false, onClose = () => {} }) {
   const { settings } = useSettings()
   const { user, logout } = useAuth()
   const navigate = useNavigate()
@@ -21,25 +21,39 @@ export default function Sidebar() {
   const role = user?.role === 'recruiter' ? 'Recruiter' : 'Job Seeker'
 
   function handleLogout() {
+    onClose()
     logout()
     navigate('/login', { replace: true })
   }
 
   return (
-    <aside className="w-50 h-screen bg-bg-surface border-r border-border flex flex-col shrink-0">
-      <div className="p-4 border-b border-border flex items-center gap-2">
-        <div className="w-7 h-7 rounded-[7px] bg-accent flex items-center justify-center shrink-0">
-          <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-            <rect x="8" y="8" width="5" height="7" rx="1.5" fill="white" fillOpacity="0.9"/>
-            <rect x="15" y="8" width="5" height="4" rx="1.5" fill="white" fillOpacity="0.6"/>
-            <rect x="15" y="14" width="5" height="6" rx="1.5" fill="white" fillOpacity="0.9"/>
-            <rect x="8" y="17" width="5" height="3" rx="1.5" fill="white" fillOpacity="0.6"/>
-          </svg>
+    <aside
+      className={`fixed inset-y-0 left-0 z-50 w-50 bg-bg-surface border-r border-border flex flex-col shrink-0 transition-transform duration-200 md:static md:translate-x-0 ${
+        open ? 'translate-x-0' : '-translate-x-full'
+      }`}
+    >
+      <div className="p-4 border-b border-border flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2 min-w-0">
+          <div className="w-7 h-7 rounded-[7px] bg-accent flex items-center justify-center shrink-0">
+            <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+              <rect x="8" y="8" width="5" height="7" rx="1.5" fill="white" fillOpacity="0.9"/>
+              <rect x="15" y="8" width="5" height="4" rx="1.5" fill="white" fillOpacity="0.6"/>
+              <rect x="15" y="14" width="5" height="6" rx="1.5" fill="white" fillOpacity="0.9"/>
+              <rect x="8" y="17" width="5" height="3" rx="1.5" fill="white" fillOpacity="0.6"/>
+            </svg>
+          </div>
+          <span className="font-outfit text-[18px] font-semibold tracking-[-0.2px]">
+            <span className="text-text-primary">Can</span>
+            <span className="text-accent">vett</span>
+          </span>
         </div>
-        <span className="font-outfit text-[18px] font-semibold tracking-[-0.2px]">
-          <span className="text-text-primary">Can</span>
-          <span className="text-accent">vett</span>
-        </span>
+        <button
+          onClick={onClose}
+          className="text-text-muted hover:text-text-body md:hidden"
+          aria-label="Close menu"
+        >
+          <X size={18} />
+        </button>
       </div>
 
       <nav className="flex flex-col flex-1">
@@ -52,6 +66,7 @@ export default function Sidebar() {
               <NavLink
                 key={to}
                 to={to}
+                onClick={onClose}
                 className={({ isActive }) =>
                   `flex items-center gap-2 px-4 py-2 text-[15px] w-full text-left border-r-2 transition-colors
                   ${isActive
@@ -74,7 +89,7 @@ export default function Sidebar() {
 
       <div className="p-4 border-t border-border">
         <button
-          onClick={() => navigate("/profile")}
+          onClick={() => { onClose(); navigate("/profile") }}
           className="flex items-center gap-2 mb-3 w-full text-left rounded-btn p-1 -m-1 hover:bg-bg-subtle transition-colors"
         >
           <div className="w-8 h-8 rounded-full bg-avatar-bg flex items-center justify-center text-[11px] font-medium text-avatar-text shrink-0">

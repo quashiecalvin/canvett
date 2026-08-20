@@ -117,7 +117,7 @@ export default function Settings() {
 
   return (
     <div className="p-6">
-      <header className="flex items-start justify-between mb-6">
+      <header className="flex flex-col gap-4 mb-6 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <h1 className="text-[22px] font-medium text-text-primary leading-[1.2]">Settings</h1>
           <p className="text-[13px] text-text-muted mt-1">Configure how candidates are scored and ranked</p>
@@ -125,7 +125,7 @@ export default function Settings() {
         <div className="flex items-center gap-3">
           <button
             onClick={handleReset}
-            className="flex items-center gap-2 h-10 px-4 rounded-btn border border-border-strong text-[13px] text-text-body hover:bg-bg-subtle transition-colors"
+            className="flex flex-1 items-center justify-center gap-2 h-10 px-4 rounded-btn border border-border-strong text-[13px] text-text-body whitespace-nowrap hover:bg-bg-subtle transition-colors sm:flex-none"
           >
             <RotateCcw size={14} />
             Reset to defaults
@@ -133,7 +133,7 @@ export default function Settings() {
           <button
             onClick={handleSave}
             disabled={saving || !weightsValid}
-            className="flex items-center gap-2 h-10 px-4 rounded-btn bg-accent text-white text-[13px] font-medium hover:bg-accent/90 transition-colors disabled:opacity-50"
+            className="flex flex-1 items-center justify-center gap-2 h-10 px-4 rounded-btn bg-accent text-white text-[13px] font-medium whitespace-nowrap hover:bg-accent/90 transition-colors disabled:opacity-50 sm:flex-none"
           >
             <Save size={14} />
             {saving ? 'Saving...' : 'Save changes'}
