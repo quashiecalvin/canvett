@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom'
 import { ArrowLeft, MapPin, Building2, Briefcase, GraduationCap, Clock, Layers,
   Code2, SquareActivity, Palette, Megaphone } from 'lucide-react'
 import { getPublicJob } from '../../lib/api'
+import ApplyChooserModal from '../../components/seeker/ApplyChooserModal'
 
 const iconForDepartment = {
   Engineering: Code2,
@@ -28,6 +29,7 @@ export default function JobDetail() {
   const [job, setJob] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [chooserOpen, setChooserOpen] = useState(false)
 
   useEffect(() => {
     setLoading(true)
@@ -74,15 +76,31 @@ export default function JobDetail() {
         All jobs
       </button>
 
-      <div className="flex items-start gap-4">
-        <div className="w-12 h-12 rounded-btn bg-accent-tint flex items-center justify-center text-accent shrink-0">
-          <Icon size={24} />
-        </div>
-        <div className="min-w-0">
-          <h1 className="text-[22px] font-medium text-text-primary leading-[1.2]">{job.title}</h1>
-          <p className="text-[13px] text-text-muted mt-1">
-            {job.company} • {job.location} • {job.employment_type}
-          </p>
+      {/* Blue header band */}
+      <div className="rounded-card border border-border overflow-hidden">
+        <div className="bg-accent px-6 py-6">
+          <div className="flex items-start gap-4">
+            <div className="w-12 h-12 rounded-btn bg-white/15 flex items-center justify-center text-white shrink-0">
+              <Icon size={24} />
+            </div>
+            <div className="min-w-0">
+              <h1 className="text-[22px] font-medium text-white leading-[1.2]">{job.title}</h1>
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-2">
+                <span className="inline-flex items-center gap-1.5 text-[12.5px] text-white/85">
+                  <Building2 size={13} />
+                  {job.company}
+                </span>
+                <span className="inline-flex items-center gap-1.5 text-[12.5px] text-white/85">
+                  <MapPin size={13} />
+                  {job.location}
+                </span>
+                <span className="inline-flex items-center gap-1.5 text-[12.5px] text-white/85">
+                  <Briefcase size={13} />
+                  {job.employment_type}
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -139,7 +157,7 @@ export default function JobDetail() {
           </div>
 
           <button
-            onClick={() => navigate(`/seeker/jobs/${job.id}/apply`)}
+            onClick={() => setChooserOpen(true)}
             className="w-full h-10 mt-5 rounded-btn bg-accent text-white text-[13.5px] font-medium hover:bg-accent-2 active:scale-[0.99] transition-all"
           >
             Apply for this role
@@ -149,6 +167,14 @@ export default function JobDetail() {
           </p>
         </div>
       </div>
+
+      {chooserOpen && (
+        <ApplyChooserModal
+          jobId={job.id}
+          jobTitle={job.title}
+          onClose={() => setChooserOpen(false)}
+        />
+      )}
     </div>
   )
 }

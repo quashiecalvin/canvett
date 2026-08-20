@@ -209,6 +209,8 @@ def my_applications(
         job = db.query(models_job.Job).filter(models_job.Job.id == app.job_id).first()
         result.append({
             "application_id": app.id,
+            "job_id": app.job_id,
+            "department": job.department if job else None,
             "job_title": job.title if job else "A role",
             "company": _company_for(db, job),
             "location": job.location if job else "",

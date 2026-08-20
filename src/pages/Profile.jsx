@@ -106,7 +106,7 @@ export default function Profile() {
 
       {/* Header band */}
       <div className="rounded-card border border-border overflow-hidden mb-5">
-        <div className="h-20 bg-gradient-to-r from-accent to-accent-2" />
+        <div className="h-20 bg-accent" />
         <div className="bg-bg-surface px-6 pb-5">
           <div className="flex flex-col sm:flex-row sm:items-end gap-4 -mt-10">
             <div className="w-20 h-20 rounded-full bg-avatar-bg ring-4 ring-bg-surface flex items-center justify-center text-[24px] font-medium text-avatar-text shrink-0">
