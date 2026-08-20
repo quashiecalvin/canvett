@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
-import { ArrowLeft, Upload, FileText, X, Plus, Trash2, CheckCircle2 , ArrowRight, FileCheck2 } from 'lucide-react'
+import { ArrowLeft, Upload, FileText, X, Plus, Trash2, CheckCircle2 , ArrowRight, FileCheck2, Download } from 'lucide-react'
 import { getPublicJob, applyWithUpload, applyWithForm } from '../../lib/api'
 import ParseReceipt from '../../components/seeker/ParseReceipt'
 
@@ -212,6 +212,21 @@ export default function ApplyToJob() {
               Remove file
             </button>
           )}
+
+          <div className="mt-4 flex items-start gap-2.5 rounded-btn bg-bg-subtle px-3 py-2.5 text-[12.5px] leading-relaxed text-text-muted">
+            <Download size={14} className="mt-0.5 shrink-0 text-accent" />
+            <span>
+              Use our{' '}
+              <a
+                href="/Canvett_CV_Template.docx"
+                download
+                className="font-medium text-accent hover:underline"
+              >
+                recommended CV template
+              </a>{' '}
+              to ensure your information is structured clearly for accurate parsing and analysis.
+            </span>
+          </div>
 
           {error && <p className="mt-4 text-[13px] text-danger">{error}</p>}
 
