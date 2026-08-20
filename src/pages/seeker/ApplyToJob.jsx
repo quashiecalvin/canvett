@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
-import { ArrowLeft, Upload, FileText, X, Plus, Trash2, CheckCircle2 } from 'lucide-react'
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
+import { ArrowLeft, Upload, FileText, X, Plus, Trash2, CheckCircle2 , ArrowRight, FileCheck2 } from 'lucide-react'
 import { getPublicJob, applyWithUpload, applyWithForm } from '../../lib/api'
 import ParseReceipt from '../../components/seeker/ParseReceipt'
 
@@ -43,7 +43,13 @@ export default function ApplyToJob() {
 
   const [job, setJob] = useState(null)
   const [loadError, setLoadError] = useState(null)
-  const [path, setPath] = useState(null)
+  const [searchParams] = useSearchParams()
+  const method = searchParams.get('method')
+  const [path, setPath] = useState(method === 'form' || method === 'upload' ? method : null)
+
+  useEffect(() => {
+    if (method === 'form' || method === 'upload') setPath(method)
+  }, [method])
   const [receipt, setReceipt] = useState(null)
   const [error, setError] = useState(null)
   const [submitting, setSubmitting] = useState(false)
@@ -58,6 +64,9 @@ export default function ApplyToJob() {
   useEffect(() => {
     getPublicJob(id).then(setJob).catch((err) => setLoadError(err.message))
   }, [id])
+    useEffect(() => {
+    if (!path) navigate(`/seeker/jobs/${id}`, { replace: true })
+  }, [path, id, navigate])
 
   const topRef = useRef(null)
 
@@ -142,58 +151,50 @@ export default function ApplyToJob() {
   const cardClass = "rounded-xl border border-border bg-bg-surface p-5 sm:p-6"
 
   return (
-    <div className="p-6 max-w-3xl">
+    <div className="p-6">
       <button
-        onClick={() => (path ? setPath(null) : navigate(`/seeker/jobs/${id}`))}
+        onClick={() => navigate(`/seeker/jobs/${id}`)}
         className="mb-5 flex items-center gap-1.5 text-[13px] font-medium text-text-muted transition-colors hover:text-text-body"
       >
         <ArrowLeft size={15} />
-        {path ? 'Choose a different way to apply' : 'Back to role'}
+        Back to role
       </button>
 
-      <h1 className="font-outfit text-[21px] font-semibold tracking-[-0.3px] text-text-primary sm:text-[24px]">
-        Apply for {job.title}
-      </h1>
-      <p className="mt-1 text-[14px] text-text-muted">{job.company}</p>
-
-      {!path && (
-        <div className="mt-6 grid gap-4 sm:grid-cols-2">
+      <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div className="min-w-0">
+          <h1 className="text-[22px] font-medium text-text-primary leading-[1.2]">
+            Apply for {job.title}
+          </h1>
+          <p className="mt-1 text-[14px] text-text-muted">{job.company}</p>
+        </div>
+        <div className="flex flex-col items-end gap-1.5">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-accent-tint px-3 py-1 text-[12px] font-medium text-accent">
+            {path === 'upload' ? <Upload size={12} /> : <FileText size={12} />}
+            {path === 'upload' ? 'Uploading a CV' : 'Guided form'}
+          </span>
           <button
-            onClick={() => setPath('upload')}
-            className="rounded-xl border border-border bg-bg-surface p-5 text-left transition-shadow hover:shadow-md focus:border-accent focus:outline-none"
+            onClick={() => navigate(`/seeker/jobs/${id}/apply?method=${path === 'upload' ? 'form' : 'upload'}`)}
+            className="text-[12px] font-medium text-text-muted hover:text-accent transition-colors"
           >
-            <Upload size={20} className="text-accent" />
-            <h2 className="mt-3 font-outfit text-[16px] font-semibold text-text-primary">Upload your CV</h2>
-            <p className="mt-1.5 text-[13.5px] leading-relaxed text-text-muted">
-              Send the CV you already have, as a PDF or Word document.
-            </p>
-          </button>
-
-          <button
-            onClick={() => setPath('form')}
-            className="rounded-xl border border-border bg-bg-surface p-5 text-left transition-shadow hover:shadow-md focus:border-accent focus:outline-none"
-          >
-            <FileText size={20} className="text-accent" />
-            <h2 className="mt-3 font-outfit text-[16px] font-semibold text-text-primary">Fill in a form</h2>
-            <p className="mt-1.5 text-[13.5px] leading-relaxed text-text-muted">
-              Enter your details directly. Takes a few minutes, and nothing gets misread.
-            </p>
-            <span className="mt-3 inline-flex items-center gap-1 rounded-md bg-success-tint px-2 py-1 text-[11.5px] font-medium text-success-text">
-              <CheckCircle2 size={11} />
-              Most accurate
-            </span>
+            Use the {path === 'upload' ? 'guided form' : 'CV upload'} instead
           </button>
         </div>
-      )}
+      </div>
 
       {path === 'upload' && (
         <div className={`mt-6 ${cardClass}`}>
-          <label className="flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-border-strong px-4 py-10 text-center transition-colors hover:border-accent hover:bg-accent-tint/30">
-            <Upload size={22} className="text-text-muted" />
-            <span className="mt-3 text-[14px] font-medium text-text-body">
+          <label className={`flex cursor-pointer flex-col items-center justify-center rounded-card border-2 border-dashed px-4 py-12 text-center transition-all
+            ${file ? 'border-accent bg-accent-tint/40' : 'border-border-strong hover:border-accent hover:bg-accent-tint/20'}`}>
+            <div className={`w-14 h-14 rounded-full flex items-center justify-center transition-colors
+              ${file ? 'bg-accent text-white' : 'bg-bg-subtle text-text-muted'}`}>
+              {file ? <FileCheck2 size={26} /> : <Upload size={26} />}
+            </div>
+            <span className="mt-4 text-[14.5px] font-medium text-text-body">
               {file ? file.name : 'Choose a PDF or Word document'}
             </span>
-            <span className="mt-1 text-[12.5px] text-text-hint">PDF or DOCX only</span>
+            <span className="mt-1 text-[12.5px] text-text-hint">
+              {file ? 'Ready to submit' : 'Click to browse — PDF or DOCX only'}
+            </span>
             <input
               type="file"
               accept=".pdf,.docx"
@@ -227,7 +228,7 @@ export default function ApplyToJob() {
       {path === 'form' && (
         <div className="mt-6 flex flex-col gap-4">
           <div className={cardClass}>
-            <h2 className="font-outfit text-[15.5px] font-semibold text-text-primary">Professional summary</h2>
+            <h2 className="flex items-center gap-2 text-[13px] font-medium text-text-primary"><span className="w-5 h-5 rounded-full bg-accent-tint text-accent text-[11px] font-semibold flex items-center justify-center shrink-0">1</span>Professional summary</h2>
             <textarea
               value={summary}
               onChange={(e) => setSummary(e.target.value)}
@@ -238,7 +239,7 @@ export default function ApplyToJob() {
           </div>
 
           <div className={cardClass}>
-            <h2 className="font-outfit text-[15.5px] font-semibold text-text-primary">Skills</h2>
+            <h2 className="flex items-center gap-2 text-[13px] font-medium text-text-primary"><span className="w-5 h-5 rounded-full bg-accent-tint text-accent text-[11px] font-semibold flex items-center justify-center shrink-0">2</span>Skills</h2>
             <p className="mt-1 text-[12.5px] text-text-muted">Separate each skill with a comma.</p>
             <input
               type="text"
@@ -250,7 +251,7 @@ export default function ApplyToJob() {
           </div>
 
           <div className={cardClass}>
-            <h2 className="font-outfit text-[15.5px] font-semibold text-text-primary">Work experience</h2>
+            <h2 className="flex items-center gap-2 text-[13px] font-medium text-text-primary"><span className="w-5 h-5 rounded-full bg-accent-tint text-accent text-[11px] font-semibold flex items-center justify-center shrink-0">3</span>Work experience</h2>
             {experience.map((e, i) => (
               <div key={i} className="mt-4 border-t border-border pt-4 first:mt-3 first:border-0 first:pt-0">
                 {experience.length > 1 && (
@@ -292,7 +293,7 @@ export default function ApplyToJob() {
           </div>
 
           <div className={cardClass}>
-            <h2 className="font-outfit text-[15.5px] font-semibold text-text-primary">Education</h2>
+            <h2 className="flex items-center gap-2 text-[13px] font-medium text-text-primary"><span className="w-5 h-5 rounded-full bg-accent-tint text-accent text-[11px] font-semibold flex items-center justify-center shrink-0">4</span>Education</h2>
             {education.map((ed, i) => (
               <div key={i} className="mt-4 border-t border-border pt-4 first:mt-3 first:border-0 first:pt-0">
                 {education.length > 1 && (
@@ -330,7 +331,7 @@ export default function ApplyToJob() {
           </div>
 
           <div className={cardClass}>
-            <h2 className="font-outfit text-[15.5px] font-semibold text-text-primary">Contact number</h2>
+            <h2 className="flex items-center gap-2 text-[13px] font-medium text-text-primary"><span className="w-5 h-5 rounded-full bg-accent-tint text-accent text-[11px] font-semibold flex items-center justify-center shrink-0">5</span>Contact number</h2>
             <p className="mt-1 text-[12.5px] text-text-muted">So the employer can reach you if shortlisted.</p>
             <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} autoComplete="tel"
               placeholder="024 000 0000" className={`mt-3 ${inputClass}`} />
