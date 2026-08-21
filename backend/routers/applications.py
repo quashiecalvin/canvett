@@ -42,8 +42,7 @@ def _create_application(db, job, user, resume_text, method, phone=None):
         job_id=job.id,
     )
     db.add(candidate)
-    db.commit()
-    db.refresh(candidate)
+    db.flush()
 
     score = models_candidate.Score(
         candidate_id=candidate.id,
@@ -100,6 +99,8 @@ async def apply_by_upload(
     job = _get_active_job(db, job_id)
 
     contents = await file.read()
+    # A ResumeParseError here is turned into a 400 with its message by the
+    # application-wide handler in main.py.
     resume_text = parse_resume_bytes(file.filename, contents)
     if not resume_text or not resume_text.strip():
         raise HTTPException(

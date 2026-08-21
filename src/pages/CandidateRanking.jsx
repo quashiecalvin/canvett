@@ -30,6 +30,7 @@ const loadRanking = useCallback(() => {
     setLoading(true)
     getRanking(selectedJobId)
       .then((data) => {
+        setError(null)
         setCandidates(data)
         setLoading(false)
       })
@@ -42,10 +43,12 @@ const loadRanking = useCallback(() => {
   async function handleRerank() {
     if (!selectedJobId) return
     setLoading(true)
+    setError(null)
     try {
       await rerankJob(selectedJobId)
       loadRanking()
-    } catch {
+    } catch (err) {
+      setError(`Could not re-rank the candidates: ${err.message}`)
       setLoading(false)
     }
   }
@@ -55,8 +58,8 @@ const loadRanking = useCallback(() => {
     try {
       await deleteCandidate(candidateId)
       loadRanking()
-    } catch {
-      alert('Failed to remove candidate.')
+    } catch (err) {
+      setError(`Could not remove the candidate: ${err.message}`)
     }
   }
 

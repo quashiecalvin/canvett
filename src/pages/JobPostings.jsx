@@ -32,6 +32,7 @@ export default function JobPostings() {
   function loadJobs() {
     getJobs()
       .then((data) => {
+        setError(null)
         setJobs(data)
         setLoading(false)
       })
@@ -46,8 +47,8 @@ export default function JobPostings() {
       await deleteJob(jobId)
       loadJobs()
       refreshJobs()
-    } catch {
-      alert('Failed to delete the job posting.')
+    } catch (err) {
+      setError(`Could not delete the job posting: ${err.message}`)
     }
   }
 
