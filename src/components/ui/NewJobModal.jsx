@@ -51,8 +51,8 @@ export default function NewJobModal({ onClose, onCreated, job }) {
       }
       onCreated()
       onClose()
-    } catch {
-      setError(`Failed to ${isEdit ? 'update' : 'create'} job. Please try again.`)
+    } catch (err) {
+      setError(`Could not ${isEdit ? 'update' : 'create'} the job posting: ${err.message}`)
       setSubmitting(false)
     }
   }

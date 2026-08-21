@@ -1,3 +1,4 @@
+import logging
 import os
 import uuid
 
@@ -20,6 +21,8 @@ from services.jobs import get_owned_job_or_404
 from schemas.score import ScoreOut, RankedCandidate
 
 router = APIRouter(prefix="/candidates", tags=["Candidates"])
+
+logger = logging.getLogger(__name__)
 
 UPLOAD_DIR = "uploads"
 
@@ -51,15 +54,29 @@ def upload_resume(
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 
-    os.makedirs(UPLOAD_DIR, exist_ok=True)
     file_path = os.path.join(
         UPLOAD_DIR,
         f"{uuid.uuid4().hex}{os.path.splitext(filename)[1].lower()}",
     )
-    with open(file_path, "wb") as buffer:
-        buffer.write(contents)
+    try:
+        os.makedirs(UPLOAD_DIR, exist_ok=True)
+        with open(file_path, "wb") as buffer:
+            buffer.write(contents)
+    except OSError as err:
+        logger.exception("Could not store uploaded resume %s", filename)
+        raise HTTPException(
+            status_code=500,
+            detail="We could not store that file. Please try again.",
+        ) from err
 
+    # A ResumeParseError here is turned into a 400 with its message by the
+    # application-wide handler in main.py.
     resume_text = parse_resume(file_path)
+    if not resume_text.strip():
+        raise HTTPException(
+            status_code=400,
+            detail="We couldn't read any text from that file. Please check it and try again.",
+        )
 
     candidate = models_candidate.Candidate(
         name=extract_name(resume_text),

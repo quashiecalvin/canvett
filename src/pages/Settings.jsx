@@ -61,7 +61,7 @@ function WeightSlider({ label, value, onChange }) {
 }
 
 export default function Settings() {
-  const { refreshSettings } = useSettings()
+  const { refreshSettings, settingsError } = useSettings()
   const [form, setForm] = useState(DEFAULTS)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -75,7 +75,10 @@ export default function Settings() {
         setForm(data)
         setLoading(false)
       })
-      .catch(() => setLoading(false))
+      .catch((err) => {
+        setError(`Could not load your saved settings: ${err.message}`)
+        setLoading(false)
+      })
   }, [])
 
   function update(field, value) {
@@ -215,6 +218,13 @@ export default function Settings() {
         {error && (
           <div className="bg-danger-tint rounded-card px-4 py-3">
             <p className="text-[12px] text-danger-text">{error}</p>
+          </div>
+        )}
+        {!error && settingsError && (
+          <div className="bg-warning-tint rounded-card px-4 py-3">
+            <p className="text-[12px] text-warning-text">
+              The scoring configuration in use could not be reloaded: {settingsError}
+            </p>
           </div>
         )}
       </div>
