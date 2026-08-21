@@ -102,6 +102,8 @@ The `--host 0.0.0.0` is required — binding to localhost will make the service 
 **Environment variables to set on Render:**
 - `DATABASE_URL` — the Neon connection string
 - `ALLOWED_ORIGINS` — the Vercel URL (set after the frontend is deployed)
+- `SECRET_KEY` — a long, random value used to sign authentication tokens; this must be set in production
+- `ENABLE_API_DOCS` — set to `true` only when `/docs`, `/redoc`, and `/openapi.json` should be exposed; it defaults to disabled
 
 ---
 
@@ -178,7 +180,7 @@ The repository has two remotes:
 1. Make the three code changes above, verify the app still runs locally, and commit.
 2. Create the Neon project and database. Record the connection string.
 3. Run `create_all` against Neon to create the schema.
-4. Deploy the backend to Render with `DATABASE_URL` set. Verify `/docs` loads.
+4. Deploy the backend to Render with `DATABASE_URL` and `SECRET_KEY` set. If API docs are needed, also set `ENABLE_API_DOCS=true` and verify `/docs` loads.
 5. Deploy the frontend to Vercel with `VITE_API_URL` set to the Render URL.
 6. Set `ALLOWED_ORIGINS` on Render to the Vercel URL and redeploy the backend.
 7. Test the full flow end to end: create a job, upload a CV, view the ranking.
