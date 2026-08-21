@@ -8,6 +8,7 @@ import { getCandidateDetail } from '../../lib/api'
 export default function CandidateDetailModal({ candidateId, onClose }) {
   const [detail, setDetail] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
 
   useEffect(() => {
     getCandidateDetail(candidateId)
@@ -15,7 +16,10 @@ export default function CandidateDetailModal({ candidateId, onClose }) {
         setDetail(data)
         setLoading(false)
       })
-      .catch(() => setLoading(false))
+      .catch((err) => {
+        setError(err.message)
+        setLoading(false)
+      })
   }, [candidateId])
 
   return (
@@ -34,7 +38,9 @@ export default function CandidateDetailModal({ candidateId, onClose }) {
         {loading && <p className="px-6 py-8 text-[13px] text-text-muted">Loading...</p>}
 
         {!loading && !detail && (
-          <p className="px-6 py-8 text-[13px] text-danger-text">Could not load candidate details.</p>
+          <p className="px-6 py-8 text-[13px] text-danger-text">
+            Could not load candidate details{error ? `: ${error}` : '.'}
+          </p>
         )}
 
         {!loading && detail && (
