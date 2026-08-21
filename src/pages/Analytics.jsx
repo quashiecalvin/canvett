@@ -24,6 +24,7 @@ function ChartCard({ title, subtitle, children }) {
 export default function Analytics() {
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
 
   useEffect(() => {
     getAnalytics()
@@ -31,7 +32,10 @@ export default function Analytics() {
         setData(d)
         setLoading(false)
       })
-      .catch(() => setLoading(false))
+      .catch((err) => {
+        setError(err.message)
+        setLoading(false)
+      })
   }, [])
 
   const hasData = data && data.score_distribution.some((b) => b.count > 0)
@@ -45,13 +49,15 @@ export default function Analytics() {
 
       {loading && <p className="text-[13px] text-text-muted">Loading analytics...</p>}
 
-      {!loading && !hasData && (
+      {!loading && error && <p className="text-[13px] text-danger-text">Error: {error}</p>}
+
+      {!loading && !error && !hasData && (
         <p className="text-[13px] text-text-muted">
           No data to analyse yet. Create job postings and upload resumes to see insights here.
         </p>
       )}
 
-      {!loading && hasData && (
+      {!loading && !error && hasData && (
         <div className="flex flex-col gap-4">
           <ChartCard
             title="Candidate score distribution"

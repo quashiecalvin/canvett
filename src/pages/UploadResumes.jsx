@@ -18,6 +18,22 @@ export default function UploadResumes() {
   async function handleFiles(selectedFiles) {
     const fileArray = Array.from(selectedFiles)
 
+    if (!selectedJobId) {
+      setFiles((prev) => [
+        ...prev,
+        ...fileArray.map((file) => ({
+          id: `${file.name}-${Date.now()}`,
+          name: file.name,
+          size: `${Math.round(file.size / 1024)} KB`,
+          type: file.name.toLowerCase().endsWith('.pdf') ? 'pdf' : 'docx',
+          status: 'error',
+          error: 'Select a job posting before uploading resumes.',
+          uploadedAt: new Date(),
+        })),
+      ])
+      return
+    }
+
     for (const file of fileArray) {
       const type = file.name.toLowerCase().endsWith('.pdf') ? 'pdf' : 'docx'
       const entry = {
@@ -34,11 +50,11 @@ export default function UploadResumes() {
       try {
         await uploadResume(selectedJobId, file)
         setFiles((prev) =>
-          prev.map((f) => (f.id === entry.id ? { ...f, status: 'parsed' } : f))
+          prev.map((f) => (f.id === entry.id ? { ...f, status: 'parsed', error: null } : f))
         )
-      } catch {
+      } catch (err) {
         setFiles((prev) =>
-          prev.map((f) => (f.id === entry.id ? { ...f, status: 'error' } : f))
+          prev.map((f) => (f.id === entry.id ? { ...f, status: 'error', error: err.message } : f))
         )
       }
     }
@@ -97,7 +113,7 @@ export default function UploadResumes() {
           </div>
 
           <div className="flex flex-col gap-3">
-            {files.map(({ id, name, size, type, status, uploadedAt }) => (
+            {files.map(({ id, name, size, type, status, error, uploadedAt }) => (
               <div key={id} className="bg-bg-surface border border-border rounded-card p-4 flex items-center gap-4">
                 <div className={`w-9 h-9 rounded-btn flex items-center justify-center shrink-0
                   ${type === 'pdf' ? 'bg-danger-tint text-danger-text' : 'bg-accent-tint text-accent'}`}>
@@ -106,6 +122,9 @@ export default function UploadResumes() {
                 <div className="flex-1 min-w-0">
                   <h3 className="text-[15px] font-medium text-text-primary leading-[1.4] truncate">{name}</h3>
                   <p className="text-[11px] text-text-muted mt-0.5">{type.toUpperCase()} • {size} • uploaded {formatTime(uploadedAt)}</p>
+                  {status === 'error' && error && (
+                    <p className="text-[11px] text-danger-text mt-0.5">{error}</p>
+                  )}
                 </div>
                 {status === 'parsed' && (
                   <div className="flex items-center gap-1.5 text-success shrink-0">
