@@ -1,9 +1,7 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react'
+import { TOKEN_KEY, USER_KEY } from '../lib/authStorage'
 
 const AuthContext = createContext(null)
-
-const TOKEN_KEY = 'canvett_token'
-const USER_KEY = 'canvett_user'
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)

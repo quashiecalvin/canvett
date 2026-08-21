@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { ArrowLeft, User, Mail, Building2, Shield, Check, Lock, IdCard, CalendarDays } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { updateProfile, changePassword } from '../lib/api'
+import { initialsFromName } from '../lib/initials'
 
 export default function Profile() {
   const { user, updateUser } = useAuth()
@@ -23,8 +24,7 @@ export default function Profile() {
   const [pwErr, setPwErr] = useState(null)
 
   const isRecruiter = user?.role === 'recruiter'
-  const initials = (user?.full_name || user?.email || '?')
-    .split(' ').map((p) => p[0]).slice(0, 2).join('').toUpperCase()
+  const initials = initialsFromName(user?.full_name || user?.email)
 
   const memberSince = user?.created_at
     ? new Date(user.created_at).toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })

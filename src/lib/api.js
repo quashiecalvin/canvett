@@ -1,164 +1,10 @@
+import { getToken } from "./authStorage"
+
 const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000"
 
-export async function getJobs() {
-  const res = await fetch(`${BASE_URL}/jobs`, { headers: authHeaders() })
-  if (!res.ok) throw new Error("Failed to fetch jobs")
-  return res.json()
-}
-
-export async function getRanking(jobId) {
-  const res = await fetch(`${BASE_URL}/candidates/ranking/${jobId}`, { headers: authHeaders() })
-  if (!res.ok) throw new Error("Failed to fetch ranking")
-  return res.json()
-}
-
-export async function uploadResume(jobId, file) {
-  const formData = new FormData()
-  formData.append("job_id", jobId)
-  formData.append("file", file)
-
-  const res = await fetch(`${BASE_URL}/candidates/upload`, {
-    method: "POST",
-    headers: authHeaders(),
-    body: formData,
-  })
-  if (!res.ok) throw new Error("Failed to upload resume")
-  return res.json()
-}
-
-export async function getStats() {
-  const res = await fetch(`${BASE_URL}/stats`, { headers: authHeaders() })
-  if (!res.ok) throw new Error("Failed to fetch stats")
-  return res.json()
-}
-
-export async function createJob(jobData) {
-  const res = await fetch(`${BASE_URL}/jobs`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json", ...authHeaders() },
-    body: JSON.stringify(jobData),
-  })
-  if (!res.ok) throw new Error("Failed to create job")
-  return res.json()
-}
-
-export async function getTopCandidates() {
-  const res = await fetch(`${BASE_URL}/stats/top-candidates`, { headers: authHeaders() })
-  if (!res.ok) throw new Error("Failed to fetch top candidates")
-  return res.json()
-}
-
-export async function getActivity() {
-  const res = await fetch(`${BASE_URL}/stats/activity`, { headers: authHeaders() })
-  if (!res.ok) throw new Error("Failed to fetch activity")
-  return res.json()
-}
-
-export async function deleteJob(jobId) {
-  const res = await fetch(`${BASE_URL}/jobs/${jobId}`, {
-    method: "DELETE",
-    headers: authHeaders(),
-  })
-  if (!res.ok) throw new Error("Failed to delete job")
-  return res.json()
-}
-
-export async function updateJob(jobId, jobData) {
-  const res = await fetch(`${BASE_URL}/jobs/${jobId}`, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json", ...authHeaders() },
-    body: JSON.stringify(jobData),
-  })
-  if (!res.ok) throw new Error("Failed to update job")
-  return res.json()
-}
-
-export async function rerankJob(jobId) {
-  const res = await fetch(`${BASE_URL}/candidates/rerank/${jobId}`, {
-    method: "POST",
-    headers: authHeaders(),
-  })
-  if (!res.ok) throw new Error("Failed to re-rank")
-  return res.json()
-}
-
-export async function deleteCandidate(candidateId) {
-  const res = await fetch(`${BASE_URL}/candidates/${candidateId}`, {
-    method: "DELETE",
-    headers: authHeaders(),
-  })
-  if (!res.ok) throw new Error("Failed to delete candidate")
-  return res.json()
-}
-
-export async function getCandidateDetail(candidateId) {
-  const res = await fetch(`${BASE_URL}/candidates/${candidateId}/detail`, { headers: authHeaders() })
-  if (!res.ok) throw new Error("Failed to fetch candidate details")
-  return res.json()
-}
-
-export async function getAnalytics() {
-  const res = await fetch(`${BASE_URL}/stats/analytics`, { headers: authHeaders() })
-  if (!res.ok) throw new Error("Failed to fetch analytics")
-  return res.json()
-}
-
-export async function getSettings() {
-  const res = await fetch(`${BASE_URL}/settings`, { headers: authHeaders() })
-  if (!res.ok) throw new Error("Failed to fetch settings")
-  return res.json()
-}
-
-export async function updateSettings(settings) {
-  const res = await fetch(`${BASE_URL}/settings`, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json", ...authHeaders() },
-    body: JSON.stringify(settings),
-  })
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}))
-    throw new Error(err.detail || "Failed to update settings")
-  }
-  return res.json()
-}
-
-// ---------- Authentication ----------
-
 function authHeaders() {
-  const token = localStorage.getItem("canvett_token")
+  const token = getToken()
   return token ? { Authorization: `Bearer ${token}` } : {}
-}
-
-export async function register(details) {
-  const res = await fetch(`${BASE_URL}/auth/register`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(details),
-  })
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}))
-    throw new Error(errorMessage(err) || "Registration failed")
-  }
-  return res.json()
-}
-
-export async function login(email, password) {
-  const res = await fetch(`${BASE_URL}/auth/login`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password }),
-  })
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}))
-    throw new Error(errorMessage(err) || "Login failed")
-  }
-  return res.json()
-}
-
-export async function getMe() {
-  const res = await fetch(`${BASE_URL}/auth/me`, { headers: authHeaders() })
-  if (!res.ok) throw new Error("Not authenticated")
-  return res.json()
 }
 
 function errorMessage(err) {
@@ -170,82 +16,172 @@ function errorMessage(err) {
   return null
 }
 
-// ---------- Seeker: public job board ----------
+/**
+ * Single entry point for every backend call.
+ *
+ * @param path      endpoint path, appended to the API base URL
+ * @param fallback  error message used when the backend sends no detail
+ * @param method    HTTP method, defaults to GET
+ * @param json      request body sent as JSON
+ * @param body      request body sent as-is (e.g. FormData)
+ * @param auth      attach the stored bearer token, defaults to true
+ * @param parse     parse the response as JSON, defaults to true
+ */
+async function request(path, fallback, { method = "GET", json, body, auth = true, parse = true } = {}) {
+  const headers = {
+    ...(auth ? authHeaders() : {}),
+    ...(json !== undefined ? { "Content-Type": "application/json" } : {}),
+  }
 
-export async function getPublicJobs() {
-  const res = await fetch(`${BASE_URL}/public/jobs/`)
-  if (!res.ok) throw new Error("Failed to fetch jobs")
-  return res.json()
+  const res = await fetch(`${BASE_URL}${path}`, {
+    method,
+    headers,
+    body: json !== undefined ? JSON.stringify(json) : body,
+  })
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}))
+    throw new Error(errorMessage(err) || fallback)
+  }
+
+  return parse ? res.json() : undefined
 }
 
-export async function getPublicJob(jobId) {
-  const res = await fetch(`${BASE_URL}/public/jobs/${jobId}`)
-  if (!res.ok) throw new Error("This job is no longer available")
-  return res.json()
+function formData(entries) {
+  const data = new FormData()
+  for (const [key, value] of Object.entries(entries)) data.append(key, value)
+  return data
+}
+
+// ---------- Jobs ----------
+
+export function getJobs() {
+  return request("/jobs", "Failed to fetch jobs")
+}
+
+export function createJob(jobData) {
+  return request("/jobs", "Failed to create job", { method: "POST", json: jobData })
+}
+
+export function updateJob(jobId, jobData) {
+  return request(`/jobs/${jobId}`, "Failed to update job", { method: "PUT", json: jobData })
+}
+
+export function deleteJob(jobId) {
+  return request(`/jobs/${jobId}`, "Failed to delete job", { method: "DELETE" })
+}
+
+// ---------- Candidates ----------
+
+export function getRanking(jobId) {
+  return request(`/candidates/ranking/${jobId}`, "Failed to fetch ranking")
+}
+
+export function uploadResume(jobId, file) {
+  return request("/candidates/upload", "Failed to upload resume", {
+    method: "POST",
+    body: formData({ job_id: jobId, file }),
+  })
+}
+
+export function rerankJob(jobId) {
+  return request(`/candidates/rerank/${jobId}`, "Failed to re-rank", { method: "POST" })
+}
+
+export function deleteCandidate(candidateId) {
+  return request(`/candidates/${candidateId}`, "Failed to delete candidate", { method: "DELETE" })
+}
+
+export function getCandidateDetail(candidateId) {
+  return request(`/candidates/${candidateId}/detail`, "Failed to fetch candidate details")
+}
+
+// ---------- Stats ----------
+
+export function getStats() {
+  return request("/stats", "Failed to fetch stats")
+}
+
+export function getTopCandidates() {
+  return request("/stats/top-candidates", "Failed to fetch top candidates")
+}
+
+export function getActivity() {
+  return request("/stats/activity", "Failed to fetch activity")
+}
+
+export function getAnalytics() {
+  return request("/stats/analytics", "Failed to fetch analytics")
+}
+
+// ---------- Settings ----------
+
+export function getSettings() {
+  return request("/settings", "Failed to fetch settings")
+}
+
+export function updateSettings(settings) {
+  return request("/settings", "Failed to update settings", { method: "PUT", json: settings })
+}
+
+// ---------- Authentication ----------
+
+export function register(details) {
+  return request("/auth/register", "Registration failed", { method: "POST", json: details, auth: false })
+}
+
+export function login(email, password) {
+  return request("/auth/login", "Login failed", {
+    method: "POST",
+    json: { email, password },
+    auth: false,
+  })
+}
+
+export function getMe() {
+  return request("/auth/me", "Not authenticated")
+}
+
+// ---------- Seeker: public job board ----------
+
+export function getPublicJobs() {
+  return request("/public/jobs/", "Failed to fetch jobs", { auth: false })
+}
+
+export function getPublicJob(jobId) {
+  return request(`/public/jobs/${jobId}`, "This job is no longer available", { auth: false })
 }
 
 // ---------- Seeker: applications ----------
 
-export async function applyWithUpload(jobId, file) {
-  const formData = new FormData()
-  formData.append("file", file)
-
-  const res = await fetch(`${BASE_URL}/applications/upload/${jobId}`, {
+export function applyWithUpload(jobId, file) {
+  return request(`/applications/upload/${jobId}`, "Failed to submit application", {
     method: "POST",
-    headers: authHeaders(),
-    body: formData,
+    body: formData({ file }),
   })
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}))
-    throw new Error(errorMessage(err) || "Failed to submit application")
-  }
-  return res.json()
 }
 
-export async function applyWithForm(jobId, details) {
-  const res = await fetch(`${BASE_URL}/applications/form/${jobId}`, {
+export function applyWithForm(jobId, details) {
+  return request(`/applications/form/${jobId}`, "Failed to submit application", {
     method: "POST",
-    headers: { "Content-Type": "application/json", ...authHeaders() },
-    body: JSON.stringify(details),
+    json: details,
   })
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}))
-    throw new Error(errorMessage(err) || "Failed to submit application")
-  }
-  return res.json()
 }
 
-export async function getMyApplications() {
-  const res = await fetch(`${BASE_URL}/applications/mine`, {
-    headers: authHeaders(),
-  })
-  if (!res.ok) throw new Error("Failed to fetch your applications")
-  return res.json()
+export function getMyApplications() {
+  return request("/applications/mine", "Failed to fetch your applications")
 }
 
 // ---------- Profile ----------
 
-export async function updateProfile(details) {
-  const res = await fetch(`${BASE_URL}/auth/me`, {
-    method: "PATCH",
-    headers: { "Content-Type": "application/json", ...authHeaders() },
-    body: JSON.stringify(details),
-  })
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}))
-    throw new Error(errorMessage(err) || "Failed to update profile")
-  }
-  return res.json()
+export function updateProfile(details) {
+  return request("/auth/me", "Failed to update profile", { method: "PATCH", json: details })
 }
 
-export async function changePassword(details) {
-  const res = await fetch(`${BASE_URL}/auth/change-password`, {
+export function changePassword(details) {
+  return request("/auth/change-password", "Failed to change password", {
     method: "POST",
-    headers: { "Content-Type": "application/json", ...authHeaders() },
-    body: JSON.stringify(details),
+    json: details,
+    parse: false,
   })
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}))
-    throw new Error(errorMessage(err) || "Failed to change password")
-  }
 }

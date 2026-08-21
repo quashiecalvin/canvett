@@ -1,10 +1,11 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 from database.session import get_db
 from database import models_job, models_candidate, models_user
 from services.activity import log_activity
 from services.auth import require_recruiter
+from services.jobs import get_owned_job_or_404
 from schemas.job import JobCreate, JobUpdate, JobOut
 
 router = APIRouter(prefix="/jobs", tags=["Jobs"])
@@ -55,14 +56,7 @@ def get_job(
     db: Session = Depends(get_db),
     user: models_user.User = Depends(require_recruiter),
 ):
-    job = (
-        db.query(models_job.Job)
-        .filter(models_job.Job.id == job_id, models_job.Job.recruiter_id == user.id)
-        .first()
-    )
-    if job is None:
-        raise HTTPException(status_code=404, detail="Job not found")
-    return job
+    return get_owned_job_or_404(db, job_id, user)
 
 
 @router.delete("/{job_id}")
@@ -71,13 +65,7 @@ def delete_job(
     db: Session = Depends(get_db),
     user: models_user.User = Depends(require_recruiter),
 ):
-    job = (
-        db.query(models_job.Job)
-        .filter(models_job.Job.id == job_id, models_job.Job.recruiter_id == user.id)
-        .first()
-    )
-    if job is None:
-        raise HTTPException(status_code=404, detail="Job not found")
+    job = get_owned_job_or_404(db, job_id, user)
     db.query(models_candidate.Score).filter(models_candidate.Score.job_id == job_id).delete()
     db.query(models_candidate.Candidate).filter(models_candidate.Candidate.job_id == job_id).delete()
     db.delete(job)
@@ -92,13 +80,7 @@ def update_job(
     db: Session = Depends(get_db),
     user: models_user.User = Depends(require_recruiter),
 ):
-    job = (
-        db.query(models_job.Job)
-        .filter(models_job.Job.id == job_id, models_job.Job.recruiter_id == user.id)
-        .first()
-    )
-    if job is None:
-        raise HTTPException(status_code=404, detail="Job not found")
+    job = get_owned_job_or_404(db, job_id, user)
     for field, value in updated.model_dump().items():
         setattr(job, field, value)
     db.commit()

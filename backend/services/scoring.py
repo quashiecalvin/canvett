@@ -96,6 +96,43 @@ def score_candidate(
     }
 
 
+def score_for_job(db, job, resume_text: str):
+    return score_candidate(
+        resume_text,
+        job.description,
+        job.required_skills,
+        job.experience_requirement,
+        job.education_requirement,
+        get_config(db),
+    )
+
+
+def build_score(candidate_id: int, job_id: int, result: dict):
+    from database import models_candidate
+    return models_candidate.Score(
+        candidate_id=candidate_id,
+        job_id=job_id,
+        overall_score=result["overall_score"],
+        skills_score=result["skills_score"],
+        experience_score=result["experience_score"],
+        education_score=result["education_score"],
+        matched_skills=result["matched_skills"],
+        unmatched_skills=result["unmatched_skills"],
+        duration_verified=result["duration_verified"],
+    )
+
+
+def apply_score(score, result: dict):
+    score.overall_score = result["overall_score"]
+    score.skills_score = result["skills_score"]
+    score.experience_score = result["experience_score"]
+    score.education_score = result["education_score"]
+    score.matched_skills = result["matched_skills"]
+    score.unmatched_skills = result["unmatched_skills"]
+    score.duration_verified = result["duration_verified"]
+    return score
+
+
 def get_config(db):
     from database import models_settings
     s = db.query(models_settings.Settings).first()

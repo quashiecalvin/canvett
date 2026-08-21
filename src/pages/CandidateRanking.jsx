@@ -1,18 +1,12 @@
 import { useState, useEffect, useCallback } from 'react'
 import ScoreCircle from '../components/ui/ScoreCircle'
-import { scoreBarColor } from '../lib/scoreColor'
+import ScoreBreakdown from '../components/ui/ScoreBreakdown'
+import { initialsFromName } from '../lib/initials'
 import { getRanking, rerankJob, deleteCandidate } from '../lib/api'
 import { useJob } from '../context/JobContext'
 import { exportToCsv } from '../lib/csv'
 import CandidateDetailModal from '../components/ui/CandidateDetailModal'
-import { RefreshCw, Download, Eye, Trash2, AlertTriangle } from 'lucide-react'
-
-function initialsFromName(name) {
-  const cleaned = name.replace(/[_-]/g, ' ').trim()
-  const parts = cleaned.split(/\s+/)
-  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase()
-  return (parts[0][0] + parts[1][0]).toUpperCase()
-}
+import { RefreshCw, Download, Eye, Trash2 } from 'lucide-react'
 
 export default function CandidateRanking() {
   const { selectedJobId, selectedJob } = useJob()
@@ -161,33 +155,7 @@ const loadRanking = useCallback(() => {
                 ))}
               </div>
 
-             <div className="grid grid-cols-1 gap-2 mt-3 sm:grid-cols-3 sm:gap-6">
-                {[
-                  { key: 'skills', label: 'Skills match', value: c.skills_score },
-                  { key: 'experience', label: 'Experience', value: c.experience_score },
-                  { key: 'education', label: 'Education', value: c.education_score },
-                ].map(({ key, label, value }) => (
-                  <div key={key}>
-                    <div className="flex items-center justify-between mb-1.5">
-                      <span className="text-[11px] text-text-muted flex items-center gap-1">
-                        {label}
-                        {key === 'experience' && !c.duration_verified && (
-                          <span title="Experience duration could not be verified — CV did not follow the standard template">
-                            <AlertTriangle size={11} className="text-warning-text" />
-                          </span>
-                        )}
-                      </span>
-                      <span className="text-[11px] font-medium text-text-body">{Math.round(value)}%</span>
-                    </div>
-                    <div className="h-1.5 rounded-full bg-bg-subtle overflow-hidden">
-                      <div
-                        className={`h-full rounded-full ${scoreBarColor(value)}`}
-                        style={{ width: `${value}%` }}
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
+              <ScoreBreakdown scores={c} durationVerified={c.duration_verified} layout="columns" />
             </div>
 
             <div className="flex flex-col items-center gap-3 shrink-0">
