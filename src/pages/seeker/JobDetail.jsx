@@ -9,18 +9,19 @@ import { daysAgo } from '../../lib/time'
 export default function JobDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
-  const [job, setJob] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
+  // Keyed by id so a slow response for a previous role cannot overwrite the
+  // current one, and so loading/error state resets when the id changes.
+  const [result, setResult] = useState({ id: null, job: null, error: null })
   const [chooserOpen, setChooserOpen] = useState(false)
 
   useEffect(() => {
-    setLoading(true)
     getPublicJob(id)
-      .then(setJob)
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false))
+      .then((job) => setResult({ id, job, error: null }))
+      .catch((err) => setResult({ id, job: null, error: err.message }))
   }, [id])
+
+  const { job, error } = result
+  const loading = result.id !== id
 
   if (loading) {
     return <div className="p-6"><p className="text-[13px] text-text-muted">Loading role...</p></div>

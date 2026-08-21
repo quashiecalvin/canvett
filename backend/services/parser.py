@@ -36,8 +36,8 @@ class ResumeParseError(Exception):
     """A resume could not be read. The message is safe to show to the user."""
 
 
-class UnsupportedFileType(ResumeParseError):
-    pass
+class UnsupportedFileType(ResumeParseError, ValueError):
+    """Also a ValueError: callers validating an upload treat it as bad input."""
 
 
 def parse_pdf(source) -> str:

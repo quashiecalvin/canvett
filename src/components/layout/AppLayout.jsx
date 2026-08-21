@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Menu } from 'lucide-react'
 import Sidebar from './Sidebar'
 
@@ -24,6 +24,15 @@ function Logo() {
 export default function AppLayout({ children }) {
   const [open, setOpen] = useState(false)
 
+  useEffect(() => {
+    if (!open) return
+    function onKeyDown(e) {
+      if (e.key === 'Escape') setOpen(false)
+    }
+    document.addEventListener('keydown', onKeyDown)
+    return () => document.removeEventListener('keydown', onKeyDown)
+  }, [open])
+
   return (
     <div className="flex h-screen bg-bg-page overflow-hidden">
       {open && (
@@ -41,6 +50,8 @@ export default function AppLayout({ children }) {
             onClick={() => setOpen(true)}
             className="text-text-body"
             aria-label="Open menu"
+            aria-controls="app-sidebar"
+            aria-expanded={open}
           >
             <Menu size={20} />
           </button>

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { Briefcase, FileText, LogOut, Menu, X } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
@@ -39,6 +39,15 @@ export default function SeekerLayout({ children }) {
     navigate('/login', { replace: true })
   }
 
+  useEffect(() => {
+    if (!open) return
+    function onKeyDown(e) {
+      if (e.key === 'Escape') setOpen(false)
+    }
+    document.addEventListener('keydown', onKeyDown)
+    return () => document.removeEventListener('keydown', onKeyDown)
+  }, [open])
+
   return (
     <div className="flex h-screen bg-bg-page overflow-hidden">
       {open && (
@@ -48,9 +57,12 @@ export default function SeekerLayout({ children }) {
         />
       )}
 
+      {/* An off-canvas drawer stays in the tab order unless it is also
+          invisible; md:visible keeps the desktop sidebar reachable. */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 w-50 bg-bg-surface border-r border-border flex flex-col shrink-0 transition-transform duration-200 md:static md:translate-x-0 ${
-          open ? 'translate-x-0' : '-translate-x-full'
+        id="seeker-sidebar"
+        className={`fixed inset-y-0 left-0 z-50 w-50 bg-bg-surface border-r border-border flex flex-col shrink-0 transition-transform duration-200 md:static md:visible md:translate-x-0 ${
+          open ? 'translate-x-0' : '-translate-x-full invisible'
         }`}
       >
         <div className="p-4 border-b border-border flex items-center justify-between">
@@ -120,6 +132,8 @@ export default function SeekerLayout({ children }) {
             onClick={() => setOpen(true)}
             className="text-text-body"
             aria-label="Open menu"
+            aria-controls="seeker-sidebar"
+            aria-expanded={open}
           >
             <Menu size={20} />
           </button>

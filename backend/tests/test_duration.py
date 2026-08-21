@@ -49,6 +49,36 @@ class TestExtractTotalYears:
     def test_en_dash_separator(self):
         assert extract_total_years("Jan 2019 \u2013 Jan 2020") == 1.0
 
+    def test_dotted_month_abbreviations(self):
+        assert extract_total_years("Jan. 2023 - Mar. 2025") == 2.2
+
+    def test_shared_year_range_across_new_year(self):
+        # The start belongs to the year before the stated one.
+        assert extract_total_years("December - January 2026") == 0.1
+
+    @pytest.mark.parametrize(
+        "text, expected",
+        [
+            # Concurrent roles count once, not twice.
+            ("Jan 2022 - Jun 2023\nMar 2023 - Dec 2023", 1.9),
+            ("May - July 2025 and June - August 2025", 0.2),
+        ],
+    )
+    def test_overlapping_ranges_are_merged(self, text, expected):
+        assert extract_total_years(text) == expected
+
+    @pytest.mark.parametrize(
+        "text",
+        [
+            "2019 - 2021",                  # years only, no months
+            "Analyst - Accra 2024",         # prose either side of a separator
+            "Data Analyst 2021 \u2013 March 2022",
+            "Managed the Toronto Mar 2024 launch",
+        ],
+    )
+    def test_prose_is_not_read_as_a_date_range(self, text):
+        assert extract_total_years(text) is None
+
 
 class TestExtractRequiredYears:
     def test_none_for_empty_input(self):

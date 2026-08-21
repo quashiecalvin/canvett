@@ -1,8 +1,29 @@
+import { useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Upload, FileText, X, CheckCircle2, ArrowRight } from 'lucide-react'
 
 export default function ApplyChooserModal({ jobId, jobTitle, onClose }) {
   const navigate = useNavigate()
+  const firstChoiceRef = useRef(null)
+
+  useEffect(() => {
+    const opener = document.activeElement
+    firstChoiceRef.current?.focus()
+
+    function onKeyDown(e) {
+      if (e.key === 'Escape') onClose()
+    }
+    document.addEventListener('keydown', onKeyDown)
+
+    const { overflow } = document.body.style
+    document.body.style.overflow = 'hidden'
+
+    return () => {
+      document.removeEventListener('keydown', onKeyDown)
+      document.body.style.overflow = overflow
+      opener?.focus?.()
+    }
+  }, [onClose])
 
   function choose(method) {
     onClose()
@@ -15,13 +36,16 @@ export default function ApplyChooserModal({ jobId, jobTitle, onClose }) {
       onClick={onClose}
     >
       <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="apply-chooser-title"
         className="w-full max-w-2xl bg-bg-surface rounded-card shadow-xl border border-border overflow-hidden animate-[fadeIn_0.15s_ease-out]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
         <div className="flex items-start justify-between gap-4 px-6 pt-5 pb-4 border-b border-border">
           <div className="min-w-0">
-            <h2 className="text-[16px] font-medium text-text-primary leading-tight">
+            <h2 id="apply-chooser-title" className="text-[16px] font-medium text-text-primary leading-tight">
               How would you like to apply?
             </h2>
             {jobTitle && (
@@ -42,6 +66,7 @@ export default function ApplyChooserModal({ jobId, jobTitle, onClose }) {
         {/* Choices */}
         <div className="grid gap-4 sm:grid-cols-2 p-6">
           <button
+            ref={firstChoiceRef}
             onClick={() => choose('upload')}
             className="group relative rounded-card border border-border bg-bg-surface p-5 text-left transition-all duration-200 hover:-translate-y-1 hover:shadow-lg hover:border-accent-light focus:outline-none focus:border-accent"
           >

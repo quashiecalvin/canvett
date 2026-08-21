@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
-import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
-import { ArrowLeft, Upload, FileText, X, Plus, Trash2, CheckCircle2 , ArrowRight, FileCheck2, Download } from 'lucide-react'
+import { Link, useParams, useNavigate, useSearchParams } from 'react-router-dom'
+import { ArrowLeft, Upload, FileText, X, Plus, Trash2, FileCheck2, Download } from 'lucide-react'
 import { getPublicJob, applyWithUpload, applyWithForm } from '../../lib/api'
 import ParseReceipt from '../../components/seeker/ParseReceipt'
 
@@ -45,11 +45,7 @@ export default function ApplyToJob() {
   const [loadError, setLoadError] = useState(null)
   const [searchParams] = useSearchParams()
   const method = searchParams.get('method')
-  const [path, setPath] = useState(method === 'form' || method === 'upload' ? method : null)
-
-  useEffect(() => {
-    if (method === 'form' || method === 'upload') setPath(method)
-  }, [method])
+  const path = method === 'form' || method === 'upload' ? method : null
   const [receipt, setReceipt] = useState(null)
   const [error, setError] = useState(null)
   const [submitting, setSubmitting] = useState(false)
@@ -64,9 +60,6 @@ export default function ApplyToJob() {
   useEffect(() => {
     getPublicJob(id).then(setJob).catch((err) => setLoadError(err.message))
   }, [id])
-    useEffect(() => {
-    if (!path) navigate(`/seeker/jobs/${id}`, { replace: true })
-  }, [path, id, navigate])
 
   const topRef = useRef(null)
 
@@ -147,6 +140,50 @@ export default function ApplyToJob() {
     )
   }
 
+  // Reached without (or with an unknown) ?method — let the applicant choose
+  // rather than bouncing them back to the role.
+  if (!path) {
+    return (
+      <div className="p-6">
+        <h1 className="text-[22px] font-medium leading-[1.2] text-text-primary">
+          Apply for {job.title}
+        </h1>
+        <p className="mt-1 text-[14px] text-text-muted">How would you like to apply?</p>
+        <div className="mt-5 flex flex-col gap-3 sm:flex-row">
+          <Link
+            to={`/seeker/jobs/${id}/apply?method=upload`}
+            replace
+            className="flex flex-1 items-center gap-3 rounded-xl border border-border bg-bg-surface p-5 transition-colors hover:border-accent"
+          >
+            <Upload size={18} className="shrink-0 text-accent" />
+            <span>
+              <span className="block text-[14px] font-medium text-text-primary">Upload a CV</span>
+              <span className="block text-[12.5px] text-text-muted">PDF or Word document</span>
+            </span>
+          </Link>
+          <Link
+            to={`/seeker/jobs/${id}/apply?method=form`}
+            replace
+            className="flex flex-1 items-center gap-3 rounded-xl border border-border bg-bg-surface p-5 transition-colors hover:border-accent"
+          >
+            <FileText size={18} className="shrink-0 text-accent" />
+            <span>
+              <span className="block text-[14px] font-medium text-text-primary">Guided form</span>
+              <span className="block text-[12.5px] text-text-muted">Fill in your details step by step</span>
+            </span>
+          </Link>
+        </div>
+        <Link
+          to={`/seeker/jobs/${id}`}
+          className="mt-5 inline-flex items-center gap-1.5 text-[13px] font-medium text-text-muted transition-colors hover:text-text-body"
+        >
+          <ArrowLeft size={15} />
+          Back to role
+        </Link>
+      </div>
+    )
+  }
+
   const inputClass = "h-10 w-full rounded-btn border border-border bg-bg-surface px-3 text-[13.5px] text-text-body placeholder:text-text-hint focus:border-accent focus:outline-none"
   const cardClass = "rounded-xl border border-border bg-bg-surface p-5 sm:p-6"
 
@@ -218,7 +255,7 @@ export default function ApplyToJob() {
             <span>
               Use our{' '}
               <a
-                href="/Canvett_CV_Template.docx"
+                href={`${import.meta.env.BASE_URL}Canvett_CV_Template.docx`}
                 download
                 className="font-medium text-accent hover:underline"
               >
