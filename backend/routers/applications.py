@@ -12,7 +12,7 @@ from services.parser import (
 )
 from services.scoring import score_for_job, build_score
 from services.activity import log_activity
-from services.jobs import get_active_job_or_404, company_name_for_job
+from services.jobs import FALLBACK_COMPANY, get_active_job_or_404
 
 router = APIRouter(prefix="/applications", tags=["Applications"])
 
@@ -168,6 +168,12 @@ def apply_by_form(
     return _create_application(db, job, user, resume_text, "form", form.phone)
 
 
+def _company_name(recruiter):
+    if recruiter is None:
+        return FALLBACK_COMPANY
+    return recruiter.company_name or recruiter.full_name
+
+
 # ---------- seeker: my applications ----------
 
 @router.get("/mine")
@@ -175,24 +181,26 @@ def my_applications(
     db: Session = Depends(get_db),
     user: models_user.User = Depends(require_seeker),
 ):
-    apps = (
-        db.query(models_application.Application)
+    rows = (
+        db.query(models_application.Application, models_job.Job, models_user.User)
+        .outerjoin(models_job.Job, models_application.Application.job_id == models_job.Job.id)
+        .outerjoin(models_user.User, models_job.Job.recruiter_id == models_user.User.id)
         .filter(models_application.Application.user_id == user.id)
         .order_by(models_application.Application.created_at.desc())
         .all()
     )
-    result = []
-    for app in apps:
-        job = db.query(models_job.Job).filter(models_job.Job.id == app.job_id).first()
-        result.append({
+    return [
+        {
             "application_id": app.id,
-            "job_id": app.job_id,
+            # Only linkable while the job still exists.
+            "job_id": job.id if job else None,
             "department": job.department if job else None,
             "job_title": job.title if job else "A role",
-            "company": company_name_for_job(db, job),
+            "company": _company_name(recruiter),
             "location": job.location if job else "",
             "method": app.method,
             "status": app.status,
             "applied_on": app.created_at,
-        })
-    return result
+        }
+        for app, job, recruiter in rows
+    ]

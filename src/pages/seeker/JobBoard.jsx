@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { Search, Filter, Briefcase, MapPin, Clock } from 'lucide-react'
 import FilterDropdown from '../../components/ui/FilterDropdown'
 import { getPublicJobs } from '../../lib/api'
@@ -22,7 +22,6 @@ export default function JobBoard() {
   const [search, setSearch] = useState('')
   const [department, setDepartment] = useState("All")
   const [applyJob, setApplyJob] = useState(null)
-  const navigate = useNavigate()
   const { user } = useAuth()
 
   const firstName = (user?.full_name || '').trim().split(' ')[0]
@@ -131,8 +130,7 @@ export default function JobBoard() {
                 return (
                   <div
                     key={job.id}
-                    onClick={() => navigate(`/seeker/jobs/${job.id}`)}
-                    className="group bg-bg-surface border border-border rounded-card p-5 flex flex-col cursor-pointer transition-all duration-200 hover:-translate-y-1 hover:shadow-md hover:border-accent-light"
+                    className="group relative bg-bg-surface border border-border rounded-card p-5 flex flex-col transition-all duration-200 hover:-translate-y-1 hover:shadow-md hover:border-accent-light focus-within:border-accent-light"
                   >
                     {/* Icon + title */}
                     <div className="flex items-start gap-3">
@@ -141,7 +139,12 @@ export default function JobBoard() {
                       </div>
                       <div className="min-w-0 flex-1">
                         <h2 className="text-[14.5px] font-medium text-text-primary leading-[1.3] line-clamp-2 group-hover:text-accent transition-colors">
-                          {job.title}
+                          {/* Stretched link: the whole card is clickable, and the
+                              title stays a real, keyboard-focusable link. */}
+                          <Link to={`/seeker/jobs/${job.id}`} className="focus:outline-none focus-visible:underline">
+                            <span className="absolute inset-0 rounded-card" aria-hidden="true" />
+                            {job.title}
+                          </Link>
                         </h2>
                         <p className="text-[12px] text-text-muted mt-0.5 truncate">
                           {job.company}
@@ -185,10 +188,10 @@ export default function JobBoard() {
                         {daysAgo(job.posted_date)}
                       </span>
                       <button
-                        onClick={(e) => { e.stopPropagation(); setApplyJob(job) }}
-                        className="h-8 px-4 rounded-btn bg-accent text-white text-[12.5px] font-medium hover:bg-accent-2 transition-colors"
+                        onClick={() => setApplyJob(job)}
+                        className="relative h-8 px-4 rounded-btn bg-accent text-white text-[12.5px] font-medium hover:bg-accent-2 transition-colors"
                       >
-                        Apply
+                        Apply<span className="sr-only"> for {job.title}</span>
                       </button>
                     </div>
                   </div>

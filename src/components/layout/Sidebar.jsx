@@ -1,6 +1,5 @@
 import { NavLink, useNavigate } from 'react-router-dom'
 import { LayoutDashboard, Briefcase, Upload, Users, BarChart2, Settings, LogOut, X } from 'lucide-react'
-import { useSettings } from '../../context/SettingsContext'
 import { useAuth } from '../../context/AuthContext'
 
 const navItems = [
@@ -13,7 +12,6 @@ const navItems = [
 ]
 
 export default function Sidebar({ open = false, onClose = () => {} }) {
-  const { settings } = useSettings()
   const { user, logout } = useAuth()
   const navigate = useNavigate()
 
@@ -28,8 +26,9 @@ export default function Sidebar({ open = false, onClose = () => {} }) {
 
   return (
     <aside
-      className={`fixed inset-y-0 left-0 z-50 w-50 bg-bg-surface border-r border-border flex flex-col shrink-0 transition-transform duration-200 md:static md:translate-x-0 ${
-        open ? 'translate-x-0' : '-translate-x-full'
+      id="app-sidebar"
+      className={`fixed inset-y-0 left-0 z-50 w-50 bg-bg-surface border-r border-border flex flex-col shrink-0 transition-transform duration-200 md:static md:visible md:translate-x-0 ${
+        open ? 'translate-x-0' : '-translate-x-full invisible'
       }`}
     >
       <div className="p-4 border-b border-border flex items-center justify-between gap-2">

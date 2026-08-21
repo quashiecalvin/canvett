@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { Building2, MapPin, Upload, FileText, FileSearch, ChevronRight } from 'lucide-react'
 import { getMyApplications } from '../../lib/api'
 import { DEPARTMENT_ICONS, FALLBACK_ICON } from '../../lib/departments'
@@ -15,7 +15,6 @@ export default function MyApplications() {
   const [applications, setApplications] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
-  const navigate = useNavigate()
 
   useEffect(() => {
     getMyApplications()
@@ -68,8 +67,7 @@ export default function MyApplications() {
           return (
             <div
               key={app.application_id}
-              onClick={() => app.job_id && navigate(`/seeker/jobs/${app.job_id}`)}
-              className="group bg-bg-surface border border-border rounded-card p-5 flex items-start gap-4 cursor-pointer transition-all duration-200 hover:border-accent-light hover:shadow-sm"
+              className="group relative bg-bg-surface border border-border rounded-card p-5 flex items-start gap-4 transition-all duration-200 hover:border-accent-light hover:shadow-sm focus-within:border-accent-light"
             >
               <div className="w-10 h-10 rounded-btn bg-accent-tint flex items-center justify-center text-accent shrink-0">
                 <Icon size={20} />
@@ -79,7 +77,17 @@ export default function MyApplications() {
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
                     <h2 className="text-[15px] font-medium text-text-primary leading-[1.3] truncate group-hover:text-accent transition-colors">
-                      {app.job_title}
+                      {/* Stretched link, so the whole card is clickable while the
+                          title remains keyboard-focusable. Roles that have since
+                          been taken down are plain text. */}
+                      {app.job_id ? (
+                        <Link to={`/seeker/jobs/${app.job_id}`} className="focus:outline-none focus-visible:underline">
+                          <span className="absolute inset-0 rounded-card" aria-hidden="true" />
+                          {app.job_title}
+                        </Link>
+                      ) : (
+                        app.job_title
+                      )}
                     </h2>
                     <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1">
                       <span className="inline-flex items-center gap-1.5 text-[12.5px] text-text-muted">
@@ -114,7 +122,9 @@ export default function MyApplications() {
                 </div>
               </div>
 
-              <ChevronRight size={16} className="text-text-hint shrink-0 mt-1 transition-transform group-hover:translate-x-0.5 group-hover:text-accent" />
+              {app.job_id && (
+                <ChevronRight size={16} className="text-text-hint shrink-0 mt-1 transition-transform group-hover:translate-x-0.5 group-hover:text-accent" />
+              )}
             </div>
           )
         })}
