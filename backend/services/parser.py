@@ -1,6 +1,29 @@
 import io
+import os
+
 from pypdf import PdfReader
 from docx import Document
+
+ALLOWED_RESUME_EXTENSIONS = {".pdf", ".docx"}
+MAX_RESUME_SIZE = 5 * 1024 * 1024
+
+
+def validate_resume_upload(filename: str | None, contents: bytes) -> str:
+    if not filename:
+        raise ValueError("A PDF or DOCX filename is required.")
+
+    sanitized_filename = os.path.basename(filename.replace("\\", "/"))
+    if sanitized_filename != filename:
+        raise ValueError("Path separators are not allowed in filenames.")
+
+    extension = os.path.splitext(sanitized_filename)[1].lower()
+    if extension not in ALLOWED_RESUME_EXTENSIONS:
+        raise ValueError("Unsupported file type. Only PDF and DOCX are allowed.")
+
+    if len(contents) > MAX_RESUME_SIZE:
+        raise ValueError("Resume files must be 5 MB or smaller.")
+
+    return sanitized_filename
 
 
 def parse_pdf(file_path: str) -> str:

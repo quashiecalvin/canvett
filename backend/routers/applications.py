@@ -5,7 +5,11 @@ from sqlalchemy.orm import Session
 from database.session import get_db
 from database import models_job, models_candidate, models_user, models_application
 from services.auth import require_seeker, get_current_user
-from services.parser import parse_resume_bytes
+from services.parser import (
+    MAX_RESUME_SIZE,
+    parse_resume_bytes,
+    validate_resume_upload,
+)
 from services.scoring import score_for_job, build_score
 from services.activity import log_activity
 from services.jobs import get_active_job_or_404, company_name_for_job
@@ -75,8 +79,13 @@ async def apply_by_upload(
 ):
     job = get_active_job_or_404(db, job_id)
 
-    contents = await file.read()
-    resume_text = parse_resume_bytes(file.filename, contents)
+    contents = await file.read(MAX_RESUME_SIZE + 1)
+    try:
+        filename = validate_resume_upload(file.filename, contents)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    resume_text = parse_resume_bytes(filename, contents)
     if not resume_text or not resume_text.strip():
         raise HTTPException(
             status_code=400,
