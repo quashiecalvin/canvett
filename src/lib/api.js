@@ -2,9 +2,18 @@ import { getToken } from "./authStorage"
 
 const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000"
 
+const NETWORK_MESSAGE = "Could not reach the server. Check your connection and try again."
+
 function authHeaders() {
   const token = getToken()
   return token ? { Authorization: `Bearer ${token}` } : {}
+}
+
+function apiError(message, status, cause) {
+  const error = new Error(message)
+  error.status = status
+  if (cause) error.cause = cause
+  return error
 }
 
 function errorMessage(err) {
@@ -26,6 +35,11 @@ function errorMessage(err) {
  * @param body      request body sent as-is (e.g. FormData)
  * @param auth      attach the stored bearer token, defaults to true
  * @param parse     parse the response as JSON, defaults to true
+ *
+ * Every failure mode — network error, non-2xx response, unreadable body —
+ * arrives as an Error carrying the backend's `detail` when there is one, with
+ * the HTTP status on `error.status` (null when the request never reached the
+ * server).
  */
 async function request(path, fallback, { method = "GET", json, body, auth = true, parse = true } = {}) {
   const headers = {
@@ -33,18 +47,29 @@ async function request(path, fallback, { method = "GET", json, body, auth = true
     ...(json !== undefined ? { "Content-Type": "application/json" } : {}),
   }
 
-  const res = await fetch(`${BASE_URL}${path}`, {
-    method,
-    headers,
-    body: json !== undefined ? JSON.stringify(json) : body,
-  })
+  let res
+  try {
+    res = await fetch(`${BASE_URL}${path}`, {
+      method,
+      headers,
+      body: json !== undefined ? JSON.stringify(json) : body,
+    })
+  } catch (cause) {
+    throw apiError(NETWORK_MESSAGE, null, cause)
+  }
 
   if (!res.ok) {
     const err = await res.json().catch(() => ({}))
-    throw new Error(errorMessage(err) || fallback)
+    throw apiError(errorMessage(err) || fallback, res.status)
   }
 
-  return parse ? res.json() : undefined
+  if (!parse || res.status === 204) return undefined
+
+  try {
+    return await res.json()
+  } catch (cause) {
+    throw apiError("The server returned a response we could not read.", res.status, cause)
+  }
 }
 
 function formData(entries) {
