@@ -3,7 +3,7 @@ import { ChevronDown } from 'lucide-react'
 import { useJob } from '../../context/JobContext'
 
 export default function JobSelector() {
-  const { jobs, selectedJob, setSelectedJobId } = useJob()
+  const { jobs, selectedJob, setSelectedJobId, jobsError } = useJob()
   const [open, setOpen] = useState(false)
   const ref = useRef(null)
 
@@ -29,6 +29,12 @@ export default function JobSelector() {
 
       {open && (
         <div className="absolute right-0 mt-1 w-64 bg-bg-surface border border-border rounded-card shadow-lg py-1 z-20">
+          {jobsError && (
+            <p className="px-4 py-2 text-[12px] text-danger-text">{jobsError}</p>
+          )}
+          {!jobsError && jobs.length === 0 && (
+            <p className="px-4 py-2 text-[12px] text-text-muted">No job postings yet.</p>
+          )}
           {jobs.map((job) => (
             <button
               key={job.id}

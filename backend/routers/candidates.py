@@ -1,3 +1,4 @@
+import logging
 import os
 import shutil
 
@@ -14,6 +15,8 @@ from services.activity import log_activity
 from schemas.score import ScoreOut, RankedCandidate
 
 router = APIRouter(prefix="/candidates", tags=["Candidates"])
+
+logger = logging.getLogger(__name__)
 
 UPLOAD_DIR = "uploads"
 
@@ -50,22 +53,33 @@ def upload_resume(
 ):
     job = _own_job_or_404(db, job_id, user)
 
-    file_path = os.path.join(UPLOAD_DIR, file.filename)
-    with open(file_path, "wb") as buffer:
-        shutil.copyfileobj(file.file, buffer)
+    filename = os.path.basename(file.filename or "")
+    if not filename:
+        raise HTTPException(status_code=400, detail="That upload did not include a file name.")
 
+    file_path = os.path.join(UPLOAD_DIR, filename)
+    try:
+        os.makedirs(UPLOAD_DIR, exist_ok=True)
+        with open(file_path, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+    except OSError as err:
+        logger.exception("Could not store uploaded resume %s", filename)
+        raise HTTPException(
+            status_code=500,
+            detail="We could not store that file. Please try again.",
+        ) from err
+
+    # A ResumeParseError here is turned into a 400 with its message by the
+    # application-wide handler in main.py.
     resume_text = parse_resume(file_path)
+    if not resume_text.strip():
+        raise HTTPException(
+            status_code=400,
+            detail="We couldn't read any text from that file. Please check it and try again.",
+        )
 
-    candidate = models_candidate.Candidate(
-        name=extract_name(resume_text),
-        filename=file.filename,
-        resume_text=resume_text,
-        job_id=job_id,
-    )
-    db.add(candidate)
-    db.commit()
-    db.refresh(candidate)
-
+    # Scored before anything is written so a scoring failure cannot leave an
+    # unranked candidate behind.
     result = score_candidate(
         resume_text,
         job.description,
@@ -74,6 +88,15 @@ def upload_resume(
         job.education_requirement,
         get_config(db),
     )
+
+    candidate = models_candidate.Candidate(
+        name=extract_name(resume_text),
+        filename=filename,
+        resume_text=resume_text,
+        job_id=job_id,
+    )
+    db.add(candidate)
+    db.flush()
 
     score = models_candidate.Score(
         candidate_id=candidate.id,
