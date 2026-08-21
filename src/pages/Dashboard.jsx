@@ -1,19 +1,12 @@
 import { useState, useEffect } from 'react'
-import { Plus, Code2, SquareActivity, Palette, Briefcase, Megaphone } from 'lucide-react'
+import { Plus } from 'lucide-react'
 import StatusBadge from '../components/ui/StatusBadge'
 import ScorePill from '../components/ui/ScorePill'
 import NewJobModal from '../components/ui/NewJobModal'
 import { getStats, getJobs, getTopCandidates, getActivity } from '../lib/api'
 import { timeAgo } from '../lib/time'
-
-const iconForDepartment = {
-  Engineering: Code2,
-  Analytics: SquareActivity,
-  Design: Palette,
-  Product: Briefcase,
-  Marketing: Megaphone,
-  Operations: Briefcase,
-}
+import { DEPARTMENT_ICONS, FALLBACK_ICON } from '../lib/departments'
+import { initialsFromName } from '../lib/initials'
 
 export default function Dashboard() {
   const today = new Date().toLocaleDateString('en-GB', {
@@ -120,7 +113,7 @@ export default function Dashboard() {
 
         <div className="flex flex-col gap-3">
           {jobs.slice(0, 5).map((job) => {
-            const Icon = iconForDepartment[job.department] || Briefcase
+            const Icon = DEPARTMENT_ICONS[job.department] || FALLBACK_ICON
             return (
               <div key={job.id} className="bg-bg-surface border border-border rounded-card p-4 flex items-center gap-4">
                 <div className="w-9 h-9 rounded-btn bg-accent-tint flex items-center justify-center text-accent shrink-0">
@@ -172,7 +165,7 @@ export default function Dashboard() {
                 {topCandidates.map((c) => (
                   <div key={c.candidate_id} className="flex items-center gap-3">
                     <div className="w-9 h-9 rounded-full bg-purple-tint flex items-center justify-center text-[11px] font-medium text-purple-text shrink-0">
-                      {c.name.split(' ').map((p) => p[0]).slice(0, 2).join('').toUpperCase()}
+                      {initialsFromName(c.name)}
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-[13px] font-medium text-text-primary leading-[1.4] truncate">{c.name}</p>

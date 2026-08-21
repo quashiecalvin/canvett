@@ -1,21 +1,13 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Plus, Search, Filter, ArrowUpDown, Code2, SquareActivity, Palette, Briefcase, Megaphone } from 'lucide-react'
+import { Plus, Search, Filter, ArrowUpDown } from 'lucide-react'
 import FilterDropdown from '../components/ui/FilterDropdown'
 import StatusBadge from '../components/ui/StatusBadge'
 import NewJobModal from '../components/ui/NewJobModal'
 import { getJobs, deleteJob } from '../lib/api'
 import { useJob } from '../context/JobContext'
 import JobActionsMenu from '../components/ui/JobActionsMenu'
-
-const iconForDepartment = {
-  Engineering: Code2,
-  Analytics: SquareActivity,
-  Design: Palette,
-  Product: Briefcase,
-  Marketing: Megaphone,
-  Operations: Briefcase,
-}
+import { DEPARTMENT_ICONS, FALLBACK_ICON } from '../lib/departments'
 
 export default function JobPostings() {
   const navigate = useNavigate()
@@ -121,7 +113,7 @@ export default function JobPostings() {
         )}
 
         {filteredJobs.map((job) => {
-          const Icon = iconForDepartment[job.department] || Briefcase
+          const Icon = DEPARTMENT_ICONS[job.department] || FALLBACK_ICON
           return (
             <div key={job.id} className="bg-bg-surface border border-border rounded-card p-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
               <div className="flex items-center gap-4 min-w-0 flex-1">

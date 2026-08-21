@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
 import { X, AlertTriangle } from 'lucide-react'
 import ScoreCircle from './ScoreCircle'
-import { scoreBarColor } from '../../lib/scoreColor'
+import ScoreBreakdown from './ScoreBreakdown'
+import { initialsFromName } from '../../lib/initials'
 import { getCandidateDetail } from '../../lib/api'
 
 export default function CandidateDetailModal({ candidateId, onClose }) {
@@ -40,7 +41,7 @@ export default function CandidateDetailModal({ candidateId, onClose }) {
           <div className="px-6 py-4 flex flex-col gap-6">
             <div className="flex items-start gap-4">
               <div className="w-12 h-12 rounded-full bg-purple-tint flex items-center justify-center text-[15px] font-medium text-purple-text shrink-0">
-                {detail.name.split(' ').map((p) => p[0]).slice(0, 2).join('').toUpperCase()}
+                {initialsFromName(detail.name)}
               </div>
               <div className="flex-1">
                 <h3 className="text-[18px] font-medium text-text-primary">{detail.name}</h3>
@@ -78,31 +79,7 @@ export default function CandidateDetailModal({ candidateId, onClose }) {
 
             <div>
               <h4 className="text-[13px] font-medium text-text-primary mb-3">Score breakdown</h4>
-              <div className="flex flex-col gap-3">
-                {[
-                  { key: 'skills', label: 'Skills match', value: detail.skills_score },
-                  { key: 'experience', label: 'Experience', value: detail.experience_score },
-                  { key: 'education', label: 'Education', value: detail.education_score },
-                ].map(({ key, label, value }) => (
-                  <div key={key}>
-                    <div className="flex items-center justify-between mb-1.5">
-                      <span className="text-[12px] text-text-muted flex items-center gap-1">
-                        {label}
-                        {key === 'experience' && !detail.duration_verified && (
-                          <AlertTriangle size={12} className="text-warning-text" />
-                        )}
-                      </span>
-                      <span className="text-[12px] font-medium text-text-body">{Math.round(value)}%</span>
-                    </div>
-                    <div className="h-1.5 rounded-full bg-bg-subtle overflow-hidden">
-                      <div
-                        className={`h-full rounded-full ${scoreBarColor(value)}`}
-                        style={{ width: `${value}%` }}
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
+              <ScoreBreakdown scores={detail} durationVerified={detail.duration_verified} />
               {!detail.duration_verified && (
                 <p className="text-[11px] text-warning-text mt-3 flex items-start gap-1.5">
                   <AlertTriangle size={12} className="shrink-0 mt-0.5" />
