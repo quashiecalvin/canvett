@@ -28,18 +28,23 @@ export default function Dashboard() {
   const [topCandidates, setTopCandidates] = useState([])
   const [activity, setActivity] = useState([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
   const [showModal, setShowModal] = useState(false)
 
   function loadData() {
     Promise.all([getStats(), getJobs(), getTopCandidates(), getActivity()])
       .then(([statsData, jobsData, topData, activityData]) => {
+        setError(null)
         setStats(statsData)
         setJobs(jobsData)
         setTopCandidates(topData)
         setActivity(activityData)
         setLoading(false)
       })
-      .catch(() => setLoading(false))
+      .catch((err) => {
+        setError(err.message)
+        setLoading(false)
+      })
   }
 
   useEffect(() => {
@@ -96,6 +101,12 @@ export default function Dashboard() {
         </button>
       </header>
 
+      {error && (
+        <p className="text-[13px] text-danger-text mb-4">
+          Could not load your dashboard: {error}
+        </p>
+      )}
+
       <div className="grid grid-cols-2 gap-4 mb-6 md:grid-cols-4">
         {statCards.map(({ label, value, delta }) => (
           <div key={label} className="bg-bg-subtle rounded-btn px-4 py-3">
@@ -114,7 +125,7 @@ export default function Dashboard() {
         <h2 className="text-[18px] font-medium text-text-primary mb-4 leading-[1.3]">Recent job postings</h2>
 
         {loading && <p className="text-[13px] text-text-muted">Loading...</p>}
-        {!loading && jobs.length === 0 && (
+        {!loading && !error && jobs.length === 0 && (
           <p className="text-[13px] text-text-muted">No job postings yet.</p>
         )}
 

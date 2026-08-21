@@ -5,11 +5,17 @@ const SettingsContext = createContext(null)
 
 export function SettingsProvider({ children }) {
   const [settings, setSettings] = useState(null)
+  const [settingsError, setSettingsError] = useState(null)
 
   const refreshSettings = useCallback(() => {
     return getSettings()
-      .then((data) => setSettings(data))
-      .catch(() => {})
+      .then((data) => {
+        setSettingsError(null)
+        setSettings(data)
+      })
+      .catch((err) => {
+        setSettingsError(err.message)
+      })
   }, [])
 
   useEffect(() => {
@@ -17,7 +23,7 @@ export function SettingsProvider({ children }) {
   }, [refreshSettings])
 
   return (
-    <SettingsContext.Provider value={{ settings, refreshSettings }}>
+    <SettingsContext.Provider value={{ settings, refreshSettings, settingsError }}>
       {children}
     </SettingsContext.Provider>
   )

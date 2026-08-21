@@ -18,8 +18,16 @@ export function AuthProvider({ children }) {
         setToken(storedToken)
         setUser(JSON.parse(storedUser))
       }
-    } catch {
-      // corrupted storage, treat as logged out
+    } catch (err) {
+      // Unreadable storage would keep failing on every load, so clear it and
+      // treat the visitor as logged out.
+      console.error('Could not restore the stored session:', err)
+      try {
+        localStorage.removeItem(TOKEN_KEY)
+        localStorage.removeItem(USER_KEY)
+      } catch (clearErr) {
+        console.error('Could not clear the stored session:', clearErr)
+      }
     }
     setLoading(false)
   }, [])
