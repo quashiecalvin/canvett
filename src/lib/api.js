@@ -1,9 +1,9 @@
+import { getToken } from "./authStorage"
+
 const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000"
 
-const NETWORK_MESSAGE = "Could not reach the server. Check your connection and try again."
-
 function authHeaders() {
-  const token = localStorage.getItem("canvett_token")
+  const token = getToken()
   return token ? { Authorization: `Bearer ${token}` } : {}
 }
 
@@ -16,206 +16,172 @@ function errorMessage(err) {
   return null
 }
 
-function apiError(message, status, cause) {
-  const error = new Error(message)
-  error.status = status
-  if (cause) error.cause = cause
-  return error
-}
-
-async function failureFor(res, fallback) {
-  let body
-  try {
-    body = await res.json()
-  } catch (cause) {
-    return apiError(fallback, res.status, cause)
-  }
-  return apiError(errorMessage(body) || fallback, res.status)
-}
-
 /**
- * Performs a request and turns every failure mode — network error, non-2xx
- * response, unparseable body — into an Error carrying the server's `detail`
- * when there is one, and the HTTP status on `error.status`.
+ * Single entry point for every backend call.
+ *
+ * @param path      endpoint path, appended to the API base URL
+ * @param fallback  error message used when the backend sends no detail
+ * @param method    HTTP method, defaults to GET
+ * @param json      request body sent as JSON
+ * @param body      request body sent as-is (e.g. FormData)
+ * @param auth      attach the stored bearer token, defaults to true
+ * @param parse     parse the response as JSON, defaults to true
  */
-async function request(path, { method = "GET", json, body, auth = true, fallback } = {}) {
-  const headers = auth ? { ...authHeaders() } : {}
-  let payload = body
-  if (json !== undefined) {
-    headers["Content-Type"] = "application/json"
-    payload = JSON.stringify(json)
+async function request(path, fallback, { method = "GET", json, body, auth = true, parse = true } = {}) {
+  const headers = {
+    ...(auth ? authHeaders() : {}),
+    ...(json !== undefined ? { "Content-Type": "application/json" } : {}),
   }
 
-  let res
-  try {
-    res = await fetch(`${BASE_URL}${path}`, { method, headers, body: payload })
-  } catch (cause) {
-    throw apiError(NETWORK_MESSAGE, null, cause)
+  const res = await fetch(`${BASE_URL}${path}`, {
+    method,
+    headers,
+    body: json !== undefined ? JSON.stringify(json) : body,
+  })
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}))
+    throw new Error(errorMessage(err) || fallback)
   }
 
-  if (!res.ok) throw await failureFor(res, fallback)
-  if (res.status === 204) return null
-
-  try {
-    return await res.json()
-  } catch (cause) {
-    throw apiError("The server returned a response we could not read.", res.status, cause)
-  }
+  return parse ? res.json() : undefined
 }
 
-export async function getJobs() {
-  return request("/jobs", { fallback: "Failed to fetch jobs" })
+function formData(entries) {
+  const data = new FormData()
+  for (const [key, value] of Object.entries(entries)) data.append(key, value)
+  return data
 }
 
-export async function getRanking(jobId) {
-  return request(`/candidates/ranking/${jobId}`, { fallback: "Failed to fetch ranking" })
+// ---------- Jobs ----------
+
+export function getJobs() {
+  return request("/jobs", "Failed to fetch jobs")
 }
 
-export async function uploadResume(jobId, file) {
-  const formData = new FormData()
-  formData.append("job_id", jobId)
-  formData.append("file", file)
+export function createJob(jobData) {
+  return request("/jobs", "Failed to create job", { method: "POST", json: jobData })
+}
 
-  return request("/candidates/upload", {
+export function updateJob(jobId, jobData) {
+  return request(`/jobs/${jobId}`, "Failed to update job", { method: "PUT", json: jobData })
+}
+
+export function deleteJob(jobId) {
+  return request(`/jobs/${jobId}`, "Failed to delete job", { method: "DELETE" })
+}
+
+// ---------- Candidates ----------
+
+export function getRanking(jobId) {
+  return request(`/candidates/ranking/${jobId}`, "Failed to fetch ranking")
+}
+
+export function uploadResume(jobId, file) {
+  return request("/candidates/upload", "Failed to upload resume", {
     method: "POST",
-    body: formData,
-    fallback: "Failed to upload resume",
+    body: formData({ job_id: jobId, file }),
   })
 }
 
-export async function getStats() {
-  return request("/stats", { fallback: "Failed to fetch stats" })
+export function rerankJob(jobId) {
+  return request(`/candidates/rerank/${jobId}`, "Failed to re-rank", { method: "POST" })
 }
 
-export async function createJob(jobData) {
-  return request("/jobs", { method: "POST", json: jobData, fallback: "Failed to create job" })
+export function deleteCandidate(candidateId) {
+  return request(`/candidates/${candidateId}`, "Failed to delete candidate", { method: "DELETE" })
 }
 
-export async function getTopCandidates() {
-  return request("/stats/top-candidates", { fallback: "Failed to fetch top candidates" })
+export function getCandidateDetail(candidateId) {
+  return request(`/candidates/${candidateId}/detail`, "Failed to fetch candidate details")
 }
 
-export async function getActivity() {
-  return request("/stats/activity", { fallback: "Failed to fetch activity" })
+// ---------- Stats ----------
+
+export function getStats() {
+  return request("/stats", "Failed to fetch stats")
 }
 
-export async function deleteJob(jobId) {
-  return request(`/jobs/${jobId}`, { method: "DELETE", fallback: "Failed to delete job" })
+export function getTopCandidates() {
+  return request("/stats/top-candidates", "Failed to fetch top candidates")
 }
 
-export async function updateJob(jobId, jobData) {
-  return request(`/jobs/${jobId}`, { method: "PUT", json: jobData, fallback: "Failed to update job" })
+export function getActivity() {
+  return request("/stats/activity", "Failed to fetch activity")
 }
 
-export async function rerankJob(jobId) {
-  return request(`/candidates/rerank/${jobId}`, { method: "POST", fallback: "Failed to re-rank" })
+export function getAnalytics() {
+  return request("/stats/analytics", "Failed to fetch analytics")
 }
 
-export async function deleteCandidate(candidateId) {
-  return request(`/candidates/${candidateId}`, {
-    method: "DELETE",
-    fallback: "Failed to delete candidate",
-  })
+// ---------- Settings ----------
+
+export function getSettings() {
+  return request("/settings", "Failed to fetch settings")
 }
 
-export async function getCandidateDetail(candidateId) {
-  return request(`/candidates/${candidateId}/detail`, {
-    fallback: "Failed to fetch candidate details",
-  })
-}
-
-export async function getAnalytics() {
-  return request("/stats/analytics", { fallback: "Failed to fetch analytics" })
-}
-
-export async function getSettings() {
-  return request("/settings", { fallback: "Failed to fetch settings" })
-}
-
-export async function updateSettings(settings) {
-  return request("/settings", {
-    method: "PUT",
-    json: settings,
-    fallback: "Failed to update settings",
-  })
+export function updateSettings(settings) {
+  return request("/settings", "Failed to update settings", { method: "PUT", json: settings })
 }
 
 // ---------- Authentication ----------
 
-export async function register(details) {
-  return request("/auth/register", {
-    method: "POST",
-    json: details,
-    auth: false,
-    fallback: "Registration failed",
-  })
+export function register(details) {
+  return request("/auth/register", "Registration failed", { method: "POST", json: details, auth: false })
 }
 
-export async function login(email, password) {
-  return request("/auth/login", {
+export function login(email, password) {
+  return request("/auth/login", "Login failed", {
     method: "POST",
     json: { email, password },
     auth: false,
-    fallback: "Login failed",
   })
 }
 
-export async function getMe() {
-  return request("/auth/me", { fallback: "Not authenticated" })
+export function getMe() {
+  return request("/auth/me", "Not authenticated")
 }
 
 // ---------- Seeker: public job board ----------
 
-export async function getPublicJobs() {
-  return request("/public/jobs/", { auth: false, fallback: "Failed to fetch jobs" })
+export function getPublicJobs() {
+  return request("/public/jobs/", "Failed to fetch jobs", { auth: false })
 }
 
-export async function getPublicJob(jobId) {
-  return request(`/public/jobs/${jobId}`, {
-    auth: false,
-    fallback: "This job is no longer available",
-  })
+export function getPublicJob(jobId) {
+  return request(`/public/jobs/${jobId}`, "This job is no longer available", { auth: false })
 }
 
 // ---------- Seeker: applications ----------
 
-export async function applyWithUpload(jobId, file) {
-  const formData = new FormData()
-  formData.append("file", file)
-
-  return request(`/applications/upload/${jobId}`, {
+export function applyWithUpload(jobId, file) {
+  return request(`/applications/upload/${jobId}`, "Failed to submit application", {
     method: "POST",
-    body: formData,
-    fallback: "Failed to submit application",
+    body: formData({ file }),
   })
 }
 
-export async function applyWithForm(jobId, details) {
-  return request(`/applications/form/${jobId}`, {
+export function applyWithForm(jobId, details) {
+  return request(`/applications/form/${jobId}`, "Failed to submit application", {
     method: "POST",
     json: details,
-    fallback: "Failed to submit application",
   })
 }
 
-export async function getMyApplications() {
-  return request("/applications/mine", { fallback: "Failed to fetch your applications" })
+export function getMyApplications() {
+  return request("/applications/mine", "Failed to fetch your applications")
 }
 
 // ---------- Profile ----------
 
-export async function updateProfile(details) {
-  return request("/auth/me", {
-    method: "PATCH",
-    json: details,
-    fallback: "Failed to update profile",
-  })
+export function updateProfile(details) {
+  return request("/auth/me", "Failed to update profile", { method: "PATCH", json: details })
 }
 
-export async function changePassword(details) {
-  await request("/auth/change-password", {
+export function changePassword(details) {
+  return request("/auth/change-password", "Failed to change password", {
     method: "POST",
     json: details,
-    fallback: "Failed to change password",
+    parse: false,
   })
 }

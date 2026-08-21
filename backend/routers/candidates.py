@@ -15,8 +15,9 @@ from services.parser import (
     extract_name,
     validate_resume_upload,
 )
-from services.scoring import score_candidate, get_config
+from services.scoring import score_for_job, build_score, apply_score
 from services.activity import log_activity
+from services.jobs import get_owned_job_or_404
 from schemas.score import ScoreOut, RankedCandidate
 
 router = APIRouter(prefix="/candidates", tags=["Candidates"])
@@ -24,17 +25,6 @@ router = APIRouter(prefix="/candidates", tags=["Candidates"])
 logger = logging.getLogger(__name__)
 
 UPLOAD_DIR = "uploads"
-
-
-def _own_job_or_404(db, job_id, user):
-    job = (
-        db.query(models_job.Job)
-        .filter(models_job.Job.id == job_id, models_job.Job.recruiter_id == user.id)
-        .first()
-    )
-    if job is None:
-        raise HTTPException(status_code=404, detail="Job not found")
-    return job
 
 
 def _own_candidate_or_404(db, candidate_id, user):
@@ -56,7 +46,7 @@ def upload_resume(
     db: Session = Depends(get_db),
     user: models_user.User = Depends(require_recruiter),
 ):
-    job = _own_job_or_404(db, job_id, user)
+    job = get_owned_job_or_404(db, job_id, user)
 
     contents = file.file.read(MAX_RESUME_SIZE + 1)
     try:
@@ -88,17 +78,6 @@ def upload_resume(
             detail="We couldn't read any text from that file. Please check it and try again.",
         )
 
-    # Scored before anything is written so a scoring failure cannot leave an
-    # unranked candidate behind.
-    result = score_candidate(
-        resume_text,
-        job.description,
-        job.required_skills,
-        job.experience_requirement,
-        job.education_requirement,
-        get_config(db),
-    )
-
     candidate = models_candidate.Candidate(
         name=extract_name(resume_text),
         filename=filename,
@@ -106,19 +85,12 @@ def upload_resume(
         job_id=job_id,
     )
     db.add(candidate)
-    db.flush()
+    db.commit()
+    db.refresh(candidate)
 
-    score = models_candidate.Score(
-        candidate_id=candidate.id,
-        job_id=job_id,
-        overall_score=result["overall_score"],
-        skills_score=result["skills_score"],
-        experience_score=result["experience_score"],
-        education_score=result["education_score"],
-        matched_skills=result["matched_skills"],
-        unmatched_skills=result["unmatched_skills"],
-        duration_verified=result["duration_verified"],
-    )
+    result = score_for_job(db, job, resume_text)
+
+    score = build_score(candidate.id, job_id, result)
     db.add(score)
     db.commit()
     db.refresh(score)
@@ -134,7 +106,7 @@ def get_ranking(
     db: Session = Depends(get_db),
     user: models_user.User = Depends(require_recruiter),
 ):
-    _own_job_or_404(db, job_id, user)
+    get_owned_job_or_404(db, job_id, user)
     results = (
         db.query(models_candidate.Score, models_candidate.Candidate)
         .join(
@@ -179,7 +151,7 @@ def rerank(
     db: Session = Depends(get_db),
     user: models_user.User = Depends(require_recruiter),
 ):
-    job = _own_job_or_404(db, job_id, user)
+    job = get_owned_job_or_404(db, job_id, user)
 
     candidates = (
         db.query(models_candidate.Candidate)
@@ -188,14 +160,7 @@ def rerank(
     )
 
     for candidate in candidates:
-        result = score_candidate(
-            candidate.resume_text,
-            job.description,
-            job.required_skills,
-            job.experience_requirement,
-            job.education_requirement,
-            get_config(db),
-        )
+        result = score_for_job(db, job, candidate.resume_text)
         score = (
             db.query(models_candidate.Score)
             .filter(models_candidate.Score.candidate_id == candidate.id)
@@ -203,13 +168,7 @@ def rerank(
             .first()
         )
         if score:
-            score.overall_score = result["overall_score"]
-            score.skills_score = result["skills_score"]
-            score.experience_score = result["experience_score"]
-            score.education_score = result["education_score"]
-            score.matched_skills = result["matched_skills"]
-            score.unmatched_skills = result["unmatched_skills"]
-            score.duration_verified = result["duration_verified"]
+            apply_score(score, result)
 
     db.commit()
     log_activity(db, f"Candidates re-ranked for {job.title}", job.recruiter_id)

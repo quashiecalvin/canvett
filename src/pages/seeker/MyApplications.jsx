@@ -1,30 +1,14 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Building2, MapPin, Upload, FileText, FileSearch, Code2, SquareActivity,
-  Palette, Briefcase, Megaphone, ChevronRight } from 'lucide-react'
+import { Building2, MapPin, Upload, FileText, FileSearch, ChevronRight } from 'lucide-react'
 import { getMyApplications } from '../../lib/api'
-
-const iconForDepartment = {
-  Engineering: Code2,
-  Analytics: SquareActivity,
-  Design: Palette,
-  Product: Briefcase,
-  Marketing: Megaphone,
-  Operations: Briefcase,
-}
+import { DEPARTMENT_ICONS, FALLBACK_ICON } from '../../lib/departments'
+import { formatLongDate } from '../../lib/time'
 
 const STATUS_STYLES = {
   'Under review': 'bg-bg-subtle text-text-muted',
   'Shortlisted': 'bg-success-tint text-success-text',
   'Rejected': 'bg-danger-tint text-danger',
-}
-
-function formatDate(iso) {
-  return new Date(iso).toLocaleDateString('en-GB', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  })
 }
 
 export default function MyApplications() {
@@ -79,7 +63,7 @@ export default function MyApplications() {
 
       <div className="flex flex-col gap-3">
         {applications.map((app) => {
-          const Icon = iconForDepartment[app.department] || Briefcase
+          const Icon = DEPARTMENT_ICONS[app.department] || FALLBACK_ICON
           const MethodIcon = app.method === 'upload' ? Upload : FileText
           return (
             <div
@@ -125,7 +109,7 @@ export default function MyApplications() {
                     {app.method === 'upload' ? 'Applied with your CV' : 'Applied using the form'}
                   </span>
                   <span className="text-[12px] text-text-hint">
-                    Applied {formatDate(app.applied_on)}
+                    Applied {formatLongDate(app.applied_on)}
                   </span>
                 </div>
               </div>

@@ -1,28 +1,12 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Search, Filter, Code2, SquareActivity, Palette, Briefcase, Megaphone, MapPin, Clock } from 'lucide-react'
+import { Search, Filter, Briefcase, MapPin, Clock } from 'lucide-react'
 import FilterDropdown from '../../components/ui/FilterDropdown'
 import { getPublicJobs } from '../../lib/api'
 import { useAuth } from '../../context/AuthContext'
 import ApplyChooserModal from '../../components/seeker/ApplyChooserModal'
-
-const iconForDepartment = {
-  Engineering: Code2,
-  Analytics: SquareActivity,
-  Design: Palette,
-  Product: Briefcase,
-  Marketing: Megaphone,
-  Operations: Briefcase,
-}
-
-function timeAgo(iso) {
-  const days = Math.floor((Date.now() - new Date(iso)) / 86400000)
-  if (days === 0) return 'today'
-  if (days === 1) return 'yesterday'
-  if (days < 30) return `${days} days ago`
-  const months = Math.floor(days / 30)
-  return `${months} month${months > 1 ? 's' : ''} ago`
-}
+import { DEPARTMENT_ICONS, FALLBACK_ICON } from '../../lib/departments'
+import { daysAgo } from '../../lib/time'
 
 function greeting() {
   const h = new Date().getHours()
@@ -143,7 +127,7 @@ export default function JobBoard() {
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
               {filtered.map((job) => {
-                const Icon = iconForDepartment[job.department] || Briefcase
+                const Icon = DEPARTMENT_ICONS[job.department] || FALLBACK_ICON
                 return (
                   <div
                     key={job.id}
@@ -198,7 +182,7 @@ export default function JobBoard() {
                     <div className="flex items-center justify-between gap-2 mt-auto pt-3 border-t border-border">
                       <span className="inline-flex items-center gap-1 text-[11px] text-text-hint">
                         <Clock size={11} />
-                        {timeAgo(job.posted_date)}
+                        {daysAgo(job.posted_date)}
                       </span>
                       <button
                         onClick={(e) => { e.stopPropagation(); setApplyJob(job) }}

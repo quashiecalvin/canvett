@@ -1,27 +1,10 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
-import { ArrowLeft, MapPin, Building2, Briefcase, GraduationCap, Clock, Layers,
-  Code2, SquareActivity, Palette, Megaphone } from 'lucide-react'
+import { ArrowLeft, MapPin, Building2, Briefcase, GraduationCap, Clock, Layers } from 'lucide-react'
 import { getPublicJob } from '../../lib/api'
 import ApplyChooserModal from '../../components/seeker/ApplyChooserModal'
-
-const iconForDepartment = {
-  Engineering: Code2,
-  Analytics: SquareActivity,
-  Design: Palette,
-  Product: Briefcase,
-  Marketing: Megaphone,
-  Operations: Briefcase,
-}
-
-function timeAgo(iso) {
-  const days = Math.floor((Date.now() - new Date(iso)) / 86400000)
-  if (days === 0) return 'today'
-  if (days === 1) return 'yesterday'
-  if (days < 30) return `${days} days ago`
-  const months = Math.floor(days / 30)
-  return `${months} month${months > 1 ? 's' : ''} ago`
-}
+import { DEPARTMENT_ICONS, FALLBACK_ICON } from '../../lib/departments'
+import { daysAgo } from '../../lib/time'
 
 export default function JobDetail() {
   const { id } = useParams()
@@ -56,14 +39,14 @@ export default function JobDetail() {
     )
   }
 
-  const Icon = iconForDepartment[job.department] || Briefcase
+  const Icon = DEPARTMENT_ICONS[job.department] || FALLBACK_ICON
 
   const facts = [
     { icon: Building2, label: 'Company', value: job.company },
     { icon: MapPin, label: 'Location', value: job.location },
     { icon: Briefcase, label: 'Type', value: job.employment_type },
     { icon: Layers, label: 'Department', value: job.department },
-    { icon: Clock, label: 'Posted', value: timeAgo(job.posted_date) },
+    { icon: Clock, label: 'Posted', value: daysAgo(job.posted_date) },
   ].filter((f) => f.value)
 
   return (

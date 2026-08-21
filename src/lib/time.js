@@ -19,3 +19,21 @@ export function timeAgo(dateString) {
   }
   return "just now"
 }
+
+// Coarser wording used on the seeker-facing job board and job detail pages.
+export function daysAgo(dateString) {
+  const days = Math.floor((Date.now() - new Date(dateString)) / 86400000)
+  if (days === 0) return "today"
+  if (days === 1) return "yesterday"
+  if (days < 30) return `${days} days ago`
+  const months = Math.floor(days / 30)
+  return `${months} month${months > 1 ? "s" : ""} ago`
+}
+
+export function formatLongDate(dateString) {
+  return new Date(dateString).toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  })
+}

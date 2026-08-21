@@ -10,8 +10,9 @@ from services.parser import (
     parse_resume_bytes,
     validate_resume_upload,
 )
-from services.scoring import score_candidate, get_config
+from services.scoring import score_for_job, build_score
 from services.activity import log_activity
+from services.jobs import get_active_job_or_404, company_name_for_job
 
 router = APIRouter(prefix="/applications", tags=["Applications"])
 
@@ -30,14 +31,7 @@ def _create_application(db, job, user, resume_text, method, phone=None):
     if already:
         raise HTTPException(status_code=400, detail="You have already applied to this job")
 
-    result = score_candidate(
-        resume_text,
-        job.description,
-        job.required_skills,
-        job.experience_requirement,
-        job.education_requirement,
-        get_config(db),
-    )
+    result = score_for_job(db, job, resume_text)
 
     candidate = models_candidate.Candidate(
         name=user.full_name,
@@ -48,18 +42,7 @@ def _create_application(db, job, user, resume_text, method, phone=None):
     db.add(candidate)
     db.flush()
 
-    score = models_candidate.Score(
-        candidate_id=candidate.id,
-        job_id=job.id,
-        overall_score=result["overall_score"],
-        skills_score=result["skills_score"],
-        experience_score=result["experience_score"],
-        education_score=result["education_score"],
-        matched_skills=result["matched_skills"],
-        unmatched_skills=result["unmatched_skills"],
-        duration_verified=result["duration_verified"],
-    )
-    db.add(score)
+    db.add(build_score(candidate.id, job.id, result))
 
     application = models_application.Application(
         job_id=job.id,
@@ -84,13 +67,6 @@ def _create_application(db, job, user, resume_text, method, phone=None):
     }
 
 
-def _get_active_job(db, job_id):
-    job = db.query(models_job.Job).filter(models_job.Job.id == job_id).first()
-    if job is None or job.status != "Active":
-        raise HTTPException(status_code=404, detail="This job is no longer available")
-    return job
-
-
 # ---------- path 1: upload a CV ----------
 
 @router.post("/upload/{job_id}")
@@ -100,7 +76,7 @@ async def apply_by_upload(
     db: Session = Depends(get_db),
     user: models_user.User = Depends(require_seeker),
 ):
-    job = _get_active_job(db, job_id)
+    job = get_active_job_or_404(db, job_id)
 
     contents = await file.read(MAX_RESUME_SIZE + 1)
     try:
@@ -185,20 +161,11 @@ def apply_by_form(
     db: Session = Depends(get_db),
     user: models_user.User = Depends(require_seeker),
 ):
-    job = _get_active_job(db, job_id)
+    job = get_active_job_or_404(db, job_id)
     resume_text = _assemble_resume_text(form)
     if not resume_text.strip():
         raise HTTPException(status_code=400, detail="Please fill in at least some of the form before submitting")
     return _create_application(db, job, user, resume_text, "form", form.phone)
-
-
-def _company_for(db, job):
-    if job is None or not job.recruiter_id:
-        return "A company on Canvett"
-    recruiter = db.query(models_user.User).filter(models_user.User.id == job.recruiter_id).first()
-    if recruiter is None:
-        return "A company on Canvett"
-    return recruiter.company_name or recruiter.full_name
 
 
 # ---------- seeker: my applications ----------
@@ -222,7 +189,7 @@ def my_applications(
             "job_id": app.job_id,
             "department": job.department if job else None,
             "job_title": job.title if job else "A role",
-            "company": _company_for(db, job),
+            "company": company_name_for_job(db, job),
             "location": job.location if job else "",
             "method": app.method,
             "status": app.status,
