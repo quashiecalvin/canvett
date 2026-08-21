@@ -1,6 +1,6 @@
 import logging
 import os
-import shutil
+import uuid
 
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form
 from sqlalchemy.orm import Session
@@ -9,7 +9,12 @@ from database.session import get_db
 from database import models_job, models_candidate, models_application
 from database import models_user
 from services.auth import require_recruiter
-from services.parser import parse_resume, extract_name
+from services.parser import (
+    MAX_RESUME_SIZE,
+    parse_resume,
+    extract_name,
+    validate_resume_upload,
+)
 from services.scoring import score_candidate, get_config
 from services.activity import log_activity
 from schemas.score import ScoreOut, RankedCandidate
@@ -53,15 +58,20 @@ def upload_resume(
 ):
     job = _own_job_or_404(db, job_id, user)
 
-    filename = os.path.basename(file.filename or "")
-    if not filename:
-        raise HTTPException(status_code=400, detail="That upload did not include a file name.")
+    contents = file.file.read(MAX_RESUME_SIZE + 1)
+    try:
+        filename = validate_resume_upload(file.filename, contents)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
 
-    file_path = os.path.join(UPLOAD_DIR, filename)
+    file_path = os.path.join(
+        UPLOAD_DIR,
+        f"{uuid.uuid4().hex}{os.path.splitext(filename)[1].lower()}",
+    )
     try:
         os.makedirs(UPLOAD_DIR, exist_ok=True)
         with open(file_path, "wb") as buffer:
-            shutil.copyfileobj(file.file, buffer)
+            buffer.write(contents)
     except OSError as err:
         logger.exception("Could not store uploaded resume %s", filename)
         raise HTTPException(

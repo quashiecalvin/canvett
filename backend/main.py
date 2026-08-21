@@ -15,7 +15,13 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
-app = FastAPI(title="Canvett API")
+enable_api_docs = os.getenv("ENABLE_API_DOCS", "").lower() in {"1", "true", "yes", "on"}
+app = FastAPI(
+    title="Canvett API",
+    docs_url="/docs" if enable_api_docs else None,
+    redoc_url="/redoc" if enable_api_docs else None,
+    openapi_url="/openapi.json" if enable_api_docs else None,
+)
 
 allowed_origins = os.getenv("ALLOWED_ORIGINS", "http://localhost:5173").split(",")
 
