@@ -1,19 +1,20 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from database.session import get_db
 from database import models_settings
+from services.auth import require_recruiter
 
 router = APIRouter(prefix="/settings", tags=["Settings"])
 
 
 class SettingsUpdate(BaseModel):
-    skills_weight: float
-    experience_weight: float
-    education_weight: float
-    unverified_factor: float
-    skill_threshold: float
+    skills_weight: float = Field(ge=0, le=1)
+    experience_weight: float = Field(ge=0, le=1)
+    education_weight: float = Field(ge=0, le=1)
+    unverified_factor: float = Field(ge=0, le=1)
+    skill_threshold: float = Field(ge=0, le=1)
     recruiter_name: str
     recruiter_role: str
 
@@ -29,7 +30,10 @@ def _get_or_create(db: Session):
 
 
 @router.get("/")
-def get_settings(db: Session = Depends(get_db)):
+def get_settings(
+    db: Session = Depends(get_db),
+    user=Depends(require_recruiter),
+):
     s = _get_or_create(db)
     return {
         "skills_weight": s.skills_weight,
@@ -43,7 +47,11 @@ def get_settings(db: Session = Depends(get_db)):
 
 
 @router.put("/")
-def update_settings(updated: SettingsUpdate, db: Session = Depends(get_db)):
+def update_settings(
+    updated: SettingsUpdate,
+    db: Session = Depends(get_db),
+    user=Depends(require_recruiter),
+):
     total = updated.skills_weight + updated.experience_weight + updated.education_weight
     if abs(total - 1.0) > 0.001:
         raise HTTPException(

@@ -1,5 +1,13 @@
-from pydantic import BaseModel
+from enum import Enum
 from datetime import datetime
+
+from pydantic import BaseModel
+
+
+class JobStatus(str, Enum):
+    ACTIVE = "Active"
+    IN_REVIEW = "In review"
+    CLOSED = "Closed"
 
 
 class JobCreate(BaseModel):
@@ -14,7 +22,7 @@ class JobCreate(BaseModel):
 
 
 class JobUpdate(JobCreate):
-    status: str
+    status: JobStatus
 
 
 class JobOut(JobCreate):
