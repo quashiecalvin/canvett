@@ -1,4 +1,6 @@
 import os
+import secrets
+import warnings
 from datetime import datetime, timedelta, timezone
 
 import bcrypt
@@ -10,7 +12,14 @@ from sqlalchemy.orm import Session
 from database.session import get_db
 from database import models_user
 
-SECRET_KEY = os.getenv("SECRET_KEY", "dev-only-secret-change-in-production")
+SECRET_KEY = os.getenv("SECRET_KEY")
+if not SECRET_KEY:
+    SECRET_KEY = secrets.token_urlsafe(32)
+    warnings.warn(
+        "SECRET_KEY is not set; generated tokens will not survive restarts.",
+        RuntimeWarning,
+        stacklevel=2,
+    )
 ALGORITHM = "HS256"
 TOKEN_EXPIRY_HOURS = 24
 
