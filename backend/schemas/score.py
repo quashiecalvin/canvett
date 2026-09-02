@@ -28,3 +28,4 @@ class RankedCandidate(BaseModel):
     status: str = "New"
     location: str | None = None
     years_experience: float | None = None
+    photo: str | None = None

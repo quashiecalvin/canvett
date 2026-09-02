@@ -45,3 +45,14 @@ def company_logo_for_job(db, job):
         .first()
     )
     return recruiter.company_logo if recruiter else None
+
+
+def company_bio_for_job(db, job):
+    if job is None or not job.recruiter_id:
+        return None
+    recruiter = (
+        db.query(models_user.User)
+        .filter(models_user.User.id == job.recruiter_id)
+        .first()
+    )
+    return recruiter.bio if recruiter else None

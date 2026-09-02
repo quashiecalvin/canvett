@@ -46,9 +46,13 @@ export default function CandidateDetailModal({ candidateId, onClose }) {
         {!loading && detail && (
           <div className="px-6 py-4 flex flex-col gap-6">
             <div className="flex items-start gap-4">
-              <div className="w-12 h-12 rounded-full bg-purple-tint flex items-center justify-center text-[15px] font-medium text-purple-text shrink-0">
-                {initialsFromName(detail.name)}
-              </div>
+              {detail.photo ? (
+                <img src={detail.photo} alt={detail.name} className="w-12 h-12 rounded-full object-cover shrink-0" />
+              ) : (
+                <div className="w-12 h-12 rounded-full bg-purple-tint flex items-center justify-center text-[15px] font-medium text-purple-text shrink-0">
+                  {initialsFromName(detail.name)}
+                </div>
+              )}
               <div className="flex-1">
                 <h3 className="text-[18px] font-medium text-text-primary">{detail.name}</h3>
                 <p className="text-[12px] text-text-muted mt-0.5">

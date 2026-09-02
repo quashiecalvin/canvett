@@ -13,7 +13,7 @@ from services.parser import (
 )
 from services.scoring import score_for_job, build_score
 from services.activity import log_activity
-from services.jobs import get_active_job_or_404, company_name_for_job
+from services.jobs import get_active_job_or_404, company_name_for_job, company_logo_for_job
 
 router = APIRouter(prefix="/applications", tags=["Applications"])
 
@@ -193,6 +193,7 @@ def my_applications(
             "department": job.department if job else None,
             "job_title": job.title if job else "A role",
             "company": company_name_for_job(db, job),
+            "company_logo": company_logo_for_job(db, job),
             "location": job.location if job else "",
             "method": app.method,
             "status": app.status,

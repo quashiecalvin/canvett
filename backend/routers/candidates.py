@@ -130,6 +130,16 @@ def get_ranking(
         .all()
     }
 
+    photo_map = {
+        cid: photo
+        for cid, photo in db.query(
+            models_application.Application.candidate_id, models_user.User.photo
+        )
+        .join(models_user.User, models_application.Application.user_id == models_user.User.id)
+        .filter(models_application.Application.job_id == job_id)
+        .all()
+    }
+
     ranked = []
     for score, candidate in results:
         ranked.append(
@@ -148,6 +158,7 @@ def get_ranking(
                 status=candidate.status,
                 location=candidate.location,
                 years_experience=candidate.years_experience,
+                photo=photo_map.get(candidate.id),
             )
         )
     return ranked
@@ -218,6 +229,13 @@ def get_candidate_detail(
         .first()
     )
 
+    seeker = (
+        db.query(models_user.User)
+        .filter(models_user.User.id == application.user_id)
+        .first()
+        if application else None
+    )
+
     return {
         "id": candidate.id,
         "source": "portal" if application else "recruiter",
@@ -237,6 +255,7 @@ def get_candidate_detail(
         "status": candidate.status,
         "location": candidate.location,
         "years_experience": candidate.years_experience,
+        "photo": seeker.photo if seeker else None,
     }
 
 

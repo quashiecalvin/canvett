@@ -18,6 +18,15 @@ function avatarColor(name) {
   return AVATAR_COLORS[h % AVATAR_COLORS.length]
 }
 
+function Avatar({ name, photo, size = 'w-10 h-10', text = 'text-[12px]' }) {
+  if (photo) return <img src={photo} alt={name} className={`${size} rounded-full object-cover shrink-0`} />
+  return (
+    <div className={`${size} ${text} rounded-full flex items-center justify-center font-semibold text-white shrink-0`} style={{ background: avatarColor(name) }}>
+      {initialsFromName(name)}
+    </div>
+  )
+}
+
 function matchLabel(score) {
   if (score >= 85) return 'Excellent match'
   if (score >= 70) return 'Strong match'
@@ -378,7 +387,7 @@ export default function CandidateRanking() {
                     <div key={c.candidate_id} role="button" tabIndex={0} onClick={() => setSelectedId(c.candidate_id)}
                       className={`flex items-center gap-3 px-3 py-3 mb-1 last:mb-0 rounded-lg cursor-pointer transition-colors ${isSel ? 'bg-accent-tint ring-1 ring-inset ring-accent/50' : 'hover:bg-bg-subtle'}`}>
                       <span className={`w-6 text-center font-mono text-[13px] shrink-0 ${rank === 1 ? 'text-accent font-semibold' : 'text-text-hint'}`}>{rank}</span>
-                      <div className="w-10 h-10 rounded-full flex items-center justify-center text-[12px] font-semibold text-white shrink-0" style={{ background: avatarColor(c.name) }}>{initialsFromName(c.name)}</div>
+                      <Avatar name={c.name} photo={c.photo} size="w-10 h-10" text="text-[12px]" />
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
                           <h3 className="text-[14px] font-medium text-text-primary leading-[1.3] truncate">{c.name}</h3>
@@ -444,7 +453,7 @@ export default function CandidateRanking() {
               <div className="bg-bg-surface border border-border rounded-card overflow-hidden">
                 <div className="p-5">
                   <div className="flex items-start gap-3">
-                    <div className="w-12 h-12 rounded-full flex items-center justify-center text-[14px] font-semibold text-white shrink-0" style={{ background: avatarColor(selected.name) }}>{initialsFromName(selected.name)}</div>
+                    <Avatar name={selected.name} photo={selected.photo} size="w-12 h-12" text="text-[14px]" />
                     <div className="flex-1 min-w-0">
                       <h2 className="text-[16px] font-semibold text-text-primary leading-[1.3] truncate">{selected.name}</h2>
                       <p className="text-[12px] text-text-muted mt-0.5 truncate">{selectedJob ? selectedJob.title : 'Candidate'}</p>

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
-import { ArrowLeft, Upload, FileText, X, Plus, Trash2, CheckCircle2 , ArrowRight, FileCheck2, Download } from 'lucide-react'
+import { ArrowLeft, Upload, UploadCloud, FileText, X, Plus, Trash2, FileCheck2, FileDown, RefreshCw, Target, SpellCheck, ShieldCheck } from 'lucide-react'
 import { getPublicJob, applyWithUpload, applyWithForm } from '../../lib/api'
 import ParseReceipt from '../../components/seeker/ParseReceipt'
 
@@ -8,6 +8,32 @@ const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June',
   'July', 'August', 'September', 'October', 'November', 'December']
 
 const YEARS = Array.from({ length: 40 }, (_, i) => String(new Date().getFullYear() - i))
+
+function LitBulb({ size = 17 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"
+      className="text-score-amber shrink-0">
+      {/* rays of light */}
+      <line x1="12" y1="0.8" x2="12" y2="3" />
+      <line x1="6.1" y1="3.1" x2="7.3" y2="4.3" />
+      <line x1="17.9" y1="3.1" x2="16.7" y2="4.3" />
+      <line x1="3.2" y1="9" x2="5" y2="9" />
+      <line x1="20.8" y1="9" x2="19" y2="9" />
+      {/* bulb */}
+      <path d="M15 15c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 9c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"
+        fill="currentColor" fillOpacity="0.22" />
+      <path d="M9.5 19h5" />
+      <path d="M10.5 22h3" />
+    </svg>
+  )
+}
+
+const UPLOAD_TIPS = [
+  { icon: RefreshCw, title: 'Keep your CV up to date', body: 'Make sure it reflects your most recent roles, skills, and achievements.' },
+  { icon: Target, title: 'Tailor it to this role', body: "Canvett matches your CV against this role's required skills — lead with the experience that fits." },
+  { icon: SpellCheck, title: 'Proofread before uploading', body: 'Clear, error-free writing parses more accurately and reads better to recruiters.' },
+]
 
 function MonthYear({ label, month, year, onMonth, onYear, allowPresent, present, onPresent }) {
   const selectClass = "h-10 rounded-btn border border-border bg-bg-surface px-2 text-[13.5px] text-text-body focus:border-accent focus:outline-none disabled:opacity-40"
@@ -55,6 +81,7 @@ export default function ApplyToJob() {
   const [submitting, setSubmitting] = useState(false)
 
   const [file, setFile] = useState(null)
+  const [dragActive, setDragActive] = useState(false)
   const [phone, setPhone] = useState('')
   const [summary, setSummary] = useState('')
   const [skillsText, setSkillsText] = useState('')
@@ -142,7 +169,7 @@ export default function ApplyToJob() {
   if (receipt) {
     return (
       <div ref={topRef}>
-        <ParseReceipt receipt={receipt} jobTitle={job.title} />
+        <ParseReceipt receipt={receipt} jobTitle={job.title} company={job.company} jobId={job.id} />
       </div>
     )
   }
@@ -182,62 +209,127 @@ export default function ApplyToJob() {
       </div>
 
       {path === 'upload' && (
-        <div className={`mt-6 ${cardClass}`}>
-          <label className={`flex cursor-pointer flex-col items-center justify-center rounded-card border-2 border-dashed px-4 py-12 text-center transition-all
-            ${file ? 'border-accent bg-accent-tint/40' : 'border-border-strong hover:border-accent hover:bg-accent-tint/20'}`}>
-            <div className={`w-14 h-14 rounded-full flex items-center justify-center transition-colors
-              ${file ? 'bg-accent text-white' : 'bg-bg-subtle text-text-muted'}`}>
-              {file ? <FileCheck2 size={26} /> : <Upload size={26} />}
-            </div>
-            <span className="mt-4 text-[14.5px] font-medium text-text-body">
-              {file ? file.name : 'Choose a PDF or Word document'}
-            </span>
-            <span className="mt-1 text-[12.5px] text-text-hint">
-              {file ? 'Ready to submit' : 'Click to browse — PDF or DOCX only'}
-            </span>
-            <input
-              type="file"
-              accept=".pdf,.docx"
-              className="hidden"
-              onChange={(e) => { setFile(e.target.files[0] || null); setError(null) }}
-            />
-          </label>
+        <>
+          <div className="mt-6 grid gap-5 lg:grid-cols-[1fr_320px] items-start">
+            {/* Upload card */}
+            <div className={cardClass}>
+              <div className="text-center">
+                <div className="w-14 h-14 rounded-full bg-accent-tint flex items-center justify-center mx-auto">
+                  <FileText size={24} className="text-accent" />
+                </div>
+                <h2 className="mt-4 text-[17px] font-semibold text-text-primary">Upload your CV</h2>
+                <p className="mt-1 text-[13px] text-text-muted">We'll read it and build your application automatically — no forms to fill in.</p>
+              </div>
 
-          {file && (
-            <button
-              onClick={() => setFile(null)}
-              className="mt-3 flex items-center gap-1.5 text-[12.5px] text-text-muted hover:text-danger"
-            >
-              <X size={13} />
-              Remove file
-            </button>
-          )}
-
-          <div className="mt-4 flex items-start gap-2.5 rounded-btn bg-bg-subtle px-3 py-2.5 text-[12.5px] leading-relaxed text-text-muted">
-            <Download size={14} className="mt-0.5 shrink-0 text-accent" />
-            <span>
-              Use our{' '}
-              <a
-                href="/Canvett_CV_Template.docx"
-                download
-                className="font-medium text-accent hover:underline"
+              <label
+                onDragOver={(e) => { e.preventDefault(); setDragActive(true) }}
+                onDragLeave={() => setDragActive(false)}
+                onDrop={(e) => {
+                  e.preventDefault(); setDragActive(false)
+                  const f = e.dataTransfer.files?.[0]
+                  if (f) { setFile(f); setError(null) }
+                }}
+                className={`mt-5 flex cursor-pointer flex-col items-center justify-center rounded-card border-2 border-dashed px-4 py-10 text-center transition-all
+                  ${file ? 'border-accent bg-accent-tint/40' : dragActive ? 'border-accent bg-accent-tint/30' : 'border-border-strong hover:border-accent hover:bg-accent-tint/15'}`}
               >
-                recommended CV template
-              </a>{' '}
-              to ensure your information is structured clearly for accurate parsing and analysis.
-            </span>
+                <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-colors ${file ? 'bg-accent text-white' : 'bg-bg-subtle text-text-muted'}`}>
+                  {file ? <FileCheck2 size={22} /> : <UploadCloud size={22} />}
+                </div>
+                <span className="mt-3 text-[14px] font-medium text-text-body">
+                  {file ? file.name : 'Drag and drop your file here'}
+                </span>
+                {file ? (
+                  <span className="mt-1 text-[12.5px] text-text-hint">Ready to submit</span>
+                ) : (
+                  <>
+                    <span className="mt-1 text-[12.5px] text-text-hint">or</span>
+                    <span className="mt-2 inline-flex items-center gap-2 h-9 px-4 rounded-btn bg-accent text-white text-[13px] font-medium">
+                      <Upload size={14} /> Choose file
+                    </span>
+                  </>
+                )}
+                <span className="mt-3 text-[12px] text-text-hint">PDF or DOCX only · Max 5MB</span>
+                <input
+                  type="file"
+                  accept=".pdf,.docx"
+                  className="hidden"
+                  onChange={(e) => { setFile(e.target.files[0] || null); setError(null) }}
+                />
+              </label>
+
+              {file && (
+                <button
+                  onClick={() => setFile(null)}
+                  className="mt-3 flex items-center gap-1.5 text-[12.5px] text-text-muted hover:text-danger"
+                >
+                  <X size={13} /> Remove file
+                </button>
+              )}
+
+              <div className="mt-4 flex items-center gap-2.5 rounded-btn bg-bg-subtle px-3 py-2.5 text-[12.5px] text-text-muted">
+                <ShieldCheck size={15} className="shrink-0 text-success-text" />
+                <span>Your CV is used only for this application.</span>
+              </div>
+
+              {error && <p className="mt-4 text-[13px] text-danger">{error}</p>}
+            </div>
+
+            {/* Tips rail */}
+            <div className="flex flex-col gap-4">
+              <div className={cardClass}>
+                <div className="flex items-center gap-2 pb-3.5 border-b border-border">
+                  <LitBulb size={17} />
+                  <h3 className="text-[14px] font-semibold text-text-primary">Tips for a great application</h3>
+                </div>
+                <div className="mt-4 flex flex-col gap-4">
+                  {UPLOAD_TIPS.map(({ icon: TipIcon, title, body }) => (
+                    <div key={title} className="flex items-start gap-3">
+                      <div className="w-8 h-8 rounded-btn bg-accent-tint flex items-center justify-center shrink-0">
+                        <TipIcon size={15} className="text-accent" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-[13px] font-medium text-text-primary leading-snug">{title}</p>
+                        <p className="mt-1 text-[12px] leading-relaxed text-text-muted">{body}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className={cardClass}>
+                <div className="flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-btn bg-accent-tint flex items-center justify-center shrink-0">
+                    <FileDown size={15} className="text-accent" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-[13px] font-medium text-text-primary">Not sure how to structure it?</p>
+                    <p className="mt-0.5 text-[12px] leading-relaxed text-text-muted">
+                      Our CV template is laid out for accurate parsing.{' '}
+                      <a href="/Canvett_CV_Template.docx" download className="font-medium text-accent hover:underline">Download template</a>
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
-          {error && <p className="mt-4 text-[13px] text-danger">{error}</p>}
-
-          <button
-            onClick={submitUpload}
-            disabled={submitting || !file}
-            className="mt-5 h-11 w-full rounded-btn bg-accent text-[14px] font-semibold text-white transition-all hover:bg-accent-2 active:scale-[0.99] disabled:opacity-50 sm:w-auto sm:px-8"
-          >
-            {submitting ? 'Submitting...' : 'Submit application'}
-          </button>
-        </div>
+          {/* Footer */}
+          <div className="mt-5 flex items-center justify-between gap-3 border-t border-border-strong pt-5">
+            <button
+              onClick={() => navigate(`/seeker/jobs/${id}`)}
+              className="h-11 px-5 rounded-btn border border-border-strong text-[13.5px] font-medium text-text-body hover:bg-bg-subtle transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={submitUpload}
+              disabled={submitting || !file}
+              className="h-11 px-8 rounded-btn bg-accent text-[14px] font-semibold text-white transition-all hover:bg-accent-2 active:scale-[0.99] disabled:opacity-50"
+            >
+              {submitting ? 'Submitting...' : 'Submit application'}
+            </button>
+          </div>
+        </>
       )}
 
       {path === 'form' && (
