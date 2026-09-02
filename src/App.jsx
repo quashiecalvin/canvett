@@ -12,12 +12,14 @@ import UploadResumes from './pages/UploadResumes'
 import CandidateRanking from './pages/CandidateRanking'
 import Analytics from './pages/Analytics'
 import Settings from './pages/Settings'
-import Profile from './pages/Profile'
 import SeekerLayout from './components/layout/SeekerLayout'
 import JobBoard from './pages/seeker/JobBoard'
 import JobDetail from './pages/seeker/JobDetail'
 import ApplyToJob from './pages/seeker/ApplyToJob'
 import MyApplications from './pages/seeker/MyApplications'
+import SeekerProfile from './pages/seeker/SeekerProfile'
+import SavedJobs from './pages/seeker/SavedJobs'
+import RecruiterProfile from './pages/RecruiterProfile'
 
 function RecruiterApp() {
   return (
@@ -31,7 +33,7 @@ function RecruiterApp() {
             <Route path="ranking" element={<CandidateRanking />} />
             <Route path="analytics" element={<Analytics />} />
             <Route path="settings" element={<Settings />} />
-            <Route path="profile" element={<Profile />} />
+            <Route path="profile" element={<RecruiterProfile />} />
             <Route path="*" element={<Navigate to="dashboard" replace />} />
           </Routes>
         </AppLayout>
@@ -47,8 +49,9 @@ function SeekerApp() {
         <Route path="jobs" element={<JobBoard />} />
         <Route path="jobs/:id" element={<JobDetail />} />
         <Route path="jobs/:id/apply" element={<ApplyToJob />} />
+        <Route path="saved" element={<SavedJobs />} />
         <Route path="applications" element={<MyApplications />} />
-        <Route path="profile" element={<Profile />} />
+        <Route path="profile" element={<SeekerProfile />} />
         <Route path="*" element={<Navigate to="jobs" replace />} />
       </Routes>
     </SeekerLayout>

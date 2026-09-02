@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 
 from database.session import get_db
 from database import models_job, models_candidate, models_user, models_application
+from services.profile import extract_location, extract_years
 from services.auth import require_seeker, get_current_user
 from services.parser import (
     MAX_RESUME_SIZE,
@@ -38,6 +39,8 @@ def _create_application(db, job, user, resume_text, method, phone=None):
         filename=f"{method}:{user.email}",
         resume_text=resume_text,
         job_id=job.id,
+        location=extract_location(resume_text),
+        years_experience=extract_years(resume_text),
     )
     db.add(candidate)
     db.flush()

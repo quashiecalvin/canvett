@@ -12,6 +12,9 @@ class Candidate(Base):
     resume_text = Column(Text, nullable=False)
     job_id = Column(Integer, ForeignKey("jobs.id"), nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+    status = Column(String, nullable=False, server_default="New")
+    location = Column(String, nullable=True)
+    years_experience = Column(Float, nullable=True)
 
 
 class Score(Base):

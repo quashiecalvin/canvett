@@ -1,11 +1,25 @@
 import { NavLink, useNavigate } from 'react-router-dom'
-import { LayoutDashboard, Briefcase, Upload, Users, BarChart2, Settings, LogOut, X } from 'lucide-react'
+import { LayoutDashboard, Upload, Users, BarChart2, Settings, LogOut, X } from 'lucide-react'
 import { useSettings } from '../../context/SettingsContext'
 import { useAuth } from '../../context/AuthContext'
 
+function JobPostingsIcon({ size = 17, strokeWidth = 2, className }) {
+  return (
+    <svg
+      width={size} height={size} viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" strokeWidth={strokeWidth}
+      strokeLinecap="round" strokeLinejoin="round" className={className}
+    >
+      <rect x="3" y="4" width="18" height="16" rx="2" />
+      <path d="M3 9h18" />
+      <path d="M8 4v5" />
+    </svg>
+  )
+}
+
 const navItems = [
   { icon: LayoutDashboard, label: 'Dashboard', to: '/dashboard', group: 'MAIN' },
-  { icon: Briefcase, label: 'Job Postings', to: '/jobs', group: 'MAIN' },
+  { icon: JobPostingsIcon, label: 'Job Postings', to: '/jobs', group: 'MAIN' },
   { icon: Upload, label: 'Upload Resumes', to: '/upload', group: 'MAIN' },
   { icon: Users, label: 'Candidates', to: '/ranking', group: 'MAIN' },
   { icon: BarChart2, label: 'Analytics', to: '/analytics', group: 'REPORTS' },
@@ -28,14 +42,14 @@ export default function Sidebar({ open = false, onClose = () => {} }) {
 
   return (
     <aside
-      className={`fixed inset-y-0 left-0 z-50 w-50 bg-bg-surface border-r border-border flex flex-col shrink-0 transition-transform duration-200 md:static md:translate-x-0 ${
+      className={`fixed inset-y-0 left-0 z-50 w-60 bg-bg-surface border-r border-border flex flex-col shrink-0 transition-transform duration-200 md:static md:translate-x-0 ${
         open ? 'translate-x-0' : '-translate-x-full'
       }`}
     >
-      <div className="p-4 border-b border-border flex items-center justify-between gap-2">
+      <div className="px-5 py-5 flex items-center justify-between gap-2">
         <div className="flex items-center gap-2 min-w-0">
-          <div className="w-7 h-7 rounded-[7px] bg-accent flex items-center justify-center shrink-0">
-            <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+          <div className="w-8 h-8 rounded-[9px] bg-accent flex items-center justify-center shrink-0">
+            <svg width="30" height="30" viewBox="0 0 28 28" fill="none">
               <rect x="8" y="8" width="5" height="7" rx="1.5" fill="white" fillOpacity="0.9"/>
               <rect x="15" y="8" width="5" height="4" rx="1.5" fill="white" fillOpacity="0.6"/>
               <rect x="15" y="14" width="5" height="6" rx="1.5" fill="white" fillOpacity="0.9"/>
@@ -56,10 +70,10 @@ export default function Sidebar({ open = false, onClose = () => {} }) {
         </button>
       </div>
 
-      <nav className="flex flex-col flex-1">
+      <nav className="flex flex-col flex-1 px-3">
         {['MAIN', 'REPORTS'].map((group, i) => (
           <div key={group}>
-            <p className={`px-4 pb-1 text-[10px] font-medium uppercase tracking-[0.07em] text-text-hint ${i === 0 ? 'pt-4' : 'pt-3'}`}>
+            <p className={`px-3 pb-2 text-[10.5px] font-semibold uppercase tracking-[0.08em] text-text-hint ${i === 0 ? 'pt-2' : 'pt-4'}`}>
               {group}
             </p>
             {navItems.filter(item => item.group === group).map(({ icon: Icon, label, to }) => (
@@ -68,16 +82,16 @@ export default function Sidebar({ open = false, onClose = () => {} }) {
                 to={to}
                 onClick={onClose}
                 className={({ isActive }) =>
-                  `flex items-center gap-2 px-4 py-2 text-[15px] w-full text-left border-r-2 transition-colors
+                  `flex items-center gap-3 px-3 py-2.5 mb-0.5 rounded-btn text-[13.5px] w-full text-left transition-colors
                   ${isActive
-                    ? 'bg-accent-tint text-accent border-accent font-medium'
-                    : 'text-text-body border-transparent hover:bg-bg-subtle font-normal'
+                    ? 'bg-accent text-white font-medium shadow-[0_6px_16px_rgba(24,95,165,0.28)]'
+                    : 'text-text-body hover:bg-bg-subtle font-medium'
                   }`
                 }
               >
                 {({ isActive }) => (
                   <>
-                    <Icon size={16} strokeWidth={isActive ? 2 : 1.75} />
+                    <Icon size={17} strokeWidth={2} className={isActive ? 'opacity-100' : 'opacity-70'} />
                     {label}
                   </>
                 )}
@@ -87,22 +101,26 @@ export default function Sidebar({ open = false, onClose = () => {} }) {
         ))}
       </nav>
 
-      <div className="p-4 border-t border-border">
+      <div className="p-3 mt-auto">
         <button
           onClick={() => { onClose(); navigate("/profile") }}
-          className="flex items-center gap-2 mb-3 w-full text-left rounded-btn p-1 -m-1 hover:bg-bg-subtle transition-colors"
+          className="flex items-center gap-2.5 w-full text-left rounded-btn p-2.5 bg-bg-subtle hover:bg-disabled-bg transition-colors"
         >
-          <div className="w-8 h-8 rounded-full bg-avatar-bg flex items-center justify-center text-[11px] font-medium text-avatar-text shrink-0">
-            {name.split(" ").map((p) => p[0]).slice(0, 2).join("").toUpperCase()}
-          </div>
+          {user?.company_logo ? (
+            <img src={user.company_logo} alt={name} className="w-9 h-9 rounded-full object-contain bg-white border border-border shrink-0" />
+          ) : (
+            <div className="w-9 h-9 rounded-full bg-avatar-bg flex items-center justify-center text-[11px] font-medium text-avatar-text shrink-0">
+              {name.split(" ").map((p) => p[0]).slice(0, 2).join("").toUpperCase()}
+            </div>
+          )}
           <div className="flex flex-col min-w-0">
             <span className="text-[13px] font-medium text-text-primary leading-tight truncate">{name}</span>
-            <span className="text-[11px] text-text-muted leading-tight truncate">{role}</span>
+            <span className="text-[11.5px] text-text-muted leading-tight truncate">{role}</span>
           </div>
         </button>
         <button
           onClick={handleLogout}
-          className="flex items-center gap-2 w-full px-2 py-1.5 rounded-btn text-[12px] text-text-muted hover:bg-bg-subtle hover:text-text-body transition-colors"
+          className="flex items-center gap-2 w-full mt-1 px-3 py-2 rounded-btn text-[12.5px] text-text-muted hover:bg-bg-subtle hover:text-text-body transition-colors"
         >
           <LogOut size={14} />
           Sign out

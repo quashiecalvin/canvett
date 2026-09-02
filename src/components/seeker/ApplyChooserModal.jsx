@@ -11,11 +11,11 @@ export default function ApplyChooserModal({ jobId, jobTitle, onClose }) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-bg-base/50"
+      className="anim-fade fixed inset-0 z-[100] flex items-center justify-center p-4 bg-bg-base/50"
       onClick={onClose}
     >
       <div
-        className="w-full max-w-2xl bg-bg-surface rounded-card shadow-xl border border-border overflow-hidden animate-[fadeIn_0.15s_ease-out]"
+        className="w-full max-w-2xl bg-bg-surface rounded-card shadow-xl border border-border overflow-hidden anim-modal"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}

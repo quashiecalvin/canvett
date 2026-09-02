@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
-import { ArrowLeft, MapPin, Building2, Briefcase, GraduationCap, Clock, Layers } from 'lucide-react'
-import { getPublicJob } from '../../lib/api'
+import { ArrowLeft, MapPin, Building2, Briefcase, GraduationCap, Clock, Layers, CheckCircle2 } from 'lucide-react'
+import { getPublicJob, getMyApplications } from '../../lib/api'
 import ApplyChooserModal from '../../components/seeker/ApplyChooserModal'
 import { DEPARTMENT_ICONS, FALLBACK_ICON } from '../../lib/departments'
 import { daysAgo } from '../../lib/time'
@@ -13,6 +13,7 @@ export default function JobDetail() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [chooserOpen, setChooserOpen] = useState(false)
+  const [myApp, setMyApp] = useState(null)
 
   useEffect(() => {
     setLoading(true)
@@ -20,6 +21,9 @@ export default function JobDetail() {
       .then(setJob)
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false))
+    getMyApplications()
+      .then((list) => setMyApp(list.find((a) => a.job_id === Number(id)) || null))
+      .catch(() => {})
   }, [id])
 
   if (loading) {
@@ -52,11 +56,11 @@ export default function JobDetail() {
   return (
     <div className="p-6 flex flex-col gap-5">
       <button
-        onClick={() => navigate('/seeker/jobs')}
+        onClick={() => navigate(-1)}
         className="flex items-center gap-1.5 text-[13px] font-medium text-text-muted hover:text-text-body transition-colors self-start"
       >
         <ArrowLeft size={15} />
-        All jobs
+        Back
       </button>
 
       {/* Blue header band */}
@@ -139,15 +143,29 @@ export default function JobDetail() {
             ))}
           </div>
 
-          <button
-            onClick={() => setChooserOpen(true)}
-            className="w-full h-10 mt-5 rounded-btn bg-accent text-white text-[13.5px] font-medium hover:bg-accent-2 active:scale-[0.99] transition-all"
-          >
-            Apply for this role
-          </button>
-          <p className="text-[11px] text-text-hint text-center mt-2">
-            Upload a CV or fill in a form
-          </p>
+          {myApp ? (
+            <div className="mt-5">
+              <div className="flex items-center justify-center gap-2 rounded-btn bg-success-tint text-success-text px-3 py-2.5 text-[13px] font-medium">
+                <CheckCircle2 size={16} /> You've applied
+              </div>
+              <p className="text-[11.5px] text-text-hint text-center mt-2">Status: {myApp.status}</p>
+              <Link to="/seeker/applications" className="block text-center text-[12.5px] font-medium text-accent hover:underline underline-offset-2 mt-1">
+                View in My Applications
+              </Link>
+            </div>
+          ) : (
+            <>
+              <button
+                onClick={() => setChooserOpen(true)}
+                className="w-full h-10 mt-5 rounded-btn bg-accent text-white text-[13.5px] font-medium hover:bg-accent-2 active:scale-[0.99] transition-all"
+              >
+                Apply for this role
+              </button>
+              <p className="text-[11px] text-text-hint text-center mt-2">
+                Upload a CV or fill in a form
+              </p>
+            </>
+          )}
         </div>
       </div>
 
@@ -155,7 +173,10 @@ export default function JobDetail() {
         <ApplyChooserModal
           jobId={job.id}
           jobTitle={job.title}
-          onClose={() => setChooserOpen(false)}
+          onClose={() => {
+            setChooserOpen(false)
+            getMyApplications().then((list) => setMyApp(list.find((a) => a.job_id === Number(id)) || null)).catch(() => {})
+          }}
         />
       )}
     </div>

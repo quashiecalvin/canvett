@@ -73,7 +73,10 @@ export default function UploadResumes() {
           <h1 className="text-[22px] font-medium text-text-primary leading-[1.2]">Upload resumes</h1>
           <p className="text-[13px] text-text-muted mt-1">Add candidate resumes to rank against a job posting</p>
         </div>
-        <JobSelector />
+        <div className="flex items-center gap-2.5">
+          <span className="text-[12px] font-medium text-text-muted whitespace-nowrap">Uploading to</span>
+          <JobSelector />
+        </div>
       </header>
 
       <div
@@ -83,18 +86,18 @@ export default function UploadResumes() {
           e.preventDefault()
           handleFiles(e.dataTransfer.files)
         }}
-        className="bg-bg-surface border-[1.5px] border-dashed border-accent-light rounded-modal p-10 flex flex-col items-center text-center mb-6 cursor-pointer hover:border-accent transition-colors"
+        className="bg-bg-surface border-[1.5px] border-dashed border-accent-light rounded-modal px-10 py-16 min-h-[460px] flex flex-col items-center justify-center text-center mb-6 cursor-pointer hover:border-accent transition-colors"
       >
-        <div className="w-14 h-14 rounded-full bg-accent-tint flex items-center justify-center text-accent mb-4">
-          <CloudUpload size={28} />
+        <div className="w-20 h-20 rounded-full bg-accent-tint flex items-center justify-center text-accent mb-5">
+          <CloudUpload size={40} />
         </div>
-        <h3 className="text-[15px] font-medium text-text-primary leading-[1.4]">Drag and drop resumes here</h3>
-        <p className="text-[13px] text-text-muted mt-1">or click to browse your files</p>
-        <button className="mt-4 flex items-center gap-2 h-10 px-4 rounded-btn bg-accent text-white text-[13px] font-medium hover:bg-accent/90 transition-colors">
-          <Folder size={14} />
+        <h3 className="text-[18px] font-medium text-text-primary leading-[1.4]">Drag and drop resumes here</h3>
+        <p className="text-[14px] text-text-muted mt-1.5">or click to browse your files</p>
+        <button className="mt-6 flex items-center gap-2 h-11 px-5 rounded-btn bg-accent text-white text-[13.5px] font-medium hover:bg-accent/90 transition-colors">
+          <Folder size={15} />
           Browse files
         </button>
-        <p className="text-[11px] text-text-hint mt-4">Supported formats: PDF, DOCX • Max 10MB per file</p>
+        <p className="text-[12px] text-text-hint mt-6">Supported formats: PDF, DOCX • Max 10MB per file</p>
         <input
           ref={fileInputRef}
           type="file"

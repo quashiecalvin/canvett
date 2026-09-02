@@ -34,3 +34,14 @@ def company_name_for_job(db, job):
     if recruiter is None:
         return FALLBACK_COMPANY
     return recruiter.company_name or recruiter.full_name
+
+
+def company_logo_for_job(db, job):
+    if job is None or not job.recruiter_id:
+        return None
+    recruiter = (
+        db.query(models_user.User)
+        .filter(models_user.User.id == job.recruiter_id)
+        .first()
+    )
+    return recruiter.company_logo if recruiter else None

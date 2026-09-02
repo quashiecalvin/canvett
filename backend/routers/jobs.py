@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 from database.session import get_db
-from database import models_job, models_candidate, models_user
+from database import models_job, models_candidate, models_user, models_application, models_saved
 from services.activity import log_activity
 from services.auth import require_recruiter
 from services.jobs import get_owned_job_or_404
@@ -66,6 +66,9 @@ def delete_job(
     user: models_user.User = Depends(require_recruiter),
 ):
     job = get_owned_job_or_404(db, job_id, user)
+    # Remove dependent rows first so foreign keys don't block the delete.
+    db.query(models_saved.SavedJob).filter(models_saved.SavedJob.job_id == job_id).delete()
+    db.query(models_application.Application).filter(models_application.Application.job_id == job_id).delete()
     db.query(models_candidate.Score).filter(models_candidate.Score.job_id == job_id).delete()
     db.query(models_candidate.Candidate).filter(models_candidate.Candidate.job_id == job_id).delete()
     db.delete(job)

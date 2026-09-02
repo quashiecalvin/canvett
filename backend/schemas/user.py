@@ -42,6 +42,19 @@ class UserOut(BaseModel):
     full_name: str
     role: str
     company_name: Optional[str] = None
+    phone: Optional[str] = None
+    location: Optional[str] = None
+    headline: Optional[str] = None
+    skills: Optional[str] = None
+    bio: Optional[str] = None
+    company_logo: Optional[str] = None
+    photo: Optional[str] = None
+    website: Optional[str] = None
+    languages: Optional[str] = None
+    pref_field: Optional[str] = None
+    pref_job_type: Optional[str] = None
+    pref_location: Optional[str] = None
+    onboarded: bool = False
     created_at: datetime
 
     class Config:
@@ -58,6 +71,18 @@ class ProfileUpdate(BaseModel):
     full_name: str
     email: EmailStr
     company_name: Optional[str] = None
+    phone: Optional[str] = None
+    location: Optional[str] = None
+    headline: Optional[str] = None
+    skills: Optional[str] = None
+    bio: Optional[str] = None
+    company_logo: Optional[str] = None
+    photo: Optional[str] = None
+    website: Optional[str] = None
+    languages: Optional[str] = None
+    pref_field: Optional[str] = None
+    pref_job_type: Optional[str] = None
+    pref_location: Optional[str] = None
 
     @field_validator("full_name")
     @classmethod
@@ -77,3 +102,15 @@ class PasswordChange(BaseModel):
         if len(v) < 8:
             raise ValueError("New password must be at least 8 characters")
         return v
+
+
+class AccountDelete(BaseModel):
+    password: str
+
+
+class OnboardingData(BaseModel):
+    pref_field: Optional[str] = None
+    pref_job_type: Optional[str] = None
+    pref_location: Optional[str] = None
+    location: Optional[str] = None
+    skills: Optional[str] = None

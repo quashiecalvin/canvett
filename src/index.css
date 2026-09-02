@@ -1,45 +1,53 @@
 @import "tailwindcss";
 
 @theme {
+  /* ── brand blue (kept — this is the login/logo colour) ── */
   --color-bg-base: #0F1B2D;
   --color-accent: #185FA5;
   --color-accent-2: #2563EB;
   --color-accent-light: #85B7EB;
-  --color-accent-tint: #E6F1FB;
-  --color-score-amber: #F59E0B;
-  --color-bg-page: #F8FAFC;
-  --color-bg-subtle: #F4F5F7;
+  --color-accent-tint: #EAF0F8;
+
+  /* ── neutrals (warmed slightly off the old cool greys) ── */
+  --color-bg-page: #E9EDF4;
+  --color-bg-subtle: #EEF1F6;
   --color-bg-surface: #FFFFFF;
-  --color-text-primary: #0F1B2D;
-  --color-text-body: #374151;
-  --color-text-muted: #6B7280;
-  --color-text-hint: #9CA3AF;
-  --color-border: #E2E4E9;
-  --color-border-strong: #D1D5DB;
-  --color-success: #059669;
-  --color-success-tint: #D1FAE5;
-  --color-success-text: #065F46;
-  --color-danger: #EF4444;
-  --color-danger-tint: #FEE2E2;
-  --color-danger-text: #991B1B;
-  --color-warning-tint: #FEF3C7;
-  --color-warning-text: #92400E;
-  --color-info-tint: #EFF6FF;
+  --color-text-primary: #182234;
+  --color-text-body: #3E4A5A;
+  --color-text-muted: #5F6B7A;
+  --color-text-hint: #949CA8;
+  --color-border: #E4E7ED;
+  --color-border-strong: #D2D6DE;
+
+  /* ── semantic score / status (kept separate from brand blue) ── */
+  --color-score-amber: #D9840F;
+  --color-success: #2E9968;
+  --color-success-tint: #E4F3EC;
+  --color-success-text: #1B6B47;
+  --color-danger: #C0453A;
+  --color-danger-tint: #F7E3E1;
+  --color-danger-text: #8F2E26;
+  --color-warning-tint: #FBEFDD;
+  --color-warning-text: #92561A;
+  --color-info-tint: #EAF0F8;
   --color-info-text: #1D4ED8;
   --color-purple-tint: #EEEDFE;
   --color-purple-text: #3C3489;
   --color-avatar-bg: #B5D4F4;
   --color-avatar-text: #0C447C;
-  --color-disabled-bg: #F3F4F6;
+  --color-disabled-bg: #F1F1F5;
 
-  --font-sans: 'Inter', sans-serif;
-  --font-outfit: 'Outfit', sans-serif;
+  /* ── type ── */
+  --font-sans: 'Hanken Grotesk', system-ui, sans-serif;
+  --font-outfit: 'Bricolage Grotesque', 'Hanken Grotesk', sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
 
-  --radius-subtle: 4px;
-  --radius-btn: 8px;
-  --radius-card: 10px;
-  --radius-modal: 12px;
-  --radius-pill: 20px;
+  /* ── radii (bumped up for the softer, rounded look) ── */
+  --radius-subtle: 6px;
+  --radius-btn: 10px;
+  --radius-card: 16px;
+  --radius-modal: 18px;
+  --radius-pill: 999px;
 }
 
 
@@ -60,3 +68,59 @@
 .auth-glow-a { animation: glow-a 20s ease-in-out infinite; }
 .auth-glow-b { animation: glow-b 24s ease-in-out infinite; }
 .auth-glow-c { animation: glow-c 28s ease-in-out infinite; }
+
+
+/* ── motion / animations ── */
+@keyframes cv-rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+@keyframes cv-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes cv-pop  { from { opacity: 0; transform: translateY(-4px) scale(0.98); } to { opacity: 1; transform: none; } }
+@keyframes cv-modal { from { opacity: 0; transform: translateY(10px) scale(0.98); } to { opacity: 1; transform: none; } }
+
+.anim-page  { animation: cv-fade 0.4s ease-out both; }
+.anim-pop   { animation: cv-pop 0.16s ease-out both; transform-origin: top; }
+.anim-fade  { animation: cv-fade 0.25s ease-out both; }
+.anim-modal { animation: cv-modal 0.22s cubic-bezier(0.22, 1, 0.36, 1) both; }
+
+/* gentle staggered entrance for lists — apply .anim-stagger to a container */
+.anim-stagger > * { animation: cv-rise 0.4s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.anim-stagger > *:nth-child(1) { animation-delay: 0.02s; }
+.anim-stagger > *:nth-child(2) { animation-delay: 0.06s; }
+.anim-stagger > *:nth-child(3) { animation-delay: 0.10s; }
+.anim-stagger > *:nth-child(4) { animation-delay: 0.14s; }
+.anim-stagger > *:nth-child(5) { animation-delay: 0.18s; }
+.anim-stagger > *:nth-child(6) { animation-delay: 0.22s; }
+.anim-stagger > *:nth-child(7) { animation-delay: 0.26s; }
+.anim-stagger > *:nth-child(8) { animation-delay: 0.30s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .anim-page, .anim-pop, .anim-fade, .anim-modal,
+  .anim-stagger > * { animation: none !important; }
+}
+
+
+/* ── dark theme (toggled via data-theme="dark") ── */
+:root[data-theme="dark"] {
+  --color-bg-page: #0E1621;
+  --color-bg-subtle: #1C2836;
+  --color-bg-surface: #161F2A;
+  --color-text-primary: #ECEEF1;
+  --color-text-body: #C3CBD4;
+  --color-text-muted: #93A0AD;
+  --color-text-hint: #64727F;
+  --color-border: #28333F;
+  --color-border-strong: #38434F;
+  --color-disabled-bg: #212D3B;
+  --color-accent: #4585C6;
+  --color-accent-tint: #17324B;
+  --color-success: #3FBF6E;
+  --color-success-tint: rgba(63, 191, 110, 0.16);
+  --color-success-text: #5FD98C;
+  --color-warning-tint: rgba(224, 151, 58, 0.16);
+  --color-warning-text: #E7A34E;
+  --color-score-amber: #E0973A;
+  --color-danger: #E5695F;
+  --color-danger-tint: rgba(229, 105, 95, 0.16);
+  --color-danger-text: #F0857C;
+  --color-info-tint: rgba(110, 155, 214, 0.16);
+  --color-info-text: #7FA9DE;
+}

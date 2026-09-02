@@ -23,9 +23,9 @@ export default function CandidateDetailModal({ candidateId, onClose }) {
   }, [candidateId])
 
   return (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4" onClick={onClose}>
+    <div className="anim-fade fixed inset-0 bg-black/40 flex items-center justify-center z-[100] p-4" onClick={onClose}>
       <div
-        className="bg-bg-surface rounded-modal w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+        className="anim-modal bg-bg-surface rounded-modal w-full max-w-2xl max-h-[calc(100vh-160px)] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between px-6 py-4 border-b border-border sticky top-0 bg-bg-surface">

@@ -25,3 +25,6 @@ class RankedCandidate(BaseModel):
     unmatched_skills: list[str]
     duration_verified: bool = True
     source: str = "recruiter"
+    status: str = "New"
+    location: str | None = None
+    years_experience: float | None = None

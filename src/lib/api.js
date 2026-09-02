@@ -210,3 +210,37 @@ export function changePassword(details) {
     parse: false,
   })
 }
+
+export function getApplicationsTimeline() {
+  return request("/stats/applications-timeline", "Failed to fetch applications timeline")
+}
+
+export function searchAll(q) {
+  return request(`/stats/search?q=${encodeURIComponent(q)}`, "Search failed")
+}
+
+export function updateCandidateStatus(candidateId, status) {
+  return request(`/candidates/${candidateId}/status`, "Failed to update candidate status", { method: "PATCH", json: { status } })
+}
+
+export function getSavedJobs() {
+  return request("/saved-jobs/", "Failed to fetch saved jobs")
+}
+export function saveJob(jobId) {
+  return request(`/saved-jobs/${jobId}`, "Failed to save job", { method: "POST" })
+}
+export function unsaveJob(jobId) {
+  return request(`/saved-jobs/${jobId}`, "Failed to remove saved job", { method: "DELETE" })
+}
+
+export function deleteAccount(password) {
+  return request("/auth/delete-account", "Failed to delete account", {
+    method: "POST",
+    json: { password },
+    parse: false,
+  })
+}
+
+export function completeOnboarding(details) {
+  return request("/auth/onboarding", "Failed to save onboarding", { method: "POST", json: details })
+}

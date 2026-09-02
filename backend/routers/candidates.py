@@ -20,6 +20,9 @@ from services.activity import log_activity
 from services.jobs import get_owned_job_or_404
 from schemas.score import ScoreOut, RankedCandidate
 
+from pydantic import BaseModel
+from services.profile import extract_location, extract_years
+
 router = APIRouter(prefix="/candidates", tags=["Candidates"])
 
 logger = logging.getLogger(__name__)
@@ -83,6 +86,8 @@ def upload_resume(
         filename=filename,
         resume_text=resume_text,
         job_id=job_id,
+        location=extract_location(resume_text),
+        years_experience=extract_years(resume_text),
     )
     db.add(candidate)
     db.commit()
@@ -140,6 +145,9 @@ def get_ranking(
                 unmatched_skills=score.unmatched_skills,
                 duration_verified=score.duration_verified,
                 source="portal" if candidate.id in portal_ids else "recruiter",
+                status=candidate.status,
+                location=candidate.location,
+                years_experience=candidate.years_experience,
             )
         )
     return ranked
@@ -226,4 +234,38 @@ def get_candidate_detail(
         "matched_skills": score.matched_skills if score else [],
         "unmatched_skills": score.unmatched_skills if score else [],
         "duration_verified": score.duration_verified if score else True,
+        "status": candidate.status,
+        "location": candidate.location,
+        "years_experience": candidate.years_experience,
     }
+
+
+class StatusUpdate(BaseModel):
+    status: str
+
+
+ALLOWED_STATUSES = {"New", "In review", "Shortlisted", "Rejected"}
+
+
+@router.patch("/{candidate_id}/status")
+def update_candidate_status(
+    candidate_id: int,
+    payload: StatusUpdate,
+    db: Session = Depends(get_db),
+    user: models_user.User = Depends(require_recruiter),
+):
+    candidate = _own_candidate_or_404(db, candidate_id, user)
+    if payload.status not in ALLOWED_STATUSES:
+        raise HTTPException(status_code=400, detail="Invalid status")
+    candidate.status = payload.status
+    # Mirror the recruiter's decision onto the seeker-facing application, if one exists.
+    # Only "Shortlisted" surfaces to the seeker; every other state reads as "Under review".
+    # Rejections are handled off-app (e.g. by email) and are never shown as "Rejected".
+    seeker_status = "Shortlisted" if payload.status == "Shortlisted" else "Under review"
+    (
+        db.query(models_application.Application)
+        .filter(models_application.Application.candidate_id == candidate.id)
+        .update({"status": seeker_status})
+    )
+    db.commit()
+    return {"candidate_id": candidate.id, "status": candidate.status}

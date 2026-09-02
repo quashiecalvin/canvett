@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { ChevronDown } from 'lucide-react'
 
-export default function FilterDropdown({ icon: Icon, label, value, options, onChange, buttonClass = "" }) {
+export default function FilterDropdown({ icon: Icon, label, value, options, onChange, buttonClass = "", compact = false }) {
   const [open, setOpen] = useState(false)
   const ref = useRef(null)
 
@@ -17,7 +17,7 @@ export default function FilterDropdown({ icon: Icon, label, value, options, onCh
     <div className="relative" ref={ref}>
       <button
         onClick={() => setOpen((o) => !o)}
-                className={`flex items-center gap-2 h-10 px-4 rounded-btn border text-[13px] transition-colors whitespace-nowrap ${buttonClass || "border-border-strong text-text-body hover:bg-bg-subtle"}`}
+                className={`flex items-center rounded-btn border transition-colors whitespace-nowrap ${compact ? "h-9 px-3 text-[12.5px] gap-1.5" : "h-10 px-4 text-[13px] gap-2"} ${buttonClass || "border-border-strong text-text-body hover:bg-bg-subtle"}`}
       >
         {Icon && <Icon size={14} />}
         {label}: {value}

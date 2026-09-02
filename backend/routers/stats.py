@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from datetime import datetime, timedelta, timezone
@@ -213,3 +213,106 @@ def analytics(
         "score_distribution": score_distribution,
         "per_job": per_job,
     }
+
+
+@router.get("/applications-timeline")
+def applications_timeline(
+    db: Session = Depends(get_db),
+    user: models_user.User = Depends(require_recruiter),
+):
+    """Applicants received per month for the last 6 months (recruiter-scoped)."""
+    job_ids = _my_job_ids(db, user)
+    now = datetime.now(timezone.utc)
+
+    # first day of the current month
+    cur = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+
+    # build the last 6 month-start boundaries, oldest first
+    starts = []
+    y, m = cur.year, cur.month
+    for _ in range(6):
+        starts.append(datetime(y, m, 1, tzinfo=timezone.utc))
+        m -= 1
+        if m == 0:
+            m = 12
+            y -= 1
+    starts.reverse()
+
+    buckets = []
+    for i, start in enumerate(starts):
+        # end = next month start (or "now" for the current, open month)
+        if i + 1 < len(starts):
+            end = starts[i + 1]
+        else:
+            ny, nm = (start.year + 1, 1) if start.month == 12 else (start.year, start.month + 1)
+            end = datetime(ny, nm, 1, tzinfo=timezone.utc)
+        if job_ids:
+            count = (
+                db.query(models_candidate.Candidate)
+                .filter(models_candidate.Candidate.job_id.in_(job_ids))
+                .filter(models_candidate.Candidate.created_at >= start)
+                .filter(models_candidate.Candidate.created_at < end)
+                .count()
+            )
+        else:
+            count = 0
+        buckets.append({"label": start.strftime("%b"), "count": count})
+
+    return {"buckets": buckets, "total": sum(b["count"] for b in buckets)}
+
+
+@router.get("/search")
+def search(
+    q: str = Query("", description="Search text"),
+    db: Session = Depends(get_db),
+    user: models_user.User = Depends(require_recruiter),
+):
+    """Search the recruiter's own job postings and candidates by name."""
+    text = (q or "").strip()
+    if not text:
+        return {"postings": [], "candidates": []}
+    like = f"%{text}%"
+
+    jobs = (
+        db.query(models_job.Job)
+        .filter(models_job.Job.recruiter_id == user.id)
+        .filter(models_job.Job.title.ilike(like) | models_job.Job.department.ilike(like))
+        .order_by(models_job.Job.posted_date.desc())
+        .limit(5)
+        .all()
+    )
+    postings = [
+        {"id": j.id, "title": j.title, "department": j.department, "status": j.status}
+        for j in jobs
+    ]
+
+    job_ids = _my_job_ids(db, user)
+    candidates = []
+    if job_ids:
+        title_by_job = {
+            j.id: j.title
+            for j in db.query(models_job.Job).filter(models_job.Job.recruiter_id == user.id).all()
+        }
+        rows = (
+            db.query(models_candidate.Candidate)
+            .filter(models_candidate.Candidate.job_id.in_(job_ids))
+            .filter(models_candidate.Candidate.name.ilike(like))
+            .limit(6)
+            .all()
+        )
+        for c in rows:
+            score = (
+                db.query(models_candidate.Score)
+                .filter(models_candidate.Score.candidate_id == c.id)
+                .filter(models_candidate.Score.job_id == c.job_id)
+                .first()
+            )
+            candidates.append({
+                "candidate_id": c.id,
+                "name": c.name,
+                "job_id": c.job_id,
+                "job_title": title_by_job.get(c.job_id, ""),
+                "score": round(score.overall_score) if score and score.overall_score is not None else None,
+            })
+
+    return {"postings": postings, "candidates": candidates}

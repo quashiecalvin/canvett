@@ -3,12 +3,12 @@ from sqlalchemy.orm import Session
 
 from database.session import get_db
 from database import models_job
-from services.jobs import get_active_job_or_404, company_name_for_job
+from services.jobs import get_active_job_or_404, company_name_for_job, company_logo_for_job
 
 router = APIRouter(prefix="/public/jobs", tags=["Public Jobs"])
 
 
-def _serialize(job, company):
+def _serialize(job, company, company_logo=None):
     return {
         "id": job.id,
         "title": job.title,
@@ -20,6 +20,7 @@ def _serialize(job, company):
         "experience_requirement": job.experience_requirement,
         "education_requirement": job.education_requirement,
         "company": company,
+        "company_logo": company_logo,
         "posted_date": job.posted_date,
     }
 
@@ -32,10 +33,10 @@ def list_open_jobs(db: Session = Depends(get_db)):
         .order_by(models_job.Job.posted_date.desc())
         .all()
     )
-    return [_serialize(job, company_name_for_job(db, job)) for job in jobs]
+    return [_serialize(job, company_name_for_job(db, job), company_logo_for_job(db, job)) for job in jobs]
 
 
 @router.get("/{job_id}")
 def get_open_job(job_id: int, db: Session = Depends(get_db)):
     job = get_active_job_or_404(db, job_id)
-    return _serialize(job, company_name_for_job(db, job))
+    return _serialize(job, company_name_for_job(db, job), company_logo_for_job(db, job))
