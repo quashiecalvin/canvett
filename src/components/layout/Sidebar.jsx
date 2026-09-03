@@ -1,6 +1,5 @@
 import { NavLink, useNavigate } from 'react-router-dom'
 import { LayoutDashboard, Upload, Users, BarChart2, Settings, LogOut, X } from 'lucide-react'
-import { useSettings } from '../../context/SettingsContext'
 import { useAuth } from '../../context/AuthContext'
 
 function JobPostingsIcon({ size = 17, strokeWidth = 2, className }) {
@@ -27,7 +26,6 @@ const navItems = [
 ]
 
 export default function Sidebar({ open = false, onClose = () => {} }) {
-  const { settings } = useSettings()
   const { user, logout } = useAuth()
   const navigate = useNavigate()
 

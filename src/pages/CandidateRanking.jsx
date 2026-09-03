@@ -6,7 +6,7 @@ import { scoreToneClass } from '../lib/scoreColor'
 import { getRanking, getCandidateDetail, rerankJob, deleteCandidate, updateCandidateStatus } from '../lib/api'
 import { useJob } from '../context/JobContext'
 import { exportToCsv } from '../lib/csv'
-import { RefreshCw, Download, Trash2, ChevronRight, ChevronLeft, Search, Mail, Phone, AlertTriangle, Sparkles, Check, FileText, Info, Bookmark, BookmarkCheck, MoreVertical, Filter } from 'lucide-react'
+import { RefreshCw, Download, Trash2, ChevronRight, ChevronLeft, Search, AlertTriangle, Sparkles, Check, FileText, Info, Bookmark, BookmarkCheck, MoreVertical, Filter } from 'lucide-react'
 
 const STATUS_OPTIONS = ['New', 'In review', 'Shortlisted', 'Rejected']
 const PAGE_SIZE = 8

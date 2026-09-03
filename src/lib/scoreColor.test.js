@@ -7,9 +7,9 @@ describe("scoreBarColor", () => {
     expect(scoreBarColor(100)).toBe("bg-success")
   })
 
-  it("returns amber for scores between 50 and 74", () => {
-    expect(scoreBarColor(50)).toBe("bg-score-amber")
-    expect(scoreBarColor(74.9)).toBe("bg-score-amber")
+  it("returns accent for scores between 50 and 74", () => {
+    expect(scoreBarColor(50)).toBe("bg-accent")
+    expect(scoreBarColor(74.9)).toBe("bg-accent")
   })
 
   it("returns danger for scores below 50", () => {

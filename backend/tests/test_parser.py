@@ -3,7 +3,7 @@ import io
 import pytest
 from docx import Document
 
-from services.parser import extract_name, parse_resume, parse_resume_bytes
+from services.parser import ResumeParseError, extract_name, parse_resume, parse_resume_bytes
 
 
 def _docx_bytes(paragraphs):
@@ -17,7 +17,7 @@ def _docx_bytes(paragraphs):
 
 class TestParseResume:
     def test_unsupported_extension_raises(self):
-        with pytest.raises(ValueError, match="Unsupported file type"):
+        with pytest.raises(ResumeParseError, match="Unsupported file type"):
             parse_resume("resume.txt")
 
     def test_docx_file(self, tmp_path):
@@ -32,7 +32,7 @@ class TestParseResumeBytes:
         assert parse_resume_bytes("resume.DOCX", contents) == "Jane Doe\nSoftware Engineer"
 
     def test_unsupported_extension_raises(self):
-        with pytest.raises(ValueError, match="Unsupported file type"):
+        with pytest.raises(ResumeParseError, match="Unsupported file type"):
             parse_resume_bytes("resume.rtf", b"data")
 
 

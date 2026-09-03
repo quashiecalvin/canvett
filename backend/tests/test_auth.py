@@ -71,3 +71,43 @@ class TestRoleGuards:
         with pytest.raises(HTTPException) as exc_info:
             require_seeker(_FakeUser("recruiter"))
         assert exc_info.value.status_code == 403
+
+
+import os
+import subprocess
+import sys
+
+_BACKEND_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+
+def _import_auth(env_overrides):
+    """Import services.auth in a clean subprocess with a given environment.
+    Returns the completed process (returncode + stderr) so we can assert on the
+    fail-fast behaviour without polluting this test process's module state.
+    """
+    env = {k: v for k, v in os.environ.items() if k not in ("APP_ENV", "SECRET_KEY")}
+    env.update(env_overrides)
+    return subprocess.run(
+        [sys.executable, "-c", "import services.auth"],
+        cwd=_BACKEND_DIR, env=env, capture_output=True, text=True,
+    )
+
+
+class TestSecretKeyPolicy:
+    def test_production_without_secret_key_fails_fast(self):
+        proc = _import_auth({"APP_ENV": "production"})
+        assert proc.returncode != 0
+        assert "SECRET_KEY" in proc.stderr
+
+    def test_production_with_short_secret_key_fails_fast(self):
+        proc = _import_auth({"APP_ENV": "production", "SECRET_KEY": "too-short"})
+        assert proc.returncode != 0
+        assert "at least" in proc.stderr
+
+    def test_production_with_strong_secret_key_starts(self):
+        proc = _import_auth({"APP_ENV": "production", "SECRET_KEY": "x" * 40})
+        assert proc.returncode == 0, proc.stderr
+
+    def test_development_without_secret_key_starts(self):
+        proc = _import_auth({"APP_ENV": "development"})
+        assert proc.returncode == 0, proc.stderr
