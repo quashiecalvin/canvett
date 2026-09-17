@@ -189,3 +189,29 @@ class TestRankingAndStatus:
         assert upd.status_code == 200
         mine = client.get("/applications/mine", headers=seeker["auth"]).json()
         assert mine[0]["status"] == "Shortlisted"
+
+
+class TestEmptyStates:
+    """A brand-new account and a freshly-posted job return empty collections,
+    not errors — these back the empty-state UI (My Applications, Saved Jobs,
+    and the ranking with no candidates yet)."""
+
+    def test_my_applications_empty_for_new_seeker(self, client, seeker):
+        r = client.get("/applications/mine", headers=seeker["auth"])
+        assert r.status_code == 200
+        assert r.json() == []
+
+    def test_saved_jobs_empty_for_new_seeker(self, client, seeker):
+        r = client.get("/saved-jobs/", headers=seeker["auth"])
+        assert r.status_code == 200
+        assert r.json() == []
+
+    def test_ranking_empty_for_job_with_no_candidates(self, client, recruiter, job):
+        r = client.get(f"/candidates/ranking/{job['id']}", headers=recruiter["auth"])
+        assert r.status_code == 200
+        assert r.json() == []
+
+    def test_public_board_empty_when_no_open_jobs(self, client):
+        r = client.get("/public/jobs/")
+        assert r.status_code == 200
+        assert r.json() == []

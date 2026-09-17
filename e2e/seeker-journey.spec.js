@@ -47,9 +47,13 @@ test('a seeker can log in, find a job, and apply through the guided form', async
   await page.getByRole('button', { name: /sign in/i }).click()
   await expect(page).toHaveURL(/\/seeker\/jobs/)
 
-  // 2. A brand-new seeker sees the onboarding questionnaire — skip it.
+  // 2. A brand-new seeker sees the onboarding questionnaire — skip it and wait
+  //    for the modal to close so it can't intercept later clicks.
   const skip = page.getByRole('button', { name: /skip for now/i })
-  if (await skip.isVisible().catch(() => false)) await skip.click()
+  if (await skip.isVisible().catch(() => false)) {
+    await skip.click()
+    await expect(skip).toBeHidden()
+  }
 
   // 3. Find and open the seeded job
   await page.getByText(JOB_TITLE).first().click()
@@ -72,4 +76,33 @@ test('a seeker can log in, find a job, and apply through the guided form', async
   // 7. The application now shows under "My Applications"
   await page.goto('/seeker/applications')
   await expect(page.getByText(JOB_TITLE).first()).toBeVisible()
+})
+
+test('a brand-new seeker sees empty states, not errors', async ({ page }) => {
+  // Register a fresh seeker who has never applied or saved anything, so both
+  // lists must render their empty states.
+  const email = `e2e.empty.${Date.now()}@e2e.io`
+  const api = await request.newContext({ baseURL: API })
+  const reg = await api.post('/auth/register', {
+    data: { email, password: PW, full_name: 'E2E Empty Seeker', role: 'seeker' },
+  })
+  expect(reg.ok(), await reg.text()).toBeTruthy()
+  await api.dispose()
+
+  await page.goto('/login')
+  await page.getByPlaceholder('you@example.com').fill(email)
+  await page.getByPlaceholder('Enter your password').fill(PW)
+  await page.getByRole('button', { name: /sign in/i }).click()
+  await expect(page).toHaveURL(/\/seeker\/jobs/)
+  const skip = page.getByRole('button', { name: /skip for now/i })
+  if (await skip.isVisible().catch(() => false)) await skip.click()
+
+  // My Applications — empty state
+  await page.goto('/seeker/applications')
+  await expect(page.getByText(/no applications yet/i)).toBeVisible()
+
+  // Saved Jobs — empty state, with the "Browse open roles" call to action
+  await page.goto('/seeker/saved')
+  await expect(page.getByText(/no saved jobs yet/i)).toBeVisible()
+  await expect(page.getByText(/browse open roles/i)).toBeVisible()
 })
