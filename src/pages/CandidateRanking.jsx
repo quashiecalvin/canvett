@@ -6,7 +6,7 @@ import { scoreToneClass } from '../lib/scoreColor'
 import { getRanking, getCandidateDetail, rerankJob, deleteCandidate, updateCandidateStatus } from '../lib/api'
 import { useJob } from '../context/JobContext'
 import { exportToCsv } from '../lib/csv'
-import { RefreshCw, Download, Trash2, ChevronRight, ChevronLeft, Search, AlertTriangle, Sparkles, Check, FileText, Info, Bookmark, BookmarkCheck, MoreVertical, Filter } from 'lucide-react'
+import { RefreshCw, Download, Trash2, ChevronRight, ChevronLeft, ChevronDown, Search, AlertTriangle, Sparkles, Check, FileText, Info, Bookmark, BookmarkCheck, MoreVertical, Filter } from 'lucide-react'
 
 const STATUS_OPTIONS = ['New', 'In review', 'Shortlisted', 'Rejected']
 const PAGE_SIZE = 8
@@ -188,7 +188,7 @@ function FiltersMenu({ statusFilter, setStatusFilter, expFilter, setExpFilter, l
 }
 
 export default function CandidateRanking() {
-  const { selectedJobId, selectedJob, setSelectedJobId } = useJob()
+  const { jobs, selectedJobId, selectedJob, setSelectedJobId } = useJob()
   const [candidates, setCandidates] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -289,7 +289,17 @@ export default function CandidateRanking() {
     .filter((c) => inExpBucket(c.years_experience, expFilter))
     .filter((c) => locFilter === 'All' || c.location === locFilter)
     .slice()
-    .sort((a, b) => sortOrder === 'Name A–Z' ? a.name.localeCompare(b.name) : b.overall_score - a.overall_score)
+    .sort((a, b) => {
+      if (sortOrder === 'Name A–Z') return a.name.localeCompare(b.name)
+      return (
+        b.overall_score - a.overall_score ||
+        b.skills_score - a.skills_score ||
+        b.experience_score - a.experience_score ||
+        b.education_score - a.education_score ||
+        (b.years_experience ?? -1) - (a.years_experience ?? -1) ||
+        a.candidate_id - b.candidate_id
+      )
+    })
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
   const pageC = Math.min(page, totalPages)
@@ -318,6 +328,22 @@ export default function CandidateRanking() {
             <ChevronRight size={13} className="text-text-hint" />
             <span className="text-text-body font-medium">{selectedJob ? selectedJob.title : 'Ranking'}</span>
           </div>
+
+          {jobs.length > 0 && (
+            <div className="relative inline-block mb-4">
+              <select
+                value={selectedJobId ?? ''}
+                onChange={(e) => setSelectedJobId(Number(e.target.value))}
+                aria-label="Select a job to view its candidates"
+                className="appearance-none h-10 max-w-[340px] truncate pl-3.5 pr-10 rounded-btn border border-border-strong bg-bg-surface text-[14px] font-medium text-text-primary cursor-pointer focus:outline-none focus:border-accent transition-colors"
+              >
+                {jobs.map((j) => (
+                  <option key={j.id} value={j.id}>{j.title}</option>
+                ))}
+              </select>
+              <ChevronDown size={16} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-text-hint pointer-events-none" />
+            </div>
+          )}
 
           <header className="flex flex-col gap-4 mb-5 sm:flex-row sm:items-start sm:justify-between">
             <div>

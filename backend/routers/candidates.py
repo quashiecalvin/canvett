@@ -4,6 +4,7 @@ import uuid
 
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form
 from sqlalchemy.orm import Session
+from sqlalchemy import nullslast
 
 from database.session import get_db
 from database import models_job, models_candidate, models_application
@@ -119,7 +120,14 @@ def get_ranking(
             models_candidate.Score.candidate_id == models_candidate.Candidate.id,
         )
         .filter(models_candidate.Score.job_id == job_id)
-        .order_by(models_candidate.Score.overall_score.desc())
+        .order_by(
+            models_candidate.Score.overall_score.desc(),
+            models_candidate.Score.skills_score.desc(),
+            models_candidate.Score.experience_score.desc(),
+            models_candidate.Score.education_score.desc(),
+            nullslast(models_candidate.Candidate.years_experience.desc()),
+            models_candidate.Candidate.id.asc(),
+        )
         .all()
     )
 
