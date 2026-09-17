@@ -129,7 +129,7 @@ function RowMenu({ candidate, onStatus, onRemove }) {
       </button>
       {open && (
         <div className="absolute right-0 mt-1 w-44 bg-bg-surface border border-border rounded-card shadow-lg py-1 z-30" onClick={(e) => e.stopPropagation()}>
-          <p className="px-3 py-1.5 text-[10.5px] font-semibold uppercase tracking-[0.05em] text-text-hint">Set status</p>
+          <p className="px-3 py-1.5 text-[10.5px] font-semibold uppercase tracking-wider text-text-hint">Set status</p>
           {STATUS_OPTIONS.map((st) => (
             <button key={st} onClick={() => { onStatus(st); setOpen(false) }}
               className={`flex items-center justify-between w-full text-left px-3 py-2 text-[13px] hover:bg-bg-subtle transition-colors ${candidate.status === st ? 'text-accent font-medium' : 'text-text-body'}`}>
@@ -165,7 +165,7 @@ function FiltersMenu({ statusFilter, setStatusFilter, expFilter, setExpFilter, l
       <button onClick={() => setOpen((o) => !o)}
         className="flex items-center gap-1.5 h-9 px-3 rounded-btn border border-border-strong text-[12.5px] text-text-body hover:bg-bg-subtle transition-colors">
         <Filter size={14} /> Filters
-        {activeFilters > 0 && <span className="min-w-[18px] h-[18px] px-1 rounded-full bg-accent text-white text-[10.5px] font-semibold flex items-center justify-center">{activeFilters}</span>}
+        {activeFilters > 0 && <span className="min-w-4.5 h-4.5 px-1 rounded-full bg-accent text-white text-[10.5px] font-semibold flex items-center justify-center">{activeFilters}</span>}
       </button>
       {open && (
         <div className="absolute right-0 mt-1.5 w-64 bg-bg-surface border border-border rounded-card shadow-lg p-3 z-30">
@@ -173,7 +173,7 @@ function FiltersMenu({ statusFilter, setStatusFilter, expFilter, setExpFilter, l
             <div key={label} className="flex items-center justify-between gap-3 py-1.5">
               <span className="text-[12px] text-text-muted">{label}</span>
               <select value={value} onChange={(e) => onChange(e.target.value)}
-                className="h-8 rounded-btn border border-border bg-bg-surface text-[12.5px] text-text-body px-2 focus:outline-none focus:border-accent max-w-[150px]">
+                className="h-8 rounded-btn border border-border bg-bg-surface text-[12.5px] text-text-body px-2 focus:outline-none focus:border-accent max-w-37.5">
                 {options.map((o) => <option key={o} value={o}>{o}</option>)}
               </select>
             </div>
@@ -335,7 +335,7 @@ export default function CandidateRanking() {
                 value={selectedJobId ?? ''}
                 onChange={(e) => setSelectedJobId(Number(e.target.value))}
                 aria-label="Select a job to view its candidates"
-                className="appearance-none h-10 max-w-[340px] truncate pl-3.5 pr-10 rounded-btn border border-border-strong bg-bg-surface text-[14px] font-medium text-text-primary cursor-pointer focus:outline-none focus:border-accent transition-colors"
+                className="appearance-none h-10 max-w-85 truncate pl-3.5 pr-10 rounded-btn border border-border-strong bg-bg-surface text-[14px] font-medium text-text-primary cursor-pointer focus:outline-none focus:border-accent transition-colors"
               >
                 {jobs.map((j) => (
                   <option key={j.id} value={j.id}>{j.title}</option>
@@ -378,7 +378,7 @@ export default function CandidateRanking() {
               {/* toolbar — one line, its own section */}
               <div className="bg-bg-surface border border-border rounded-card p-3 mb-4">
                 <div className="flex flex-wrap items-center gap-2">
-                  <div className="relative flex-1 min-w-[140px]">
+                  <div className="relative flex-1 min-w-35">
                     <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-hint" />
                     <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search candidates..."
                       className="w-full h-9 pl-9 pr-3 rounded-btn border border-border text-[12.5px] text-text-body placeholder:text-text-hint focus:outline-none focus:border-accent focus:border-[1.5px]" />
@@ -395,13 +395,13 @@ export default function CandidateRanking() {
 
               {/* table */}
               <div className="bg-bg-surface border border-border rounded-card p-2">
-                <div className="hidden md:flex items-center gap-3 px-3 py-2 mb-1 border-b border-border text-[11px] font-semibold uppercase tracking-[0.05em] text-text-hint">
+                <div className="hidden md:flex items-center gap-3 px-3 py-2 mb-1 border-b border-border text-[11px] font-semibold uppercase tracking-wider text-text-hint">
                   <span className="w-6 text-center">#</span>
                   <span className="flex-1">Candidate</span>
-                  <span className="w-[112px] flex items-center justify-center gap-1">Match score <Info size={12} className="text-text-hint" /></span>
-                  <span className="hidden lg:block w-[130px]">Key skills</span>
-                  <span className="w-[104px] text-center">Status</span>
-                  <span className="w-[72px] text-right">Actions</span>
+                  <span className="w-28 flex items-center justify-center gap-1">Match score <Info size={12} className="text-text-hint" /></span>
+                  <span className="hidden lg:block w-32.5">Key skills</span>
+                  <span className="w-26 text-center">Status</span>
+                  <span className="w-18 text-right">Actions</span>
                 </div>
 
                 {paged.map((c) => {
@@ -424,21 +424,21 @@ export default function CandidateRanking() {
                           <FileText size={11} className="shrink-0" /><span className="truncate">{c.filename}</span>
                         </p>
                       </div>
-                      <div className="w-[64px] sm:w-[112px] flex flex-col items-center shrink-0">
+                      <div className="w-16 sm:w-28 flex flex-col items-center shrink-0">
                         <Donut score={score} color={ringColor(score)} />
                         <span className={`hidden sm:block text-[10.5px] font-medium mt-1 ${bandText(score)}`}>{matchLabel(score)}</span>
                       </div>
-                      <div className="hidden lg:flex flex-wrap gap-1.5 w-[130px] shrink-0">
+                      <div className="hidden lg:flex flex-wrap gap-1.5 w-32.5 shrink-0">
                         {c.matched_skills.slice(0, 2).map((sk) => (
                           <span key={sk} className="text-[10.5px] font-medium text-text-body bg-bg-subtle px-2 py-0.5 rounded-subtle">{sk}</span>
                         ))}
                         {c.matched_skills.length > 2 && <span className="text-[10.5px] text-text-muted bg-bg-subtle px-2 py-0.5 rounded-subtle">+{c.matched_skills.length - 2}</span>}
                         {c.matched_skills.length === 0 && <span className="text-[11px] text-text-hint">—</span>}
                       </div>
-                      <div className="hidden md:flex w-[104px] justify-center shrink-0">
+                      <div className="hidden md:flex w-26 justify-center shrink-0">
                         <span className={`text-[10.5px] font-medium px-2.5 py-1 rounded-pill border whitespace-nowrap ${statusStyle(c.status)}`}>{c.status}</span>
                       </div>
-                      <div className="w-[72px] flex items-center justify-end gap-1.5 shrink-0" onClick={(e) => e.stopPropagation()}>
+                      <div className="w-18 flex items-center justify-end gap-1.5 shrink-0" onClick={(e) => e.stopPropagation()}>
                         <button onClick={() => setStatus(c.candidate_id, shortlisted ? 'New' : 'Shortlisted')} title={shortlisted ? 'Remove from shortlist' : 'Shortlist'}
                           className={`w-8 h-8 rounded-btn border flex items-center justify-center transition-colors ${shortlisted ? 'border-accent/40 bg-accent-tint text-accent' : 'border-border text-text-muted hover:bg-bg-subtle'}`}>
                           {shortlisted ? <BookmarkCheck size={15} /> : <Bookmark size={15} />}
@@ -500,7 +500,7 @@ export default function CandidateRanking() {
                   {tab === 'overview' && (
                     <div className="flex flex-col gap-4">
                       <div className="rounded-card border border-border shadow-sm p-4">
-                        <h4 className="text-[12px] font-semibold uppercase tracking-[0.05em] text-text-hint mb-3">Match breakdown</h4>
+                        <h4 className="text-[12px] font-semibold uppercase tracking-wider text-text-hint mb-3">Match breakdown</h4>
                         <div className="flex flex-col gap-3.5">
                           <Bar label="Skills" value={selected.skills_score} />
                           <Bar label="Experience" value={selected.experience_score} />
@@ -508,7 +508,7 @@ export default function CandidateRanking() {
                         </div>
                       </div>
                       <div className="rounded-card border border-border shadow-sm p-4">
-                        <h4 className="text-[12px] font-semibold uppercase tracking-[0.05em] text-text-hint mb-2">Top matched skills</h4>
+                        <h4 className="text-[12px] font-semibold uppercase tracking-wider text-text-hint mb-2">Top matched skills</h4>
                         <div className="flex flex-wrap gap-1.5">
                           {selected.matched_skills.length === 0 && <span className="text-[12px] text-text-muted">None</span>}
                           {selected.matched_skills.map((s) => (
@@ -519,7 +519,7 @@ export default function CandidateRanking() {
                       <div className="rounded-card border border-border shadow-sm p-4">
                         <div className="flex items-center gap-1.5 mb-2">
                           <Sparkles size={14} className="text-accent" fill="currentColor" strokeWidth={1.5} />
-                          <h4 className="text-[12px] font-semibold uppercase tracking-[0.05em] text-text-hint">AI summary</h4>
+                          <h4 className="text-[12px] font-semibold uppercase tracking-wider text-text-hint">AI summary</h4>
                         </div>
                         <p className="text-[12.5px] text-text-body leading-relaxed">{buildSummary(selected)}</p>
                         {(() => {
@@ -542,7 +542,7 @@ export default function CandidateRanking() {
                     <div className="flex flex-col gap-5">
                       <Bar label="Skills match" value={selected.skills_score} />
                       <div>
-                        <h4 className="text-[12px] font-semibold uppercase tracking-[0.05em] text-text-hint mb-2">Matched skills</h4>
+                        <h4 className="text-[12px] font-semibold uppercase tracking-wider text-text-hint mb-2">Matched skills</h4>
                         <div className="flex flex-wrap gap-1.5">
                           {selected.matched_skills.length === 0 && <span className="text-[12px] text-text-muted">None</span>}
                           {selected.matched_skills.map((s) => (
@@ -551,7 +551,7 @@ export default function CandidateRanking() {
                         </div>
                       </div>
                       <div>
-                        <h4 className="text-[12px] font-semibold uppercase tracking-[0.05em] text-text-hint mb-2">Missing skills</h4>
+                        <h4 className="text-[12px] font-semibold uppercase tracking-wider text-text-hint mb-2">Missing skills</h4>
                         <div className="flex flex-wrap gap-1.5">
                           {selected.unmatched_skills.length === 0 && <span className="text-[12px] text-text-muted">None — all required skills matched.</span>}
                           {selected.unmatched_skills.map((s) => (
@@ -583,7 +583,7 @@ export default function CandidateRanking() {
                       {detailLoading && <p className="text-[13px] text-text-muted">Loading resume…</p>}
                       {!detailLoading && detail && (
                         <>
-                          <div className="bg-bg-subtle rounded-btn p-4 max-h-[420px] overflow-y-auto">
+                          <div className="bg-bg-subtle rounded-btn p-4 max-h-105 overflow-y-auto">
                             <pre className="text-[11px] text-text-body whitespace-pre-wrap font-sans leading-relaxed">{detail.resume_text}</pre>
                           </div>
                           <p className="text-[11px] text-text-hint mt-2">Text extracted from {detail.filename} and used for scoring.</p>
@@ -595,7 +595,7 @@ export default function CandidateRanking() {
                   {tab === 'notes' && (
                     <div>
                       <textarea value={notes} onChange={(e) => saveNotes(e.target.value)} placeholder="Add private notes about this candidate…"
-                        className="w-full min-h-[180px] rounded-btn border border-border bg-bg-subtle p-3 text-[13px] text-text-body placeholder:text-text-hint focus:outline-none focus:border-accent resize-y leading-relaxed" />
+                        className="w-full min-h-45 rounded-btn border border-border bg-bg-subtle p-3 text-[13px] text-text-body placeholder:text-text-hint focus:outline-none focus:border-accent resize-y leading-relaxed" />
                       <p className="text-[10.5px] text-text-hint mt-2">Saved in this browser. A shared notes feature can be added later.</p>
                     </div>
                   )}
