@@ -1,4 +1,10 @@
+import torch
 from sentence_transformers import SentenceTransformer, util
+
+# Inference-only service on a memory-constrained host (Render free tier,
+# 512 MB / ~0.1 CPU): keep torch lean.
+torch.set_num_threads(1)       # a single CPU thread; extra threads add overhead we can't use
+torch.set_grad_enabled(False)  # we never train, so skip gradient bookkeeping (less RAM, faster)
 
 model = SentenceTransformer("all-MiniLM-L6-v2")
 
