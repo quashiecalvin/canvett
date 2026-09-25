@@ -153,6 +153,8 @@ class TestGoogleAuth:
         assert data["user"]["role"] == "seeker"
         assert data["user"]["email"] == "grace@gmail.com"
         assert data["user"]["photo"] == "https://example.com/g.png"
+        # The UI relies on this to hide password-only controls.
+        assert data["user"]["auth_provider"] == "google"
 
     def test_new_recruiter_requires_company(self, client, stub_google):
         r = client.post("/auth/google", json={"credential": "tok", "role": "recruiter"})

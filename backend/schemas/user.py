@@ -61,6 +61,9 @@ class UserOut(BaseModel):
     email: EmailStr
     full_name: str
     role: str
+    # "password" or "google" - lets the UI hide password-only controls
+    # (change password) for accounts that sign in with Google.
+    auth_provider: str = "password"
     company_name: Optional[str] = None
     phone: Optional[str] = None
     location: Optional[str] = None

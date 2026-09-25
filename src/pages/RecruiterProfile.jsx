@@ -42,6 +42,9 @@ function InfoRow({ label, value }) {
 
 export default function RecruiterProfile() {
   const { user, updateUser, logout } = useAuth()
+  // Google accounts have no password of their own, so password-only controls
+  // (change password) are hidden and account deletion is confirmed by typing DELETE.
+  const isGoogle = user?.auth_provider === 'google'
   const navigate = useNavigate()
 
   const [editing, setEditing] = useState(false)
@@ -295,7 +298,8 @@ export default function RecruiterProfile() {
 
           {/* Account & security (full width) */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mt-5 items-start">
-            {/* Password */}
+            {/* Password (hidden for Google accounts, which have no password) */}
+            {!isGoogle && (
             <div className="bg-bg-surface border border-border rounded-card p-6">
               <div className="flex items-center gap-2 mb-1">
                 <Lock size={15} className="text-text-muted" />
@@ -327,6 +331,7 @@ export default function RecruiterProfile() {
                 </div>
               )}
             </div>
+            )}
 
             {/* Delete account */}
             <div className="bg-bg-surface rounded-card border border-danger/30 p-6">
@@ -342,7 +347,7 @@ export default function RecruiterProfile() {
                 </button>
               ) : (
                 <div className="flex flex-col gap-3 max-w-md">
-                  <input type="password" value={deletePw} onChange={(e) => setDeletePw(e.target.value)} autoComplete="current-password" placeholder="Enter your password to confirm" className={inputCls} />
+                  <input type={isGoogle ? 'text' : 'password'} value={deletePw} onChange={(e) => setDeletePw(e.target.value)} autoComplete={isGoogle ? 'off' : 'current-password'} placeholder={isGoogle ? 'Type DELETE to confirm' : 'Enter your password to confirm'} className={inputCls} />
                   {deleteErr && <span className="text-[12px] text-danger-text">{deleteErr}</span>}
                   <div className="flex items-center gap-2">
                     <button onClick={handleDeleteAccount} disabled={deleteBusy || !deletePw}
