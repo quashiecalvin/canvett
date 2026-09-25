@@ -1,4 +1,5 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { useEffect } from 'react'
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import { SettingsProvider } from './context/SettingsContext'
 import { JobProvider } from './context/JobContext'
@@ -20,6 +21,8 @@ import MyApplications from './pages/seeker/MyApplications'
 import SeekerProfile from './pages/seeker/SeekerProfile'
 import SavedJobs from './pages/seeker/SavedJobs'
 import RecruiterProfile from './pages/RecruiterProfile'
+import About from './pages/About'
+import Privacy from './pages/Privacy'
 
 function RecruiterApp() {
   return (
@@ -58,6 +61,15 @@ function SeekerApp() {
   )
 }
 
+// Every navigation lands at the top of the page, on every route in the app.
+function ScrollToTop() {
+  const { pathname } = useLocation()
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [pathname])
+  return null
+}
+
 function RootRedirect() {
   const { isAuthenticated, user, loading } = useAuth()
   if (loading) return null
@@ -69,10 +81,13 @@ export default function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
+        <ScrollToTop />
         <Routes>
           <Route path="/" element={<RootRedirect />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/privacy" element={<Privacy />} />
           <Route
             path="/seeker/*"
             element={

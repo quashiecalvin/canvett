@@ -26,6 +26,19 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 os.environ.setdefault("DATABASE_URL", "sqlite://")
 os.environ.setdefault("SECRET_KEY", "test-secret-key-not-for-production")
 
+# ---- optional torch stub ---------------------------------------------------
+# nlp_engine imports torch only to tune it for lean inference. When torch is not
+# installed (a lightweight test box), a stub with those two no-op setters lets
+# the scoring stack import. On a machine with real torch this is a no-op.
+try:  # pragma: no cover - depends on the environment
+    import torch  # noqa: F401
+except Exception:  # noqa: BLE001
+    _torch = types.ModuleType("torch")
+    _torch.set_num_threads = lambda *a, **k: None
+    _torch.set_grad_enabled = lambda *a, **k: None
+    sys.modules["torch"] = _torch
+
+
 # ---- optional NLP stub -----------------------------------------------------
 try:  # pragma: no cover - depends on the environment
     import sentence_transformers  # noqa: F401

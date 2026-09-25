@@ -10,13 +10,25 @@ from database import (
     models_saved,
     models_activity,
 )
-from schemas.user import UserRegister, UserLogin, UserOut, TokenOut, ProfileUpdate, PasswordChange, AccountDelete, OnboardingData
+from schemas.user import (
+    UserRegister,
+    UserLogin,
+    UserOut,
+    TokenOut,
+    ProfileUpdate,
+    PasswordChange,
+    AccountDelete,
+    OnboardingData,
+    GoogleAuth,
+    GoogleAuthResult,
+)
 from services.auth import (
     hash_password,
     verify_password,
     create_access_token,
     get_current_user,
     require_seeker,
+    verify_google_token,
 )
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
@@ -58,6 +70,14 @@ def login(payload: UserLogin, db: Session = Depends(get_db)):
         .first()
     )
 
+    # A Google account has no password of its own; point the person at the right
+    # door instead of a generic "incorrect password".
+    if user is not None and not user.password_hash:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="This account uses Google sign-in. Use “Continue with Google” instead.",
+        )
+
     if user is None or not verify_password(payload.password, user.password_hash):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -66,6 +86,62 @@ def login(payload: UserLogin, db: Session = Depends(get_db)):
 
     token = create_access_token(user.id, user.role)
     return TokenOut(access_token=token, user=UserOut.model_validate(user))
+
+
+@router.post("/google", response_model=GoogleAuthResult)
+def google_auth(payload: GoogleAuth, db: Session = Depends(get_db)):
+    """Sign in or sign up with Google.
+
+    Google verifies the person's identity; we still decide their Canvett role.
+    A returning user is signed straight in. A first-time user is verified on the
+    first call, which returns needs_role so the frontend can ask whether they are
+    hiring or job-seeking; the second call carries that choice and creates the
+    account.
+    """
+    info = verify_google_token(payload.credential)
+    email = info["email"].lower()
+    full_name = (info.get("name") or "").strip() or email.split("@")[0]
+    photo = info.get("picture") or None
+
+    user = (
+        db.query(models_user.User)
+        .filter(models_user.User.email == email)
+        .first()
+    )
+
+    # Returning user: sign straight in, whichever way they first signed up.
+    if user is not None:
+        token = create_access_token(user.id, user.role)
+        return GoogleAuthResult(
+            access_token=token, user=UserOut.model_validate(user)
+        )
+
+    # First-time user, no role chosen yet: verified, but we need to ask.
+    if payload.role is None:
+        return GoogleAuthResult(needs_role=True, email=email, full_name=full_name)
+
+    # First-time user who has now picked a role: create the account.
+    if payload.role == "recruiter" and not (payload.company_name or "").strip():
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Company name is required for recruiter accounts",
+        )
+
+    user = models_user.User(
+        email=email,
+        password_hash=None,
+        auth_provider="google",
+        full_name=full_name,
+        role=payload.role,
+        company_name=(payload.company_name or "").strip() or None,
+        photo=photo,
+    )
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+
+    token = create_access_token(user.id, user.role)
+    return GoogleAuthResult(access_token=token, user=UserOut.model_validate(user))
 
 
 @router.get("/me", response_model=UserOut)
@@ -122,6 +198,11 @@ def change_password(
     db: Session = Depends(get_db),
     user: models_user.User = Depends(get_current_user),
 ):
+    if not user.password_hash:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="This account uses Google sign-in and has no password to change.",
+        )
     if not verify_password(payload.current_password, user.password_hash):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -137,10 +218,18 @@ def delete_account(
     db: Session = Depends(get_db),
     user: models_user.User = Depends(get_current_user),
 ):
-    if not verify_password(payload.password, user.password_hash):
+    # Google accounts have no password; they confirm deletion by typing the word
+    # DELETE instead (the frontend adapts the prompt to match).
+    if user.password_hash:
+        if not verify_password(payload.password, user.password_hash):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Password is incorrect",
+            )
+    elif payload.password.strip().upper() != "DELETE":
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Password is incorrect",
+            detail="Type DELETE to confirm removing your account.",
         )
 
     # 1. This account's own saved-job bookmarks

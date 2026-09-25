@@ -39,3 +39,11 @@ backend/.dev_secret_key
 test-results/
 playwright-report/
 /shots/
+
+# Environment variables (keep real values out of git; examples are committed)
+.env
+.env.*
+!.env.example
+backend/.env
+backend/.env.*
+!backend/.env.example

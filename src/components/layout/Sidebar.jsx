@@ -1,6 +1,5 @@
-import { NavLink, useNavigate } from 'react-router-dom'
-import { LayoutDashboard, Upload, Users, BarChart2, Settings, LogOut, X } from 'lucide-react'
-import { useAuth } from '../../context/AuthContext'
+import { NavLink } from 'react-router-dom'
+import { LayoutDashboard, Upload, Users, BarChart2, Settings, X } from 'lucide-react'
 
 function JobPostingsIcon({ size = 17, strokeWidth = 2, className }) {
   return (
@@ -26,21 +25,9 @@ const navItems = [
 ]
 
 export default function Sidebar({ open = false, onClose = () => {} }) {
-  const { user, logout } = useAuth()
-  const navigate = useNavigate()
-
-  const name = user?.full_name || 'Recruiter'
-  const role = user?.role === 'recruiter' ? 'Recruiter' : 'Job Seeker'
-
-  function handleLogout() {
-    onClose()
-    logout()
-    navigate('/login', { replace: true })
-  }
-
   return (
     <aside
-      className={`fixed inset-y-0 left-0 z-50 w-60 bg-bg-surface border-r border-border flex flex-col shrink-0 transition-transform duration-200 md:static md:translate-x-0 ${
+      className={`fixed inset-y-0 left-0 z-50 w-60 bg-bg-surface border-r border-border flex flex-col shrink-0 transition-transform duration-200 md:sticky md:top-0 md:h-screen md:self-start md:translate-x-0 ${
         open ? 'translate-x-0' : '-translate-x-full'
       }`}
     >
@@ -68,7 +55,7 @@ export default function Sidebar({ open = false, onClose = () => {} }) {
         </button>
       </div>
 
-      <nav className="flex flex-col flex-1 px-3">
+      <nav className="flex flex-col flex-1 px-3 pb-4">
         {['MAIN', 'REPORTS'].map((group, i) => (
           <div key={group}>
             <p className={`px-3 pb-2 text-[10.5px] font-semibold uppercase tracking-[0.08em] text-text-hint ${i === 0 ? 'pt-2' : 'pt-4'}`}>
@@ -98,32 +85,6 @@ export default function Sidebar({ open = false, onClose = () => {} }) {
           </div>
         ))}
       </nav>
-
-      <div className="p-3 mt-auto">
-        <button
-          onClick={() => { onClose(); navigate("/profile") }}
-          className="flex items-center gap-2.5 w-full text-left rounded-btn p-2.5 bg-bg-subtle hover:bg-disabled-bg transition-colors"
-        >
-          {user?.company_logo ? (
-            <img src={user.company_logo} alt={name} className="w-9 h-9 rounded-full object-contain bg-white border border-border shrink-0" />
-          ) : (
-            <div className="w-9 h-9 rounded-full bg-avatar-bg flex items-center justify-center text-[11px] font-medium text-avatar-text shrink-0">
-              {name.split(" ").map((p) => p[0]).slice(0, 2).join("").toUpperCase()}
-            </div>
-          )}
-          <div className="flex flex-col min-w-0">
-            <span className="text-[13px] font-medium text-text-primary leading-tight truncate">{name}</span>
-            <span className="text-[11.5px] text-text-muted leading-tight truncate">{role}</span>
-          </div>
-        </button>
-        <button
-          onClick={handleLogout}
-          className="flex items-center gap-2 w-full mt-1 px-3 py-2 rounded-btn text-[12.5px] text-text-muted hover:bg-bg-subtle hover:text-text-body transition-colors"
-        >
-          <LogOut size={14} />
-          Sign out
-        </button>
-      </div>
     </aside>
   )
 }

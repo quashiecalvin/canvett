@@ -4,6 +4,7 @@ import { ArrowRight, Mail, Lock } from 'lucide-react'
 import { login as loginRequest } from '../lib/api'
 import { useAuth } from '../context/AuthContext'
 import AuthShell from './auth/AuthShell'
+import GoogleSignIn from './auth/GoogleSignIn'
 
 export default function Login() {
   const navigate = useNavigate()
@@ -88,6 +89,8 @@ export default function Login() {
           {!submitting && <ArrowRight size={16} className="transition-transform group-hover:translate-x-0.5" />}
         </button>
       </form>
+
+      <GoogleSignIn />
 
       <p className="text-[13.5px] text-white/50 text-center mt-7">
         New to Canvett?{' '}

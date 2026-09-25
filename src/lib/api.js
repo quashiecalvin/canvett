@@ -163,6 +163,17 @@ export function login(email, password) {
   })
 }
 
+export function googleAuth(credential, role, company_name) {
+  const body = { credential }
+  if (role) body.role = role
+  if (company_name) body.company_name = company_name
+  return request("/auth/google", "Google sign-in failed", {
+    method: "POST",
+    json: body,
+    auth: false,
+  })
+}
+
 export function getMe() {
   return request("/auth/me", "Not authenticated")
 }

@@ -3,6 +3,7 @@ import { NavLink, useNavigate, useLocation } from 'react-router-dom'
 import { Home, Bookmark, FileText, LogOut, Menu, X, Sun, Moon, Search } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import OnboardingModal from '../seeker/OnboardingModal'
+import Footer from './Footer'
 
 const navItems = [
   { icon: Home, label: 'Home', to: '/seeker/jobs', end: true },
@@ -38,7 +39,9 @@ export default function SeekerLayout({ children }) {
   const searchRef = useRef(null)
 
   const name = user?.full_name || 'Job Seeker'
+  const role = 'Job Seeker'
   const initials = name.split(' ').map((p) => p[0]).slice(0, 2).join('').toUpperCase()
+  const [profileOpen, setProfileOpen] = useState(false)
 
   const [dark, setDark] = useState(false)
   useEffect(() => {
@@ -80,7 +83,7 @@ export default function SeekerLayout({ children }) {
   }, [])
 
   return (
-    <div className="flex h-screen bg-bg-page overflow-hidden">
+    <div className="flex min-h-screen flex-col bg-bg-page">
       {user && user.role === 'seeker' && !user.onboarded && (
         <OnboardingModal user={user} onDone={(u) => updateUser(u)} />
       )}
@@ -88,8 +91,9 @@ export default function SeekerLayout({ children }) {
         <div onClick={() => setOpen(false)} className="fixed inset-0 z-40 bg-bg-base/40 md:hidden" />
       )}
 
+      <div className="flex flex-1">
       <aside
-        className={`fixed inset-y-0 left-0 z-50 w-60 bg-bg-surface border-r border-border flex flex-col shrink-0 transition-transform duration-200 md:static md:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-50 w-60 bg-bg-surface border-r border-border flex flex-col shrink-0 transition-transform duration-200 md:sticky md:top-0 md:h-screen md:self-start md:translate-x-0 ${
           open ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
@@ -125,31 +129,10 @@ export default function SeekerLayout({ children }) {
             </NavLink>
           ))}
         </nav>
-
-        <div className="p-3 mt-auto">
-          <button
-            onClick={() => { setOpen(false); navigate('/seeker/profile') }}
-            className="flex items-center gap-2.5 w-full text-left rounded-btn p-2.5 bg-bg-subtle hover:bg-disabled-bg transition-colors"
-          >
-            {user?.photo
-              ? <img src={user.photo} alt={name} className="w-9 h-9 rounded-full object-cover bg-white shrink-0" />
-              : <div className="w-9 h-9 rounded-full bg-avatar-bg flex items-center justify-center text-[11px] font-medium text-avatar-text shrink-0">{initials}</div>}
-            <div className="flex flex-col min-w-0">
-              <span className="text-[13px] font-medium text-text-primary leading-tight truncate">{name}</span>
-              <span className="text-[11.5px] text-text-muted leading-tight truncate">Job Seeker</span>
-            </div>
-          </button>
-          <button
-            onClick={handleLogout}
-            className="flex items-center gap-2 w-full mt-1 px-3 py-2 rounded-btn text-[12.5px] text-text-muted hover:bg-bg-subtle hover:text-text-body transition-colors"
-          >
-            <LogOut size={14} /> Sign out
-          </button>
-        </div>
       </aside>
 
-      <div className="flex flex-1 flex-col overflow-hidden">
-        <header className="flex items-center gap-3 border-b border-border bg-bg-surface px-4 py-3 md:px-6">
+      <div className="flex flex-1 flex-col min-w-0 min-h-screen">
+        <header className="sticky top-0 z-30 flex items-center gap-3 border-b border-border bg-bg-surface px-4 py-3 md:px-6">
           <button onClick={() => setOpen(true)} className="text-text-body md:hidden" aria-label="Open menu">
             <Menu size={20} />
           </button>
@@ -175,21 +158,52 @@ export default function SeekerLayout({ children }) {
               className="w-10 h-10 rounded-btn border border-border bg-bg-surface flex items-center justify-center text-text-muted hover:bg-bg-subtle transition-colors">
               {dark ? <Sun size={17} /> : <Moon size={17} />}
             </button>
-            <button onClick={() => navigate('/seeker/profile')} aria-label="Your profile"
-              className="w-10 h-10 rounded-full overflow-hidden bg-avatar-bg flex items-center justify-center text-[12px] font-medium text-avatar-text shrink-0 hover:opacity-90 transition-opacity">
-              {user?.photo
-                ? <img src={user.photo} alt={name} className="w-full h-full object-cover" />
-                : initials}
-            </button>
+            <div className="relative">
+              <button onClick={() => setProfileOpen((o) => !o)} aria-label="Account menu"
+                className="w-10 h-10 rounded-full overflow-hidden bg-avatar-bg flex items-center justify-center text-[12px] font-medium text-avatar-text shrink-0 hover:opacity-90 transition-opacity">
+                {user?.photo
+                  ? <img src={user.photo} alt={name} className="w-full h-full object-cover" />
+                  : initials}
+              </button>
+              {profileOpen && (
+                <div className="anim-pop absolute right-0 top-full mt-2 z-50 w-60 rounded-card border border-border bg-bg-surface shadow-lg shadow-black/5 overflow-hidden">
+                  <button
+                    onClick={() => { setProfileOpen(false); navigate('/seeker/profile') }}
+                    className="w-full flex items-center gap-3 px-4 py-3.5 text-left border-b border-border hover:bg-bg-subtle transition-colors"
+                  >
+                    <span className="w-10 h-10 rounded-full overflow-hidden bg-avatar-bg flex items-center justify-center text-[12px] font-medium text-avatar-text shrink-0">
+                      {user?.photo
+                        ? <img src={user.photo} alt={name} className="w-full h-full object-cover" />
+                        : initials}
+                    </span>
+                    <span className="min-w-0">
+                      <span className="block text-[13px] font-semibold text-text-primary truncate">{name}</span>
+                      <span className="block text-[11.5px] text-text-muted truncate">{role}</span>
+                    </span>
+                  </button>
+                  <button
+                    onClick={handleLogout}
+                    className="w-full flex items-center gap-2.5 px-4 py-2.5 text-[13px] text-text-body hover:bg-bg-subtle transition-colors"
+                  >
+                    <LogOut size={15} className="text-text-muted" /> Sign out
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
+          {profileOpen && (
+            <div className="fixed inset-0 z-40" onClick={() => setProfileOpen(false)} />
+          )}
         </header>
 
-        <main className="flex-1 overflow-y-auto">
+        <main className="flex-1">
           <div key={location.pathname} className="anim-page">
             {children}
           </div>
         </main>
       </div>
+      </div>
+      <Footer />
     </div>
   )
 }

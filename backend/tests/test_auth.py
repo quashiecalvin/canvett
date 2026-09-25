@@ -111,3 +111,83 @@ class TestSecretKeyPolicy:
     def test_development_without_secret_key_starts(self):
         proc = _import_auth({"APP_ENV": "development"})
         assert proc.returncode == 0, proc.stderr
+
+
+class TestGoogleAuth:
+    """The /auth/google flow, with Google's own token verification stubbed out.
+
+    We patch routers.auth.verify_google_token so no real Google token is needed;
+    it returns the claims Google would have handed back for a verified account.
+    """
+
+    CLAIMS = {
+        "email": "grace@gmail.com",
+        "email_verified": True,
+        "name": "Grace Google",
+        "picture": "https://example.com/g.png",
+    }
+
+    @pytest.fixture()
+    def stub_google(self, monkeypatch):
+        def _stub(credential):
+            return dict(self.CLAIMS)
+
+        import routers.auth as auth_router
+        monkeypatch.setattr(auth_router, "verify_google_token", _stub)
+
+    def test_new_user_without_role_is_asked_for_one(self, client, stub_google):
+        r = client.post("/auth/google", json={"credential": "tok"})
+        assert r.status_code == 200, r.text
+        data = r.json()
+        assert data["needs_role"] is True
+        assert data["email"] == "grace@gmail.com"
+        assert data["full_name"] == "Grace Google"
+        assert data["access_token"] is None
+
+    def test_new_seeker_is_created_and_signed_in(self, client, stub_google):
+        r = client.post("/auth/google", json={"credential": "tok", "role": "seeker"})
+        assert r.status_code == 200, r.text
+        data = r.json()
+        assert data["needs_role"] is False
+        assert data["access_token"]
+        assert data["user"]["role"] == "seeker"
+        assert data["user"]["email"] == "grace@gmail.com"
+        assert data["user"]["photo"] == "https://example.com/g.png"
+
+    def test_new_recruiter_requires_company(self, client, stub_google):
+        r = client.post("/auth/google", json={"credential": "tok", "role": "recruiter"})
+        assert r.status_code == 400
+        assert "Company name" in r.json()["detail"]
+
+    def test_new_recruiter_with_company_is_created(self, client, stub_google):
+        r = client.post(
+            "/auth/google",
+            json={"credential": "tok", "role": "recruiter", "company_name": "Acme"},
+        )
+        assert r.status_code == 200, r.text
+        data = r.json()
+        assert data["user"]["role"] == "recruiter"
+        assert data["user"]["company_name"] == "Acme"
+
+    def test_returning_google_user_signs_straight_in(self, client, stub_google):
+        first = client.post("/auth/google", json={"credential": "tok", "role": "seeker"})
+        assert first.status_code == 200
+        # Second time, no role needed - the account already exists.
+        again = client.post("/auth/google", json={"credential": "tok"})
+        assert again.status_code == 200, again.text
+        data = again.json()
+        assert data["needs_role"] is False
+        assert data["access_token"]
+        assert data["user"]["email"] == "grace@gmail.com"
+
+    def test_password_login_on_google_account_is_guided(self, client, stub_google):
+        client.post("/auth/google", json={"credential": "tok", "role": "seeker"})
+        r = client.post("/auth/login", json={"email": "grace@gmail.com", "password": "whatever"})
+        assert r.status_code == 401
+        assert "Google" in r.json()["detail"]
+
+    def test_invalid_token_is_rejected(self, client):
+        # No stub here: with no GOOGLE_CLIENT_ID configured, the endpoint reports
+        # the feature is unavailable rather than accepting an unverified token.
+        r = client.post("/auth/google", json={"credential": "not-a-real-token"})
+        assert r.status_code in (401, 503)

@@ -1,5 +1,17 @@
 import logging
 import os
+from pathlib import Path
+
+# Load backend/.env for local development (e.g. GOOGLE_CLIENT_ID) before any
+# module reads its environment. Real environment variables always win, so this
+# is a no-op in production (Render) where they are set on the dashboard. If
+# python-dotenv is not installed, plain environment variables still work.
+try:
+    from dotenv import load_dotenv
+
+    load_dotenv(Path(__file__).resolve().parent / ".env")
+except ImportError:
+    pass
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -79,6 +91,9 @@ def _startup_migrate_and_backfill():
         "ALTER TABLE users ADD COLUMN IF NOT EXISTS pref_job_type VARCHAR",
         "ALTER TABLE users ADD COLUMN IF NOT EXISTS pref_location VARCHAR",
         "ALTER TABLE users ADD COLUMN IF NOT EXISTS onboarded BOOLEAN NOT NULL DEFAULT false",
+        "ALTER TABLE users ADD COLUMN IF NOT EXISTS auth_provider VARCHAR NOT NULL DEFAULT 'password'",
+        # Google accounts have no password of their own.
+        "ALTER TABLE users ALTER COLUMN password_hash DROP NOT NULL",
         "CREATE TABLE IF NOT EXISTS saved_jobs (id SERIAL PRIMARY KEY, user_id INTEGER NOT NULL REFERENCES users(id), job_id INTEGER NOT NULL REFERENCES jobs(id), created_at TIMESTAMPTZ DEFAULT now(), CONSTRAINT uq_saved_user_job UNIQUE (user_id, job_id))",
     ]
     try:

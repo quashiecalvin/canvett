@@ -9,7 +9,12 @@ class User(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     email = Column(String, unique=True, nullable=False, index=True)
-    password_hash = Column(String, nullable=False)
+    # Nullable: accounts created through Google sign-in have no password of their
+    # own. Password accounts still always carry a hash.
+    password_hash = Column(String, nullable=True)
+    # "password" for email/password sign-up, "google" for Google sign-in. Lets
+    # us give a clear message if someone tries the wrong method for their account.
+    auth_provider = Column(String, nullable=False, server_default="password")
     full_name = Column(String, nullable=False)
     role = Column(String, nullable=False)
     company_name = Column(String, nullable=True)

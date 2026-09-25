@@ -65,6 +65,12 @@ elif not SECRET_KEY:
 ALGORITHM = "HS256"
 TOKEN_EXPIRY_HOURS = 24
 
+# The OAuth Client ID from Google Cloud Console. Supplied via the environment so
+# the same code runs locally and in production against different projects. When
+# it is unset, the Google sign-in endpoint reports that the feature is not
+# configured rather than failing in a confusing way.
+GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID", "").strip()
+
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
 
 
@@ -82,6 +88,45 @@ def create_access_token(user_id: int, role: str) -> str:
     expiry = datetime.now(timezone.utc) + timedelta(hours=TOKEN_EXPIRY_HOURS)
     payload = {"sub": str(user_id), "role": role, "exp": expiry}
     return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
+
+
+def verify_google_token(credential: str) -> dict:
+    """Verify a Google ID token and return its verified claims.
+
+    The heavy lifting is Google's own library: it checks the token's signature
+    against Google's public keys, the issuer, the expiry, and that the audience
+    matches our Client ID. We only add the email-verified check on top.
+    """
+    if not GOOGLE_CLIENT_ID:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Google sign-in is not configured on the server.",
+        )
+
+    try:
+        from google.auth.transport import requests as google_requests
+        from google.oauth2 import id_token as google_id_token
+
+        info = google_id_token.verify_oauth2_token(
+            credential, google_requests.Request(), GOOGLE_CLIENT_ID
+        )
+    except Exception:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="We could not verify your Google sign-in. Please try again.",
+        )
+
+    if not info.get("email_verified"):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Your Google account email is not verified.",
+        )
+    if not info.get("email"):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Your Google account did not share an email address.",
+        )
+    return info
 
 
 def get_current_user(

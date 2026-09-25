@@ -9,7 +9,13 @@
   --color-accent-tint: #EAF0F8;
 
   /* ── neutrals (warmed slightly off the old cool greys) ── */
-  --color-bg-page: #E9EDF4;
+  --color-bg-page: #EFF2F7;
+
+  /* ── footer (dark in both themes) ── */
+  --color-foot-bg: #0F1B2D;
+  --color-foot-border: #243247;
+  --color-foot-text: #AEB9C7;
+  --color-foot-hint: #6C7A8C;
   --color-bg-subtle: #EEF1F6;
   --color-bg-surface: #FFFFFF;
   --color-text-primary: #182234;
@@ -100,7 +106,9 @@
 
 /* ── dark theme (toggled via data-theme="dark") ── */
 :root[data-theme="dark"] {
-  --color-bg-page: #0E1621;
+  --color-bg-page: #101A24;
+  --color-foot-bg: #0A121C;
+  --color-foot-border: #1E2A38;
   --color-bg-subtle: #1C2836;
   --color-bg-surface: #161F2A;
   --color-text-primary: #ECEEF1;
@@ -124,3 +132,9 @@
   --color-info-tint: rgba(110, 155, 214, 0.16);
   --color-info-text: #7FA9DE;
 }
+
+
+/* Page background is solid and the rubber-band bounce is disabled so no
+   white gap shows under the full-width footer when you over-scroll. */
+html, body { background-color: var(--color-bg-page); }
+html { overscroll-behavior-y: none; }

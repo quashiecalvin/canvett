@@ -4,6 +4,7 @@ import { User, Mail, Lock, Building2 } from 'lucide-react'
 import { register as registerRequest } from '../lib/api'
 import { useAuth } from '../context/AuthContext'
 import AuthShell from './auth/AuthShell'
+import GoogleSignIn from './auth/GoogleSignIn'
 
 export default function Register() {
   const navigate = useNavigate()
@@ -128,6 +129,8 @@ export default function Register() {
           {submitting ? 'Creating account…' : 'Create account'}
         </button>
       </form>
+
+      <GoogleSignIn />
 
       <p className="text-[13.5px] text-white/50 text-center mt-7">
         Already have an account?{' '}

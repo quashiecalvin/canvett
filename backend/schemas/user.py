@@ -36,6 +36,26 @@ class UserLogin(BaseModel):
     password: str
 
 
+class GoogleAuth(BaseModel):
+    """A Google sign-in attempt.
+
+    `credential` is the ID token Google Identity Services hands the browser.
+    On a first-time user the frontend calls once with no role (to verify the
+    person and learn we need a role), then again with the role they picked.
+    """
+
+    credential: str
+    role: Optional[str] = None
+    company_name: Optional[str] = None
+
+    @field_validator("role")
+    @classmethod
+    def role_must_be_valid(cls, v):
+        if v is not None and v not in ("recruiter", "seeker"):
+            raise ValueError("Role must be either 'recruiter' or 'seeker'")
+        return v
+
+
 class UserOut(BaseModel):
     id: int
     email: EmailStr
@@ -65,6 +85,23 @@ class TokenOut(BaseModel):
     access_token: str
     token_type: str = "bearer"
     user: UserOut
+
+
+class GoogleAuthResult(BaseModel):
+    """Result of a Google sign-in.
+
+    Returning user, or a first-timer who has now picked a role: `access_token`
+    and `user` are set and `needs_role` is False. A first-timer we have verified
+    but who still needs to choose a role: `needs_role` is True and we echo back
+    their verified name/email to show on the role step.
+    """
+
+    needs_role: bool = False
+    email: Optional[EmailStr] = None
+    full_name: Optional[str] = None
+    access_token: Optional[str] = None
+    token_type: str = "bearer"
+    user: Optional[UserOut] = None
 
 
 class ProfileUpdate(BaseModel):
