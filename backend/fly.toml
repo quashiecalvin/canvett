@@ -4,7 +4,7 @@
 #
 
 app = 'canvett-backend'
-primary_region = 'jnb'
+primary_region = "fra"   # Frankfurt: co-located with the Neon database (eu-central-1)
 
 [build]
 [env]
