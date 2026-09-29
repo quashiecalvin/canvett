@@ -29,7 +29,7 @@ def _get_or_create(db: Session):
     return settings
 
 
-@router.get("/")
+@router.get("")
 def get_settings(
     db: Session = Depends(get_db),
     user=Depends(require_recruiter),
@@ -46,7 +46,7 @@ def get_settings(
     }
 
 
-@router.put("/")
+@router.put("")
 def update_settings(
     updated: SettingsUpdate,
     db: Session = Depends(get_db),

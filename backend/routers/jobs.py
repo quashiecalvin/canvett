@@ -11,7 +11,7 @@ from schemas.job import JobCreate, JobUpdate, JobOut
 router = APIRouter(prefix="/jobs", tags=["Jobs"])
 
 
-@router.post("/", response_model=JobOut)
+@router.post("", response_model=JobOut)
 def create_job(
     job: JobCreate,
     db: Session = Depends(get_db),
@@ -25,7 +25,7 @@ def create_job(
     return new_job
 
 
-@router.get("/", response_model=list[JobOut])
+@router.get("", response_model=list[JobOut])
 def list_jobs(
     db: Session = Depends(get_db),
     user: models_user.User = Depends(require_recruiter),

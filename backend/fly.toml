@@ -1,0 +1,24 @@
+# fly.toml app configuration file generated for canvett-backend on 2026-09-29T02:38:07Z
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = 'canvett-backend'
+primary_region = 'jnb'
+
+[build]
+[env]
+  APP_ENV = 'production'
+  HF_HOME = '/app/.hf'
+  PORT = '8080'
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = 'off'
+  auto_start_machines = true
+  min_machines_running = 1
+
+[[vm]]
+  size = 'shared-cpu-1x'
+  memory = '2gb'

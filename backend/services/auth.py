@@ -1,3 +1,4 @@
+import logging
 import os
 import secrets
 import warnings
@@ -11,6 +12,8 @@ from sqlalchemy.orm import Session
 
 from database.session import get_db
 from database import models_user
+
+logger = logging.getLogger(__name__)
 
 # --- SECRET_KEY resolution -------------------------------------------------
 # The JWT signing key. In production it MUST be supplied via the environment
@@ -110,7 +113,8 @@ def verify_google_token(credential: str) -> dict:
         info = google_id_token.verify_oauth2_token(
             credential, google_requests.Request(), GOOGLE_CLIENT_ID
         )
-    except Exception:
+    except Exception as exc:
+        logger.warning("Google ID-token verification failed: %s: %s", type(exc).__name__, exc)
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="We could not verify your Google sign-in. Please try again.",

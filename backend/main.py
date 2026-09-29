@@ -20,8 +20,18 @@ from fastapi.responses import JSONResponse
 from routers import jobs, candidates, stats, settings, auth, applications, public_jobs, saved
 from services.parser import ResumeParseError
 from sqlalchemy import text
-from database.connection import engine, SessionLocal
-from database import models_candidate
+from database.connection import engine, SessionLocal, Base
+# Import every model module so their tables are registered on Base.metadata
+# before create_all runs at startup.
+from database import (
+    models_candidate,
+    models_user,
+    models_job,
+    models_application,
+    models_saved,
+    models_settings,
+    models_activity,
+)
 from services.profile import extract_location, extract_years
 
 logging.basicConfig(
@@ -74,6 +84,16 @@ async def log_unhandled_errors(request: Request, call_next):
 
 @app.on_event("startup")
 def _startup_migrate_and_backfill():
+    # Create any tables that do not yet exist. This leaves existing tables
+    # untouched, so on a database with an older, partial schema it fills in the
+    # missing tables (users, applications, saved_jobs, scores, settings,
+    # activities); the ALTER statements below then patch columns onto tables that
+    # predate later features.
+    try:
+        Base.metadata.create_all(bind=engine)
+    except Exception:
+        logger.exception("schema create_all failed")
+
     stmts = [
         "ALTER TABLE candidates ADD COLUMN IF NOT EXISTS status VARCHAR NOT NULL DEFAULT 'New'",
         "ALTER TABLE candidates ADD COLUMN IF NOT EXISTS location VARCHAR",

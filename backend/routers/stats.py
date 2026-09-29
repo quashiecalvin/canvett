@@ -18,7 +18,7 @@ def _my_job_ids(db, user):
     return [r[0] for r in rows]
 
 
-@router.get("/")
+@router.get("")
 def get_stats(
     db: Session = Depends(get_db),
     user: models_user.User = Depends(require_recruiter),

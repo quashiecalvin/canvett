@@ -1,0 +1,13 @@
+# Keep the build context small and never ship local-only files
+venv/
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+tests/
+uploads/
+.env
+.env.*
+.dev_secret_key
+*.md
