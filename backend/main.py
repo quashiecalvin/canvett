@@ -31,6 +31,7 @@ from database import (
     models_saved,
     models_settings,
     models_activity,
+    models_reset,
 )
 from services.profile import extract_location, extract_years
 

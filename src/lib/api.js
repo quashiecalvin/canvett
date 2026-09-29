@@ -182,6 +182,22 @@ export function login(email, password) {
   })
 }
 
+export function forgotPassword(email) {
+  return request("/auth/forgot-password", "Could not start the reset", {
+    method: "POST",
+    json: { email },
+    auth: false,
+  })
+}
+
+export function resetPassword(token, new_password) {
+  return request("/auth/reset-password", "Could not reset your password", {
+    method: "POST",
+    json: { token, new_password },
+    auth: false,
+  })
+}
+
 export function googleAuth(credential, role, company_name) {
   const body = { credential }
   if (role) body.role = role

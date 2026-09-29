@@ -150,6 +150,22 @@ class AccountDelete(BaseModel):
     password: str
 
 
+class ForgotPasswordRequest(BaseModel):
+    email: EmailStr
+
+
+class ResetPasswordConfirm(BaseModel):
+    token: str
+    new_password: str
+
+    @field_validator("new_password")
+    @classmethod
+    def password_length(cls, v):
+        if len(v) < 8:
+            raise ValueError("New password must be at least 8 characters")
+        return v
+
+
 class OnboardingData(BaseModel):
     pref_field: Optional[str] = None
     pref_job_type: Optional[str] = None

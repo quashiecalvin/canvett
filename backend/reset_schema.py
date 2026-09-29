@@ -20,6 +20,7 @@ from database import (  # noqa: F401
     models_saved,
     models_settings,
     models_activity,
+    models_reset,
 )
 
 

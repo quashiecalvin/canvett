@@ -1,3 +1,8 @@
+import hashlib
+import os
+import secrets
+from datetime import datetime, timedelta, timezone
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
@@ -9,6 +14,7 @@ from database import (
     models_application,
     models_saved,
     models_activity,
+    models_reset,
 )
 from schemas.user import (
     UserRegister,
@@ -21,6 +27,8 @@ from schemas.user import (
     OnboardingData,
     GoogleAuth,
     GoogleAuthResult,
+    ForgotPasswordRequest,
+    ResetPasswordConfirm,
 )
 from services.auth import (
     hash_password,
@@ -30,6 +38,7 @@ from services.auth import (
     require_seeker,
     verify_google_token,
 )
+from services.email import send_email
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
@@ -312,3 +321,93 @@ def complete_onboarding(
     db.commit()
     db.refresh(user)
     return user
+
+
+RESET_TOKEN_TTL_HOURS = 1
+
+
+def _hash_token(raw: str) -> str:
+    return hashlib.sha256(raw.encode("utf-8")).hexdigest()
+
+
+def _frontend_base() -> str:
+    base = os.getenv("FRONTEND_URL") or os.getenv("ALLOWED_ORIGINS", "http://localhost:5173").split(",")[0]
+    return base.strip().rstrip("/")
+
+
+@router.post("/forgot-password")
+def forgot_password(payload: ForgotPasswordRequest, db: Session = Depends(get_db)):
+    # Always return the same response whether or not the email exists, so the
+    # endpoint cannot be used to discover which emails have accounts.
+    generic = {"message": "If an account exists for that email, a reset link has been sent."}
+
+    user = (
+        db.query(models_user.User)
+        .filter(models_user.User.email == payload.email.lower())
+        .first()
+    )
+    # Only accounts with a password can reset one. Google accounts have none, so
+    # nothing is sent (still the generic response).
+    if user and user.password_hash:
+        # Invalidate any earlier unused tokens for this user.
+        db.query(models_reset.PasswordResetToken).filter(
+            models_reset.PasswordResetToken.user_id == user.id,
+            models_reset.PasswordResetToken.used.is_(False),
+        ).delete()
+
+        raw = secrets.token_urlsafe(32)
+        db.add(models_reset.PasswordResetToken(
+            user_id=user.id,
+            token_hash=_hash_token(raw),
+            expires_at=datetime.now(timezone.utc) + timedelta(hours=RESET_TOKEN_TTL_HOURS),
+        ))
+        db.commit()
+
+        link = f"{_frontend_base()}/reset-password?token={raw}"
+        html = (
+            "<div style=\"font-family:Arial,Helvetica,sans-serif;color:#1f2937;line-height:1.5\">"
+            "<h2 style=\"color:#1B5595\">Reset your Canvett password</h2>"
+            "<p>We received a request to reset the password for your Canvett account. "
+            "Click the button below to choose a new one. This link expires in one hour.</p>"
+            f"<p><a href=\"{link}\" style=\"display:inline-block;background:#1B5595;color:#fff;"
+            "text-decoration:none;padding:10px 18px;border-radius:8px\">Reset password</a></p>"
+            f"<p style=\"font-size:12px;color:#6b7280\">Or paste this link into your browser:<br>{link}</p>"
+            "<p style=\"font-size:12px;color:#6b7280\">If you did not request this, you can safely ignore this email.</p>"
+            "</div>"
+        )
+        send_email(user.email, "Reset your Canvett password", html)
+
+    return generic
+
+
+@router.post("/reset-password")
+def reset_password(payload: ResetPasswordConfirm, db: Session = Depends(get_db)):
+    invalid = HTTPException(
+        status_code=status.HTTP_400_BAD_REQUEST,
+        detail="This reset link is invalid or has expired. Please request a new one.",
+    )
+    row = (
+        db.query(models_reset.PasswordResetToken)
+        .filter(
+            models_reset.PasswordResetToken.token_hash == _hash_token(payload.token),
+            models_reset.PasswordResetToken.used.is_(False),
+        )
+        .first()
+    )
+    if row is None:
+        raise invalid
+
+    expires = row.expires_at
+    if expires.tzinfo is None:
+        expires = expires.replace(tzinfo=timezone.utc)
+    if expires < datetime.now(timezone.utc):
+        raise invalid
+
+    user = db.query(models_user.User).filter(models_user.User.id == row.user_id).first()
+    if user is None:
+        raise invalid
+
+    user.password_hash = hash_password(payload.new_password)
+    row.used = True
+    db.commit()
+    return {"message": "Your password has been reset. You can now sign in."}

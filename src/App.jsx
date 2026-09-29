@@ -7,6 +7,8 @@ import { ActivityProvider } from './context/ActivityContext'
 import ProtectedRoute from './components/ProtectedRoute'
 import Login from './pages/Login'
 import Register from './pages/Register'
+import ForgotPassword from './pages/auth/ForgotPassword'
+import ResetPassword from './pages/auth/ResetPassword'
 import AppLayout from './components/layout/AppLayout'
 import Dashboard from './pages/Dashboard'
 import JobPostings from './pages/JobPostings'
@@ -89,6 +91,8 @@ export default function App() {
           <Route path="/" element={<RootRedirect />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/about" element={<About />} />
           <Route path="/privacy" element={<Privacy />} />
           <Route
