@@ -2,13 +2,9 @@ import { useState, useRef, useEffect, useMemo } from 'react'
 import { X, Search } from 'lucide-react'
 import { SKILLS_TAXONOMY } from '../../lib/skillsTaxonomy'
 
-// A deliberately cross-industry starter set shown before the user types, so the
-// selector does not look tech-only (the full list simply happens to begin with
-// programming languages).
-const DEFAULT_SUGGESTIONS = [
-  'Communication', 'Leadership', 'Project Management', 'Customer Service',
-  'Sales', 'Accounting', 'Teaching', 'Data Analysis', 'Graphic Design', 'Nursing',
-]
+// The full skill list sorted alphabetically once, so the dropdown reads like a
+// course selector: browse the whole range in order, or type to narrow it.
+const SORTED_SKILLS = [...SKILLS_TAXONOMY].sort((a, b) => a.localeCompare(b))
 
 // Searchable, cross-industry skills selector. Users type to filter a broad list
 // and pick with the mouse or keyboard; anything not in the list can still be
@@ -19,6 +15,7 @@ export default function SkillsInput({ skills, setSkills }) {
   const [open, setOpen] = useState(false)
   const [active, setActive] = useState(0)
   const wrapRef = useRef(null)
+  const listRef = useRef(null)
 
   const selectedLower = useMemo(
     () => new Set(skills.map((s) => s.toLowerCase())),
@@ -27,13 +24,13 @@ export default function SkillsInput({ skills, setSkills }) {
 
   const query = input.trim().toLowerCase()
   const suggestions = useMemo(() => {
-    const pool = SKILLS_TAXONOMY.filter((s) => !selectedLower.has(s.toLowerCase()))
-    if (!query) return DEFAULT_SUGGESTIONS.filter((s) => !selectedLower.has(s.toLowerCase())).slice(0, 8)
+    const pool = SORTED_SKILLS.filter((s) => !selectedLower.has(s.toLowerCase()))
+    if (!query) return pool
     const starts = pool.filter((s) => s.toLowerCase().startsWith(query))
     const contains = pool.filter(
       (s) => !s.toLowerCase().startsWith(query) && s.toLowerCase().includes(query),
     )
-    return [...starts, ...contains].slice(0, 8)
+    return [...starts, ...contains]
   }, [query, selectedLower])
 
   // Whether the typed text is an exact (case-insensitive) match already offered.
@@ -45,6 +42,10 @@ export default function SkillsInput({ skills, setSkills }) {
   const options = showAddCustom ? [...suggestions, { custom: input.trim() }] : suggestions
 
   useEffect(() => { setActive(0) }, [input, open])
+
+  useEffect(() => {
+    if (open) listRef.current?.children[active]?.scrollIntoView({ block: 'nearest' })
+  }, [active, open])
 
   useEffect(() => {
     function onDocClick(e) {
@@ -114,7 +115,7 @@ export default function SkillsInput({ skills, setSkills }) {
       </div>
 
       {open && options.length > 0 && (
-        <ul className="absolute z-50 mt-1 w-full max-h-60 overflow-y-auto rounded-btn border border-border bg-bg-surface shadow-lg shadow-black/5 py-1">
+        <ul ref={listRef} className="absolute z-50 mt-1 w-full max-h-60 overflow-y-auto rounded-btn border border-border bg-bg-surface shadow-lg shadow-black/5 py-1">
           {options.map((opt, i) => {
             const isCustom = typeof opt !== 'string'
             const label = isCustom ? opt.custom : opt
