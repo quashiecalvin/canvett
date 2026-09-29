@@ -403,7 +403,7 @@ export default function SeekerProfile() {
               </div>
               <div>
                 <p className="text-[11.5px] text-text-muted">Work style</p>
-                <p className="text-[15px] font-medium text-text-primary mt-1">{user?.pref_location || '—'}</p>
+                <p className="text-[15px] font-medium text-text-primary mt-1">{user?.pref_work_mode || user?.pref_location || '—'}</p>
               </div>
             </div>
           </div>
