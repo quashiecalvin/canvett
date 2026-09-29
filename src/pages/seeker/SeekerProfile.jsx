@@ -290,7 +290,7 @@ export default function SeekerProfile() {
               {AvatarBlock()}
               <div className="min-w-0 flex-1 w-full grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div><label className={labelCls}>Full name</label><input value={fullName} onChange={(e) => setFullName(e.target.value)} className={inputCls} /></div>
-                <div><label className={labelCls}>Job title</label><input value={headline} onChange={(e) => setHeadline(e.target.value)} placeholder="e.g. Software Engineer" className={inputCls} /></div>
+                <div><label className={labelCls}>Job title</label><input value={headline} onChange={(e) => setHeadline(e.target.value)} placeholder="e.g. Accountant" className={inputCls} /></div>
                 <div><label className={labelCls}>Location</label><input value={location} onChange={(e) => setLocation(e.target.value)} placeholder="City, Country" className={inputCls} /></div>
                 <div><label className={labelCls}>Phone</label><input value={phone} onChange={(e) => setPhone(e.target.value)} className={inputCls} /></div>
                 <div><label className={labelCls}>Email</label><input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className={inputCls} /></div>

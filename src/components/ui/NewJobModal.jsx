@@ -80,7 +80,7 @@ export default function NewJobModal({ onClose, onCreated, job }) {
               type="text"
               value={form.title}
               onChange={(e) => update('title', e.target.value)}
-              placeholder="e.g. Software Engineer - Backend"
+              placeholder="e.g. Accountant, Sales Manager, Registered Nurse"
               className="w-full h-10 px-3 rounded-btn border border-border-strong text-[13px] text-text-body placeholder:text-text-hint focus:outline-none focus:border-accent focus:border-[1.5px]"
             />
           </div>
@@ -173,7 +173,7 @@ export default function NewJobModal({ onClose, onCreated, job }) {
             <textarea
               value={form.experience_requirement}
               onChange={(e) => update('experience_requirement', e.target.value)}
-              placeholder="e.g. 2+ years building web applications with React and modern JavaScript"
+              placeholder="e.g. 3+ years in a similar role"
               rows={2}
               className="w-full px-3 py-2 rounded-btn border border-border-strong text-[13px] text-text-body placeholder:text-text-hint focus:outline-none focus:border-accent focus:border-[1.5px] resize-none"
             />
@@ -184,7 +184,7 @@ export default function NewJobModal({ onClose, onCreated, job }) {
             <textarea
               value={form.education_requirement}
               onChange={(e) => update('education_requirement', e.target.value)}
-              placeholder="e.g. BSc in Computer Science, Information Technology, or a related field"
+              placeholder="e.g. BSc in a relevant field, or equivalent experience"
               rows={2}
               className="w-full px-3 py-2 rounded-btn border border-border-strong text-[13px] text-text-body placeholder:text-text-hint focus:outline-none focus:border-accent focus:border-[1.5px] resize-none"
             />

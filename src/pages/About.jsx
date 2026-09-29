@@ -41,9 +41,9 @@ const CHECKS = [
 ]
 
 const CANDIDATES = [
-  ['Kofi Asante', 'Backend Engineer', '98%', 'text-success bg-success-tint'],
-  ['Ama Yeboah', 'Full-Stack Developer', '92%', 'text-success bg-success-tint'],
-  ['Emmanuel Boakye', 'Frontend Developer', '88%', 'text-accent bg-accent-tint'],
+  ['Kofi Asante', 'Accountant', '98%', 'text-success bg-success-tint'],
+  ['Ama Yeboah', 'Registered Nurse', '92%', 'text-success bg-success-tint'],
+  ['Emmanuel Boakye', 'Civil Engineer', '88%', 'text-accent bg-accent-tint'],
   ['Sarah Lartey', 'Marketing Specialist', '84%', 'text-score-amber bg-warning-tint'],
 ]
 

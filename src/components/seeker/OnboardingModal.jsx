@@ -142,7 +142,7 @@ export default function OnboardingModal({ user, onDone }) {
                     <button type="button" onClick={() => setSkills((p) => p.filter((x) => x !== s))} className="hover:text-accent-2"><X size={13} /></button>
                   </span>
                 ))}
-                {skills.length === 0 && <span className="text-[12px] text-text-hint">e.g. React, Python, Figma…</span>}
+                {skills.length === 0 && <span className="text-[12px] text-text-hint">e.g. Communication, Microsoft Excel, Sales…</span>}
               </div>
               <div className="flex gap-2">
                 <input

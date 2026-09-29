@@ -352,7 +352,7 @@ export default function ApplyToJob() {
               type="text"
               value={skillsText}
               onChange={(e) => setSkillsText(e.target.value)}
-              placeholder="Python, FastAPI, PostgreSQL"
+              placeholder="e.g. Communication, Microsoft Excel, Project management"
               className={`mt-3 ${inputClass}`}
             />
           </div>
