@@ -92,3 +92,28 @@ class TestScoreCandidate:
         )
         # No parseable dates in the resume -> duration cannot be verified.
         assert result["duration_verified"] is False
+
+    def test_no_duration_penalty_when_role_states_no_years(self, monkeypatch):
+        # relevance is forced to calibrate(0.5) = 66.7 so the maths is checked
+        # deterministically. The role states no required number of years, so the
+        # experience score must be the full relevance with no duration penalty.
+        monkeypatch.setattr("services.scoring.best_line_similarity", lambda *a, **k: 0.5)
+        result = score_candidate(
+            resume_text="Experience\nSoftware Engineer, Jan 2020 - Jan 2023",
+            job_description="Backend",
+            required_skills=["Python"],
+            experience_requirement="Experience building web applications",
+        )
+        assert result["experience_score"] == pytest.approx(66.7, abs=0.2)
+
+    def test_duration_penalty_when_years_required_but_no_dates(self, monkeypatch):
+        # Same forced relevance (66.7). The role requires a duration but the CV
+        # has no readable dates, so the cautious 0.7 discount applies: 66.7*0.7.
+        monkeypatch.setattr("services.scoring.best_line_similarity", lambda *a, **k: 0.5)
+        result = score_candidate(
+            resume_text="Skills\nPython",
+            job_description="Backend",
+            required_skills=["Python"],
+            experience_requirement="3+ years",
+        )
+        assert result["experience_score"] == pytest.approx(46.7, abs=0.2)

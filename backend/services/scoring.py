@@ -66,12 +66,24 @@ def score_candidate(
     candidate_years = extract_total_years(sections.get("experience") or "")
     required_years = extract_required_years(experience_requirement or "")
 
-    duration_verified = candidate_years is not None and required_years is not None
-    if duration_verified and required_years > 0:
-        duration_ratio = min(candidate_years / required_years, 1.0)
-        experience_score = round(experience_relevance * duration_ratio, 1)
+    # duration_verified reflects only whether the candidate's experience dates
+    # could be read from the CV; it is what the UI reports to both parties.
+    duration_verified = candidate_years is not None
+
+    if required_years and required_years > 0:
+        if candidate_years is not None:
+            # The role states a required duration and the dates are readable, so
+            # scale the experience score by how well the candidate meets it.
+            duration_ratio = min(candidate_years / required_years, 1.0)
+            experience_score = round(experience_relevance * duration_ratio, 1)
+        else:
+            # A duration is required but the CV gives nothing to verify it with,
+            # so apply the cautious unverified discount.
+            experience_score = round(experience_relevance * cfg["unverified_factor"], 1)
     else:
-        experience_score = round(experience_relevance * cfg["unverified_factor"], 1)
+        # The role states no required duration, so there is nothing to verify
+        # against; judge experience on relevance alone, with no penalty.
+        experience_score = round(experience_relevance, 1)
 
     # Education: semantic relevance via best-line matching
     education_target = education_requirement or job_description
