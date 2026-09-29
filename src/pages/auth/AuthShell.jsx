@@ -10,18 +10,9 @@ export default function AuthShell({ children }) {
   }, [])
 
   return (
-    <div className="min-h-screen w-full relative flex items-center justify-center overflow-hidden px-5 py-6 sm:py-10"
-         style={{ minHeight: '100dvh', background: 'radial-gradient(140% 120% at 50% 0%, #10203f 0%, #0a1526 45%, #070d18 100%)' }}>
+    <div className="auth-scope min-h-screen w-full relative flex items-center justify-center overflow-hidden px-5 py-6 sm:py-10"
+         style={{ minHeight: '100dvh', background: "#070d18 url('/auth-bg.jpg') center / cover no-repeat" }}>
 
-      {/* soft blue glows in opposite corners */}
-      <div
-        className="absolute -top-[15%] -right-[10%] w-[65%] h-[70%] max-w-[680px] rounded-full blur-[130px] pointer-events-none auth-glow-a motion-reduce:animate-none"
-        style={{ background: 'radial-gradient(circle, #2563EB 0%, transparent 70%)', opacity: 0.38 }}
-      />
-      <div
-        className="absolute -bottom-[15%] -left-[10%] w-[60%] h-[65%] max-w-[620px] rounded-full blur-[130px] pointer-events-none auth-glow-b motion-reduce:animate-none"
-        style={{ background: 'radial-gradient(circle, #1D4ED8 0%, transparent 70%)', opacity: 0.30 }}
-      />
 
       {/* the card */}
       <div

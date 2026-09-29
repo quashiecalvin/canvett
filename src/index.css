@@ -138,3 +138,16 @@
    white gap shows under the full-width footer when you over-scroll. */
 html, body { background-color: var(--color-bg-page); }
 html { overscroll-behavior-y: none; }
+
+/* On the dark auth screens, stop Chrome/Edge from repainting autofilled inputs
+   with a light background (Safari does not do this). The long transition delay
+   keeps each input's own translucent background instead of the autofill colour,
+   and the text stays white. */
+.auth-scope input:-webkit-autofill,
+.auth-scope input:-webkit-autofill:hover,
+.auth-scope input:-webkit-autofill:focus,
+.auth-scope input:-webkit-autofill:active {
+  -webkit-text-fill-color: #ffffff;
+  caret-color: #ffffff;
+  transition: background-color 9999s ease-in-out 0s;
+}

@@ -568,7 +568,7 @@ export default function CandidateRanking() {
                     <div className="flex flex-col gap-4">
                       <Bar label="Experience alignment" value={selected.experience_score} />
                       {selected.years_experience != null && (
-                        <p className="text-[12.5px] text-text-body">Detected experience: <span className="font-medium">{expLabel(selected.years_experience)?.replace(' exp', '')}</span>{selected.location ? ` · ${selected.location}` : ''}.</p>
+                        <p className="text-[12.5px] text-text-body">Detected experience: <span className="font-medium">{expLabel(selected.years_experience)?.replace(' exp', '')}</span>.{selected.location ? <> Location: <span className="font-medium">{selected.location}</span>.</> : ''}</p>
                       )}
                       <div className={`flex items-start gap-2 rounded-btn px-3 py-2.5 ${selected.duration_verified ? 'bg-success-tint' : 'bg-bg-subtle'}`}>
                         {selected.duration_verified ? <Check size={14} className="text-success-text shrink-0 mt-0.5" /> : <AlertTriangle size={14} className="text-text-muted shrink-0 mt-0.5" />}
