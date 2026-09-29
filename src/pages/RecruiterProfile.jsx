@@ -205,7 +205,7 @@ export default function RecruiterProfile() {
             <Pencil size={15} /> Edit Profile
           </button>
         ) : (
-          <div className="flex items-center gap-2 shrink-0">
+          <div className="hidden sm:flex items-center gap-2 shrink-0">
             <button onClick={() => setEditing(false)} disabled={saving}
               className="h-10 px-4 rounded-btn text-[13px] font-medium text-text-muted hover:bg-bg-subtle transition-colors">
               Cancel
