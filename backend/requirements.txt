@@ -17,4 +17,7 @@ bcrypt==5.0.0
 pyjwt==2.13.0
 email-validator==2.3.0
 google-auth==2.43.0
+# google-auth's ID-token verification uses the requests transport; it is not
+# pulled in transitively, so it must be declared explicitly.
+requests==2.32.5
 python-dotenv==1.2.1
