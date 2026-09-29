@@ -1,189 +1,140 @@
-# Canvett — Deployment Brief
+# Canvett — Deployment Record
 
-Hand this to Claude Code as context before starting the deployment.
+This document describes how Canvett is deployed. It replaces the original
+pre-deployment brief (which targeted Render and predated the live system).
 
 ---
 
 ## What this project is
 
-Canvett is an AI-powered resume ranking system. It is currently a **recruiter-facing** web application: a recruiter creates job postings, uploads candidate CVs, and receives a ranked, explainable list of candidates.
+Canvett is an AI-powered resume ranking system: a two-sided web application in
+which job seekers apply directly to advertised roles and recruiters receive a
+ranked, explainable list of candidates. It runs locally for development and is
+also **deployed and live**.
 
-It runs correctly on localhost. It has **never been deployed**. The goal is to get it live.
+## Live architecture
 
-## Current stack
-
-| Layer | Technology | Location in repo |
+| Layer | Technology | Host |
 |---|---|---|
-| Frontend | React + Vite + Tailwind CSS v4 | repo root (`src/`) |
-| Backend | Python 3.13 + FastAPI + SQLAlchemy | `backend/` |
-| Database | PostgreSQL | local Postgres, database named `canvett` |
-| NLP | sentence-transformers (`all-MiniLM-L6-v2`) | `backend/services/` |
+| Frontend | React + Vite + Tailwind CSS v4 | **Vercel** (repo root, Vite build) |
+| Backend | Python 3.11 + FastAPI + SQLAlchemy | **Fly.io** (Docker, `backend/`) |
+| Database | PostgreSQL | **Neon** (serverless, `eu-central-1` / Frankfurt) |
+| NLP | sentence-transformers (`all-MiniLM-L6-v2`) on PyTorch | in the backend image |
 
-The repo root contains the frontend. The backend lives in a `backend/` subdirectory with its own `requirements.txt` and a `venv/` that must **not** be deployed.
+The backend runs on Fly.io in the **Frankfurt (`fra`)** region, deliberately
+co-located with the Neon database (also Frankfurt) so queries do not cross
+regions. One machine (`shared-cpu-1x`, 2 GB RAM) is kept always-on to avoid
+cold starts. 2 GB comfortably fits PyTorch plus the MiniLM model, which is why
+the project moved off Render's 512 MB free tier.
 
-## Target deployment architecture
-
-- **Frontend → Vercel** (repo root, Vite build)
-- **Backend → Render** (free web service, root directory `backend`)
-- **Database → Neon** (free tier serverless Postgres — chosen deliberately because Render's free Postgres expires after 30 days and deletes the data)
-
----
-
-## Changes required before deployment
-
-Three values are hardcoded to the local machine and will break in production. All three must become environment variables.
-
-### 1. Database connection
-
-**File:** `backend/database/connection.py`
-
-Currently hardcoded to a local Postgres instance using the developer's macOS username, something like:
-
-```python
-DATABASE_URL = "postgresql://kayhunter@localhost:5432/canvett"
-```
-
-Must read from an environment variable, falling back to the local value for development:
-
-```python
-import os
-DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://kayhunter@localhost:5432/canvett")
-```
-
-**Note:** Neon connection strings begin with `postgresql://` and require SSL. If SQLAlchemy raises an SSL error, append `?sslmode=require` to the URL.
-
-### 2. CORS origins
-
-**File:** `backend/main.py`
-
-Currently:
-
-```python
-allow_origins=["http://localhost:5173"]
-```
-
-Must include the deployed Vercel URL. Read from an environment variable so the URL is not committed:
-
-```python
-import os
-origins = os.getenv("ALLOWED_ORIGINS", "http://localhost:5173").split(",")
-```
-
-This is a chicken-and-egg problem: the Vercel URL does not exist until the frontend is deployed. Deploy the backend first with a placeholder, then update the environment variable once the Vercel URL is known, then redeploy the backend.
-
-### 3. Frontend API base URL
-
-**File:** `src/lib/api.js`
-
-Currently:
-
-```javascript
-const BASE_URL = "http://localhost:8000"
-```
-
-Vite exposes environment variables prefixed with `VITE_`:
-
-```javascript
-const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000"
-```
-
-Set `VITE_API_URL` in Vercel's environment variables to the Render backend URL. Vite inlines these at **build time**, so the frontend must be rebuilt after changing it.
+Live URLs:
+- Frontend: `https://canvett.vercel.app`
+- Backend: `https://canvett-backend.fly.dev`
 
 ---
 
-## Render configuration
+## Configuration (environment-driven)
 
-- **Root Directory:** `backend`
-- **Build Command:** `pip install -r requirements.txt`
-- **Start Command:** `uvicorn main:app --host 0.0.0.0 --port $PORT`
+Three values that were once hardcoded to the local machine are read from the
+environment, each falling back to a local default for development.
 
-The `--host 0.0.0.0` is required — binding to localhost will make the service unreachable. Render supplies the port via the `$PORT` environment variable.
+- `DATABASE_URL` — `backend/database/connection.py`. Falls back to a local
+  Postgres URL. The Neon string requires SSL (`?sslmode=require`).
+- `ALLOWED_ORIGINS` — `backend/main.py`. Comma-separated; set to the Vercel URL
+  in production, defaults to `http://localhost:5173`.
+- `VITE_API_URL` — `src/lib/api.js`. The frontend's API base; Vite inlines it at
+  **build time**, so the frontend must be rebuilt after it changes. Set in Vercel.
 
-**Environment variables to set on Render:**
+### Fly.io secrets / env (backend)
+
 - `DATABASE_URL` — the Neon connection string
-- `ALLOWED_ORIGINS` — the Vercel URL (set after the frontend is deployed)
-- `APP_ENV` — set to `production`. This turns on the `SECRET_KEY` enforcement below; the app refuses to start in production without a valid key.
-- `SECRET_KEY` — a long, random value used to sign authentication tokens. **Required in production and must be at least 32 bytes** — the app fails fast on startup if it is missing or too short. Generate one with `python -c "import secrets; print(secrets.token_urlsafe(64))"`. (In development, if unset, a key is generated and persisted to `backend/.dev_secret_key` so tokens survive restarts.)
-- `ENABLE_API_DOCS` — set to `true` only when `/docs`, `/redoc`, and `/openapi.json` should be exposed; it defaults to disabled
+- `ALLOWED_ORIGINS` — the Vercel URL
+- `SECRET_KEY` — token-signing key, ≥32 bytes; the app refuses to start in
+  production without it. Generate: `python -c "import secrets; print(secrets.token_urlsafe(64))"`
+- `APP_ENV=production` — enables the SECRET_KEY enforcement
+- `GOOGLE_CLIENT_ID` — the Google OAuth client ID, used to verify Google sign-in tokens
+- `HF_HOME=/app/.hf` — Hugging Face cache location inside the container
+- `ENABLE_API_DOCS` — set `true` only to expose `/docs`, `/redoc`, `/openapi.json`
+
+### Vercel environment variables (frontend)
+
+- `VITE_API_URL` — `https://canvett-backend.fly.dev`
+- `VITE_GOOGLE_CLIENT_ID` — the Google OAuth client ID
+
+`vercel.json` at the repo root supplies the SPA rewrite so client-side routes
+(e.g. `/dashboard`) resolve to `index.html` instead of 404-ing.
 
 ---
 
-## Database initialisation
+## Backend container (Fly.io)
 
-The Neon database will be **empty**. Tables must be created before the app will work.
+Defined by `backend/Dockerfile` and `backend/fly.toml`.
 
-The SQLAlchemy models are complete and current — they include every column added during development (`experience_requirement`, `education_requirement`, `duration_verified`, `created_at`, `recruiter_name`, `recruiter_role`). A single `Base.metadata.create_all(bind=engine)` against the Neon database will produce the correct schema.
+- Base image `python:3.11-slim`; installs `requirements.txt`.
+- The MiniLM model is **pre-downloaded into the image** at build time, so the
+  first request after a deploy or restart does not wait on Hugging Face.
+- Start command runs Uvicorn with `--proxy-headers --forwarded-allow-ips='*'`.
+  This is required: Fly terminates TLS and forwards plain HTTP internally, and
+  without it FastAPI's trailing-slash redirects emit `http://` Location headers
+  that the HTTPS frontend blocks as mixed content.
+- `torch` is pinned platform-conditionally in `requirements.txt`: the CPU-only
+  wheel (`+cpu`) on Linux (small, fits the memory budget) and the plain wheel on
+  macOS/Windows for local development.
 
-Models to import before calling `create_all`:
-- `database.models_job`
-- `database.models_candidate`
-- `database.models_activity`
-- `database.models_settings`
+### Deploy commands
 
-The `settings` table also needs one default row. The settings router creates it automatically on first access, so no manual seeding is required.
+```bash
+# from the repo, backend directory
+cd backend
+flyctl deploy
 
----
+# secrets (names shown; set once, or when they change)
+flyctl secrets set DATABASE_URL="..." ALLOWED_ORIGINS="https://canvett.vercel.app" \
+  SECRET_KEY="..." GOOGLE_CLIENT_ID="..." -a canvett-backend
 
-## Known constraints and likely failure points
-
-### Memory — the most likely problem
-
-Render's free web service provides **512 MB RAM and 0.1 CPU**. The backend must load PyTorch plus the 90 MB `all-MiniLM-L6-v2` model into that. This may not fit.
-
-`backend/requirements.txt` already specifies the CPU-only PyTorch build via:
-
+# keep a single machine in Frankfurt
+flyctl machines list -a canvett-backend
+flyctl scale count 1 --region fra -a canvett-backend
 ```
---extra-index-url https://download.pytorch.org/whl/cpu
+
+---
+
+## Database
+
+The Neon database is initialised by the backend itself. On startup the app runs
+`Base.metadata.create_all(bind=engine)` to create any missing tables, followed by
+idempotent `ALTER TABLE ... ADD COLUMN IF NOT EXISTS` statements that patch
+columns added by later features onto pre-existing tables. `backend/reset_schema.py`
+is a one-off that drops and recreates the whole schema from the current models,
+for use only when the data is expendable:
+
+```bash
+flyctl ssh console -C "python reset_schema.py" -a canvett-backend
 ```
 
-This is essential — the default PyTorch wheel includes CUDA and is roughly 2 GB, which will exhaust both the build and the memory limit. Do not remove this line.
-
-If the service still runs out of memory, the realistic options are a paid Render tier, or a different host with more free memory.
-
-### Cold starts
-
-Free Render services spin down after 15 minutes of inactivity and take 30–60 seconds to restart. The model reload adds to this. The first request after a quiet period will be slow. This is expected behaviour, not a bug.
-
-### Model download on first boot
-
-`sentence-transformers` downloads the model from Hugging Face on first use. On Render this happens during the first request after each cold start unless the model is pre-downloaded during the build step. Pre-downloading in the build command will make cold starts faster but increases build time.
-
-### Ephemeral filesystem
-
-Render's filesystem does not persist. Uploaded CV files are written to `backend/uploads/` and **will be lost** on every restart or redeploy.
-
-This does not break the application: the parsed `resume_text` is stored in the database, and all scoring and re-ranking operates on that text rather than the original file. Only the original uploaded document is lost. Acceptable for a prototype; worth noting.
-
-### Do not deploy these
-
-- `backend/venv/` — the virtual environment
-- `node_modules/`
-- `backend/uploads/` — contains test CVs
-- Any `.env` files
-
-Confirm `.gitignore` covers these before pushing.
+Connection pooling is tuned in `connection.py` (`pool_pre_ping`, `pool_recycle`,
+TCP keepalives) so connections to Neon stay warm and validated between requests
+instead of being rebuilt each time.
 
 ---
 
-## Git remotes
+## Notes and known constraints
 
-The repository has two remotes:
-
-- `origin` — a university DMS server that intermittently rejects pushes with an object integrity error
-- `backup` — GitHub (`github.com/quashiecalvin/canvett`, private), which is reliable
-
-**Deploy from the GitHub remote.** Pushing to `origin` may fail; this is a known server-side issue and is not a problem with the repository.
+- **Uploaded files are ephemeral.** Original CV files written to
+  `backend/uploads/` are lost on restart/redeploy. This does not break anything:
+  the parsed `resume_text` is stored in the database and all scoring works from
+  that text, not the original file.
+- **First request after a restart** briefly warms the model in memory. With one
+  always-on machine this is rare in normal use.
+- **Do not deploy** `backend/venv/`, `node_modules/`, `backend/uploads/`, or any
+  `.env` files. `.gitignore` and `.dockerignore` cover these.
 
 ---
 
-## Recommended order of operations
+## Redeploy checklist
 
-1. Make the three code changes above, verify the app still runs locally, and commit.
-2. Create the Neon project and database. Record the connection string.
-3. Run `create_all` against Neon to create the schema.
-4. Deploy the backend to Render with `DATABASE_URL`, `APP_ENV=production`, and a valid `SECRET_KEY` set (the app will refuse to start otherwise). If API docs are needed, also set `ENABLE_API_DOCS=true` and verify `/docs` loads.
-5. Deploy the frontend to Vercel with `VITE_API_URL` set to the Render URL.
-6. Set `ALLOWED_ORIGINS` on Render to the Vercel URL and redeploy the backend.
-7. Test the full flow end to end: create a job, upload a CV, view the ranking.
-
-Step 4 is the one most likely to fail, for the memory reasons above. Verify the backend is genuinely working before moving on to the frontend.
+1. Commit and push changes (frontend changes auto-deploy on Vercel).
+2. For backend changes: `cd backend && flyctl deploy`.
+3. If env/secrets changed, set them with `flyctl secrets set ...` (a secret
+   change triggers a restart on its own).
+4. Verify: sign in, load the dashboard, confirm data loads and Google sign-in works.

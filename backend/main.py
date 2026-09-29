@@ -4,7 +4,7 @@ from pathlib import Path
 
 # Load backend/.env for local development (e.g. GOOGLE_CLIENT_ID) before any
 # module reads its environment. Real environment variables always win, so this
-# is a no-op in production (Render) where they are set on the dashboard. If
+# is a no-op in production (Fly.io) where they are set as secrets. If
 # python-dotenv is not installed, plain environment variables still work.
 try:
     from dotenv import load_dotenv
