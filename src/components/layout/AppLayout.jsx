@@ -6,7 +6,8 @@ import Footer from './Footer'
 import ScorePill from '../ui/ScorePill'
 import StatusBadge from '../ui/StatusBadge'
 import { useAuth } from '../../context/AuthContext'
-import { getActivity, searchAll } from '../../lib/api'
+import { searchAll } from '../../lib/api'
+import { useActivity } from '../../context/ActivityContext'
 import { timeAgo } from '../../lib/time'
 
 function Logo() {
@@ -85,14 +86,10 @@ export default function AppLayout({ children }) {
     navigate(path)
   }
 
-  // ── notifications (reuses the activity feed) ──
-  const [notifs, setNotifs] = useState([])
+  // ── notifications (reuses the shared activity feed) ──
+  const { activity: notifs } = useActivity()
   const [notifOpen, setNotifOpen] = useState(false)
   const [seen, setSeen] = useState(false)
-
-  useEffect(() => {
-    getActivity().then(setNotifs).catch(() => setNotifs([]))
-  }, [])
 
   const unread = notifs.length > 0 && !seen
 

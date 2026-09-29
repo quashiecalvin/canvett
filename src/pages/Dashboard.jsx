@@ -5,7 +5,9 @@ import StatusBadge from '../components/ui/StatusBadge'
 import ScorePill from '../components/ui/ScorePill'
 import NewJobModal from '../components/ui/NewJobModal'
 import { useAuth } from '../context/AuthContext'
-import { getStats, getJobs, getTopCandidates, getActivity } from '../lib/api'
+import { useJob } from '../context/JobContext'
+import { useActivity } from '../context/ActivityContext'
+import { getStats, getTopCandidates } from '../lib/api'
 import { timeAgo } from '../lib/time'
 import { DEPARTMENT_ICONS, FALLBACK_ICON } from '../lib/departments'
 import { initialsFromName } from '../lib/initials'
@@ -30,6 +32,8 @@ function JobPostingsIcon({ size = 19 }) {
 export default function Dashboard() {
   const navigate = useNavigate()
   const { user } = useAuth()
+  const { jobs, refreshJobs } = useJob()
+  const { activity, refreshActivity } = useActivity()
 
   const today = new Date().toLocaleDateString('en-GB', {
     weekday: 'long',
@@ -42,21 +46,17 @@ export default function Dashboard() {
   const firstName = (user?.full_name || 'there').trim().split(' ')[0]
 
   const [stats, setStats] = useState(null)
-  const [jobs, setJobs] = useState([])
   const [topCandidates, setTopCandidates] = useState([])
-  const [activity, setActivity] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [showModal, setShowModal] = useState(false)
 
   function loadData() {
-    Promise.all([getStats(), getJobs(), getTopCandidates(), getActivity()])
-      .then(([statsData, jobsData, topData, activityData]) => {
+    Promise.all([getStats(), getTopCandidates()])
+      .then(([statsData, topData]) => {
         setError(null)
         setStats(statsData)
-        setJobs(jobsData)
         setTopCandidates(topData)
-        setActivity(activityData)
         setLoading(false)
       })
       .catch((err) => {
@@ -325,7 +325,7 @@ export default function Dashboard() {
       {showModal && (
         <NewJobModal
           onClose={() => setShowModal(false)}
-          onCreated={loadData}
+          onCreated={() => { loadData(); refreshJobs(); refreshActivity() }}
         />
       )}
     </div>

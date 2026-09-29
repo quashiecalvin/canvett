@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-route
 import { AuthProvider, useAuth } from './context/AuthContext'
 import { SettingsProvider } from './context/SettingsContext'
 import { JobProvider } from './context/JobContext'
+import { ActivityProvider } from './context/ActivityContext'
 import ProtectedRoute from './components/ProtectedRoute'
 import Login from './pages/Login'
 import Register from './pages/Register'
@@ -28,18 +29,20 @@ function RecruiterApp() {
   return (
     <SettingsProvider>
       <JobProvider>
-        <AppLayout>
-          <Routes>
-            <Route path="dashboard" element={<Dashboard />} />
-            <Route path="jobs" element={<JobPostings />} />
-            <Route path="upload" element={<UploadResumes />} />
-            <Route path="ranking" element={<CandidateRanking />} />
-            <Route path="analytics" element={<Analytics />} />
-            <Route path="settings" element={<Settings />} />
-            <Route path="profile" element={<RecruiterProfile />} />
-            <Route path="*" element={<Navigate to="dashboard" replace />} />
-          </Routes>
-        </AppLayout>
+        <ActivityProvider>
+          <AppLayout>
+            <Routes>
+              <Route path="dashboard" element={<Dashboard />} />
+              <Route path="jobs" element={<JobPostings />} />
+              <Route path="upload" element={<UploadResumes />} />
+              <Route path="ranking" element={<CandidateRanking />} />
+              <Route path="analytics" element={<Analytics />} />
+              <Route path="settings" element={<Settings />} />
+              <Route path="profile" element={<RecruiterProfile />} />
+              <Route path="*" element={<Navigate to="dashboard" replace />} />
+            </Routes>
+          </AppLayout>
+        </ActivityProvider>
       </JobProvider>
     </SettingsProvider>
   )
