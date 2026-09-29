@@ -7,6 +7,7 @@ import {
 import { useAuth } from '../../context/AuthContext'
 import { updateProfile, changePassword, deleteAccount } from '../../lib/api'
 import { initialsFromName } from '../../lib/initials'
+import SkillsInput from '../../components/ui/SkillsInput'
 
 const FIELD_OPTIONS = ['Engineering', 'Analytics', 'Design', 'Product', 'Marketing', 'Operations']
 const TYPE_OPTIONS = ['Full-time', 'Part-time', 'Contract', 'Internship']
@@ -86,7 +87,7 @@ export default function SeekerProfile() {
   const [photo, setPhoto] = useState('')
   const [prefField, setPrefField] = useState('')
   const [prefType, setPrefType] = useState('')
-  const [prefLocation, setPrefLocation] = useState('')
+  const [prefWorkMode, setPrefWorkMode] = useState('')
   const [skillList, setSkillList] = useState([])
   const [skillInput, setSkillInput] = useState('')
   const photoInputRef = useRef(null)
@@ -120,7 +121,7 @@ export default function SeekerProfile() {
     setPhoto(user?.photo || '')
     setPrefField(user?.pref_field || '')
     setPrefType(user?.pref_job_type || '')
-    setPrefLocation(user?.pref_location || '')
+    setPrefWorkMode(user?.pref_work_mode || user?.pref_location || '')
     setSkillList(skillsFromUser)
     setSkillInput('')
     setMsg(null); setErr(null)
@@ -156,7 +157,7 @@ export default function SeekerProfile() {
         bio: user?.bio,
         pref_field: user?.pref_field,
         pref_job_type: user?.pref_job_type,
-        pref_location: user?.pref_location,
+        pref_work_mode: user?.pref_work_mode,
         skills: user?.skills,
         photo: dataUrl,
       })
@@ -182,7 +183,7 @@ export default function SeekerProfile() {
         photo,
         pref_field: prefField,
         pref_job_type: prefType,
-        pref_location: prefLocation,
+        pref_work_mode: prefWorkMode,
         skills: skillList.join(', '),
       })
       updateUser(updated)
@@ -237,22 +238,8 @@ export default function SeekerProfile() {
   )
 
   const SkillsEditor = () => (
-    <div>
-      <div className="flex flex-wrap gap-2 mb-3">
-        {skillList.map((s) => (
-          <span key={s} className="inline-flex items-center gap-1.5 bg-accent-tint text-accent text-[12px] font-medium pl-3 pr-1.5 py-1 rounded-full">
-            {s}
-            <button type="button" onClick={() => setSkillList((prev) => prev.filter((x) => x !== s))} className="hover:text-accent-2"><X size={13} /></button>
-          </span>
-        ))}
-        {skillList.length === 0 && <span className="text-[12px] text-text-hint">Add your key skills…</span>}
-      </div>
-      <div className="flex gap-2 max-w-md">
-        <input value={skillInput} onChange={(e) => setSkillInput(e.target.value)}
-          onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addSkill() } }}
-          placeholder="Type a skill and press Enter" className={inputCls + ' flex-1'} />
-        <button type="button" onClick={addSkill} className="h-10 px-3.5 rounded-btn border border-border-strong text-text-body hover:bg-bg-subtle transition-colors inline-flex items-center gap-1.5 text-[13px] font-medium"><Plus size={15} /> Add</button>
-      </div>
+    <div className="max-w-md">
+      <SkillsInput skills={skillList} setSkills={setSkillList} />
     </div>
   )
 
@@ -303,7 +290,7 @@ export default function SeekerProfile() {
               {AvatarBlock()}
               <div className="min-w-0 flex-1 w-full grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div><label className={labelCls}>Full name</label><input value={fullName} onChange={(e) => setFullName(e.target.value)} className={inputCls} /></div>
-                <div><label className={labelCls}>Headline</label><input value={headline} onChange={(e) => setHeadline(e.target.value)} placeholder="e.g. Software Engineer" className={inputCls} /></div>
+                <div><label className={labelCls}>Job title</label><input value={headline} onChange={(e) => setHeadline(e.target.value)} placeholder="e.g. Software Engineer" className={inputCls} /></div>
                 <div><label className={labelCls}>Location</label><input value={location} onChange={(e) => setLocation(e.target.value)} placeholder="City, Country" className={inputCls} /></div>
                 <div><label className={labelCls}>Phone</label><input value={phone} onChange={(e) => setPhone(e.target.value)} className={inputCls} /></div>
                 <div><label className={labelCls}>Email</label><input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className={inputCls} /></div>
@@ -334,8 +321,13 @@ export default function SeekerProfile() {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div><label className={labelCls}>Field</label><PrefSelect value={prefField} onChange={(e) => setPrefField(e.target.value)} options={FIELD_OPTIONS} /></div>
               <div><label className={labelCls}>Job type</label><PrefSelect value={prefType} onChange={(e) => setPrefType(e.target.value)} options={TYPE_OPTIONS} /></div>
-              <div><label className={labelCls}>Work style</label><PrefSelect value={prefLocation} onChange={(e) => setPrefLocation(e.target.value)} options={WORK_OPTIONS} /></div>
+              <div><label className={labelCls}>Work style</label><PrefSelect value={prefWorkMode} onChange={(e) => setPrefWorkMode(e.target.value)} options={WORK_OPTIONS} /></div>
             </div>
+          </div>
+
+          <div className="sticky bottom-0 -mx-6 px-6 py-3 bg-bg-page/95 backdrop-blur border-t border-border flex items-center justify-end gap-2 sm:hidden">
+            <button onClick={() => setEditing(false)} disabled={saving} className="h-10 px-4 rounded-btn text-[13px] font-medium text-text-muted hover:bg-bg-subtle transition-colors">Cancel</button>
+            <button onClick={save} disabled={saving || !fullName.trim()} className="inline-flex items-center gap-2 h-10 px-5 rounded-btn bg-accent text-white text-[13px] font-medium hover:bg-accent-2 transition-colors disabled:opacity-50">{saving ? 'Saving…' : 'Save changes'}</button>
           </div>
         </div>
       ) : (

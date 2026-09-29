@@ -185,6 +185,7 @@ def update_profile(
     user.pref_field = (payload.pref_field or "").strip() or None
     user.pref_job_type = (payload.pref_job_type or "").strip() or None
     user.pref_location = (payload.pref_location or "").strip() or None
+    user.pref_work_mode = (payload.pref_work_mode or "").strip() or None
     if payload.photo is not None:
         user.photo = payload.photo.strip() or None
     db.commit()
@@ -301,6 +302,8 @@ def complete_onboarding(
         user.pref_job_type = payload.pref_job_type.strip() or None
     if payload.pref_location is not None:
         user.pref_location = payload.pref_location.strip() or None
+    if payload.pref_work_mode is not None:
+        user.pref_work_mode = payload.pref_work_mode.strip() or None
     if payload.location is not None:
         user.location = payload.location.strip() or None
     if payload.skills is not None:

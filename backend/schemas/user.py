@@ -77,6 +77,7 @@ class UserOut(BaseModel):
     pref_field: Optional[str] = None
     pref_job_type: Optional[str] = None
     pref_location: Optional[str] = None
+    pref_work_mode: Optional[str] = None
     onboarded: bool = False
     created_at: datetime
 
@@ -123,6 +124,7 @@ class ProfileUpdate(BaseModel):
     pref_field: Optional[str] = None
     pref_job_type: Optional[str] = None
     pref_location: Optional[str] = None
+    pref_work_mode: Optional[str] = None
 
     @field_validator("full_name")
     @classmethod
@@ -152,5 +154,6 @@ class OnboardingData(BaseModel):
     pref_field: Optional[str] = None
     pref_job_type: Optional[str] = None
     pref_location: Optional[str] = None
+    pref_work_mode: Optional[str] = None
     location: Optional[str] = None
     skills: Optional[str] = None

@@ -418,6 +418,9 @@ export default function CandidateRanking() {
                         <div className="flex items-center gap-2">
                           <h3 className="text-[14px] font-medium text-text-primary leading-[1.3] truncate">{c.name}</h3>
                           {rank === 1 && <span className="text-[10px] font-medium text-accent bg-bg-surface border border-accent/30 px-1.5 py-0.5 rounded-pill shrink-0">Top match</span>}
+                          {c.source === 'portal'
+                            ? <span className="text-[10px] font-medium text-success-text bg-success-tint px-1.5 py-0.5 rounded-pill shrink-0">Applied directly</span>
+                            : <span className="text-[10px] font-medium text-text-muted bg-bg-subtle border border-border px-1.5 py-0.5 rounded-pill shrink-0">Added by recruiter</span>}
                         </div>
                         <p className="text-[11.5px] text-text-muted mt-0.5 truncate">{metaLine(c) || (c.source === 'portal' ? 'Applied online' : 'Added by you')}</p>
                         <p className="text-[11px] text-text-hint mt-0.5 flex items-center gap-1 min-w-0">

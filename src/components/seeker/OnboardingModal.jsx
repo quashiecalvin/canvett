@@ -48,7 +48,7 @@ export default function OnboardingModal({ user, onDone }) {
       const payload = skip ? {} : {
         pref_field: field,
         pref_job_type: jobType,
-        pref_location: workStyle,
+        pref_work_mode: workStyle,
         location,
         skills: skills.join(', '),
       }

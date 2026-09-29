@@ -1,13 +1,14 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate, Link, useSearchParams } from 'react-router-dom'
 import {
-  Search, Briefcase, MapPin, Clock, Bookmark, ArrowRight, PieChart, ChevronDown,
+  Search, Briefcase, MapPin, Clock, Bookmark, ArrowRight, PieChart, ChevronDown, Laptop,
 } from 'lucide-react'
 import {
   getPublicJobs, getSavedJobs, saveJob, unsaveJob, getMyApplications,
 } from '../../lib/api'
 import { useAuth } from '../../context/AuthContext'
 import { daysAgo } from '../../lib/time'
+import { normalizeLocation } from '../../lib/locations'
 
 function greeting() {
   const h = new Date().getHours()
@@ -20,6 +21,8 @@ const STATUS_META = [
   { key: 'Under review', label: 'In review', color: 'var(--color-accent)' },
   { key: 'Shortlisted', label: 'Shortlisted', color: 'var(--color-success)' },
 ]
+
+const WORK_MODES = ['On-site', 'Remote', 'Hybrid']
 
 const COMPANY_COLORS = ['#2F6FB0', '#5A8F3C', '#C77D2E', '#B0505A', '#6E5AAE', '#2A9AA0', '#B85C9E']
 function companyColor(name) {
@@ -87,6 +90,7 @@ export default function JobBoard() {
   const [search, setSearch] = useState(searchParams.get('q') || '')
   const [locationFilter, setLocationFilter] = useState('All')
   const [typeFilter, setTypeFilter] = useState('All')
+  const [modeFilter, setModeFilter] = useState('All')
   const [savedIds, setSavedIds] = useState(new Set())
   const [apps, setApps] = useState([])
   const [showAll, setShowAll] = useState(false)
@@ -156,22 +160,23 @@ export default function JobBoard() {
     }
   }
 
-  const locations = [...new Set(jobs.map((j) => j.location).filter(Boolean))].sort()
+  const locations = [...new Set(jobs.map((j) => normalizeLocation(j.location)).filter(Boolean))].sort()
   const types = [...new Set(jobs.map((j) => j.employment_type).filter(Boolean))].sort()
   const popular = [...new Set(jobs.map((j) => j.department).filter(Boolean))].slice(0, 5)
   const term = search.trim().toLowerCase()
   const filtered = jobs.filter((job) => {
-    if (locationFilter !== 'All' && job.location !== locationFilter) return false
+    if (locationFilter !== 'All' && normalizeLocation(job.location) !== locationFilter) return false
     if (typeFilter !== 'All' && job.employment_type !== typeFilter) return false
+    if (modeFilter !== 'All' && job.work_mode !== modeFilter) return false
     if (!term) return true
     return [job.title, job.company, job.location, job.department]
       .filter(Boolean)
       .some((field) => field.toLowerCase().includes(term))
   })
-  const hasFilters = !!term || locationFilter !== 'All' || typeFilter !== 'All'
+  const hasFilters = !!term || locationFilter !== 'All' || typeFilter !== 'All' || modeFilter !== 'All'
 
   function clearFilters() {
-    setSearch(''); setLocationFilter('All'); setTypeFilter('All'); setShowAll(false)
+    setSearch(''); setLocationFilter('All'); setTypeFilter('All'); setModeFilter('All'); setShowAll(false)
   }
   function runSearch() {
     resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
@@ -182,7 +187,7 @@ export default function JobBoard() {
   const appliedDepts = new Set(apps.map((a) => a.department).filter(Boolean))
   const prefField = user?.pref_field || ''
   const prefType = user?.pref_job_type || ''
-  const prefLoc = (user?.pref_location || '').toLowerCase()
+  const prefMode = user?.pref_work_mode || user?.pref_location || ''
   function relevance(job) {
     let s = 0
     const js = (job.required_skills || []).map((x) => x.toLowerCase())
@@ -190,7 +195,7 @@ export default function JobBoard() {
     if (prefField && job.department === prefField) s += 3
     if (appliedDepts.has(job.department)) s += 1
     if (prefType && job.employment_type === prefType) s += 2
-    if (prefLoc && (job.location || '').toLowerCase().includes(prefLoc)) s += 1
+    if (prefMode && job.work_mode === prefMode) s += 2
     return s
   }
   const byNewest = [...jobs].sort((a, b) => new Date(b.posted_date) - new Date(a.posted_date))
@@ -200,6 +205,13 @@ export default function JobBoard() {
     .slice(0, 4)
     .map((x) => x.j)
   const latest = byNewest.slice(0, 5)
+  const filteredIds = new Set(filtered.map((j) => j.id))
+  const similarJobs = [...jobs]
+    .filter((j) => !filteredIds.has(j.id))
+    .map((j) => ({ j, s: relevance(j) }))
+    .sort((a, b) => b.s - a.s || new Date(b.j.posted_date) - new Date(a.j.posted_date))
+    .slice(0, 4)
+    .map((x) => x.j)
   const allCompanies = Object.entries(
     jobs.reduce((m, j) => { const c = j.company || '—'; m[c] = (m[c] || 0) + 1; return m }, {}),
   ).sort((a, b) => b[1] - a[1])
@@ -329,8 +341,21 @@ export default function JobBoard() {
                         onChange={(e) => setTypeFilter(e.target.value)}
                         className="w-full h-11 pl-9 pr-8 rounded-btn bg-bg-surface border border-border text-[13px] text-text-body appearance-none cursor-pointer focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/15 transition-colors"
                       >
-                        <option value="All">Job type</option>
+                        <option value="All">Any type</option>
                         {types.map((t) => <option key={t} value={t}>{t}</option>)}
+                      </select>
+                      <ChevronDown size={15} className="absolute right-3 top-1/2 -translate-y-1/2 text-text-hint pointer-events-none" />
+                    </div>
+
+                    <div className="relative w-full sm:w-40">
+                      <Laptop size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-hint pointer-events-none" />
+                      <select
+                        value={modeFilter}
+                        onChange={(e) => setModeFilter(e.target.value)}
+                        className="w-full h-11 pl-9 pr-8 rounded-btn bg-bg-surface border border-border text-[13px] text-text-body appearance-none cursor-pointer focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/15 transition-colors"
+                      >
+                        <option value="All">Any mode</option>
+                        {WORK_MODES.map((m) => <option key={m} value={m}>{m}</option>)}
                       </select>
                       <ChevronDown size={15} className="absolute right-3 top-1/2 -translate-y-1/2 text-text-hint pointer-events-none" />
                     </div>
@@ -407,6 +432,20 @@ export default function JobBoard() {
               ) : (
                 <div className="bg-bg-surface border border-border rounded-card p-2 sm:p-3">
                   {filtered.map(rowFull)}
+                </div>
+              )}
+
+              {hasFilters && filtered.length < 3 && similarJobs.length > 0 && (
+                <div className="mt-1">
+                  <div className="flex items-center justify-between mb-2 px-0.5">
+                    <h2 className="text-[14px] font-medium text-text-primary">
+                      {filtered.length === 0 ? 'Similar roles you might like' : 'You might also like'}
+                    </h2>
+                    <span className="text-[11.5px] text-text-muted">Related to your criteria</span>
+                  </div>
+                  <div className="bg-bg-surface border border-border rounded-card p-2 sm:p-3">
+                    {similarJobs.map(rowFull)}
+                  </div>
                 </div>
               )}
             </>

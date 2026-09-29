@@ -246,6 +246,11 @@ export default function RecruiterProfile() {
               placeholder="A short description of your company, shown to job seekers…"
               className="w-full px-3 py-2.5 rounded-btn border border-border-strong text-[13px] text-text-body placeholder:text-text-hint focus:outline-none focus:border-accent focus:border-[1.5px] transition-colors resize-y" />
           </div>
+
+          <div className="sticky bottom-0 -mx-6 px-6 py-3 bg-bg-page/95 backdrop-blur border-t border-border flex items-center justify-end gap-2 sm:hidden">
+            <button onClick={() => setEditing(false)} disabled={saving} className="h-10 px-4 rounded-btn text-[13px] font-medium text-text-muted hover:bg-bg-subtle transition-colors">Cancel</button>
+            <button onClick={save} disabled={saving || !fullName.trim()} className="inline-flex items-center gap-2 h-10 px-5 rounded-btn bg-accent text-white text-[13px] font-medium hover:bg-accent-2 transition-colors disabled:opacity-50">{saving ? 'Saving…' : 'Save changes'}</button>
+          </div>
         </div>
       ) : (
         /* ---------- VIEW: main + rail, then full-width ---------- */

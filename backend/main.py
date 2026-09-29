@@ -112,6 +112,8 @@ def _startup_migrate_and_backfill():
         "ALTER TABLE users ADD COLUMN IF NOT EXISTS pref_location VARCHAR",
         "ALTER TABLE users ADD COLUMN IF NOT EXISTS onboarded BOOLEAN NOT NULL DEFAULT false",
         "ALTER TABLE users ADD COLUMN IF NOT EXISTS auth_provider VARCHAR NOT NULL DEFAULT 'password'",
+        "ALTER TABLE jobs ADD COLUMN IF NOT EXISTS work_mode VARCHAR",
+        "ALTER TABLE users ADD COLUMN IF NOT EXISTS pref_work_mode VARCHAR",
         # Google accounts have no password of their own.
         "ALTER TABLE users ALTER COLUMN password_hash DROP NOT NULL",
         "CREATE TABLE IF NOT EXISTS saved_jobs (id SERIAL PRIMARY KEY, user_id INTEGER NOT NULL REFERENCES users(id), job_id INTEGER NOT NULL REFERENCES jobs(id), created_at TIMESTAMPTZ DEFAULT now(), CONSTRAINT uq_saved_user_job UNIQUE (user_id, job_id))",

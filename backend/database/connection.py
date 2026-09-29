@@ -21,23 +21,28 @@ DATABASE_URL = os.getenv(
 #   requests rather than being torn down and rebuilt.
 # For local SQLite/other setups these psycopg2 args are harmless; they only apply
 # to PostgreSQL, which is what both dev and production use here.
+# The QueuePool options below (pool_size, max_overflow, keepalives) are specific
+# to a networked database like PostgreSQL. SQLite (used in tests and simple local
+# runs) uses a different pool that rejects them, so they are applied only for
+# Postgres; SQLite keeps SQLAlchemy's defaults.
 _is_postgres = DATABASE_URL.startswith("postgres")
 
-_engine_kwargs = {
-    "pool_pre_ping": True,
-    "pool_recycle": 300,
-    "pool_size": 5,
-    "max_overflow": 5,
-}
 if _is_postgres:
-    _engine_kwargs["connect_args"] = {
-        "keepalives": 1,
-        "keepalives_idle": 30,
-        "keepalives_interval": 10,
-        "keepalives_count": 5,
-        "connect_timeout": 10,
-    }
-
-engine = create_engine(DATABASE_URL, **_engine_kwargs)
+    engine = create_engine(
+        DATABASE_URL,
+        pool_pre_ping=True,
+        pool_recycle=300,
+        pool_size=5,
+        max_overflow=5,
+        connect_args={
+            "keepalives": 1,
+            "keepalives_idle": 30,
+            "keepalives_interval": 10,
+            "keepalives_count": 5,
+            "connect_timeout": 10,
+        },
+    )
+else:
+    engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()

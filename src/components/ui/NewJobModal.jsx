@@ -1,9 +1,11 @@
 import { useState } from 'react'
 import { X } from 'lucide-react'
 import SkillsInput from './SkillsInput'
+import { LOCATIONS } from '../../lib/locations'
 import { createJob, updateJob } from '../../lib/api'
 
-const EMPLOYMENT_TYPES = ['Full-time', 'Part-time', 'Contract']
+const EMPLOYMENT_TYPES = ['Full-time', 'Part-time', 'Contract', 'Internship']
+const WORK_MODES = ['On-site', 'Remote', 'Hybrid']
 const DEPARTMENTS = ['Engineering', 'Analytics', 'Design', 'Product', 'Marketing', 'Operations']
 const STATUSES = ['Active', 'In review', 'Closed']
 
@@ -14,6 +16,7 @@ export default function NewJobModal({ onClose, onCreated, job }) {
     title: job?.title || '',
     department: job?.department || 'Engineering',
     employment_type: job?.employment_type || 'Full-time',
+    work_mode: job?.work_mode || 'On-site',
     location: job?.location || '',
     description: job?.description || '',
     experience_requirement: job?.experience_requirement || '',
@@ -103,17 +106,31 @@ export default function NewJobModal({ onClose, onCreated, job }) {
                 {EMPLOYMENT_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
               </select>
             </div>
+            <div>
+              <label className="block text-[12px] font-medium text-text-body mb-1.5">Work mode</label>
+              <select
+                value={form.work_mode}
+                onChange={(e) => update('work_mode', e.target.value)}
+                className="w-full h-10 px-3 rounded-btn border border-border-strong text-[13px] text-text-body focus:outline-none focus:border-accent focus:border-[1.5px] bg-bg-surface"
+              >
+                {WORK_MODES.map((w) => <option key={w} value={w}>{w}</option>)}
+              </select>
+            </div>
           </div>
 
           <div>
             <label className="block text-[12px] font-medium text-text-body mb-1.5">Location</label>
             <input
               type="text"
+              list="job-locations"
               value={form.location}
               onChange={(e) => update('location', e.target.value)}
-              placeholder="e.g. Accra"
+              placeholder="Start typing a city…"
               className="w-full h-10 px-3 rounded-btn border border-border-strong text-[13px] text-text-body placeholder:text-text-hint focus:outline-none focus:border-accent focus:border-[1.5px]"
             />
+            <datalist id="job-locations">
+              {LOCATIONS.map((l) => <option key={l} value={l} />)}
+            </datalist>
           </div>
           {isEdit && (
             <div>

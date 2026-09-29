@@ -30,5 +30,6 @@ class User(Base):
     pref_field = Column(String, nullable=True)
     pref_job_type = Column(String, nullable=True)
     pref_location = Column(String, nullable=True)
+    pref_work_mode = Column(String, nullable=True)  # On-site / Remote / Hybrid
     onboarded = Column(Boolean, nullable=False, server_default="false")
     created_at = Column(DateTime(timezone=True), server_default=func.now())

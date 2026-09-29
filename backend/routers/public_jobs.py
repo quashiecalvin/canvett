@@ -14,6 +14,7 @@ def _serialize(job, company, company_logo=None, company_description=None):
         "title": job.title,
         "department": job.department,
         "employment_type": job.employment_type,
+        "work_mode": job.work_mode,
         "location": job.location,
         "description": job.description,
         "required_skills": job.required_skills,

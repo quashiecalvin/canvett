@@ -11,6 +11,7 @@ class Job(Base):
     title = Column(String, nullable=False)
     department = Column(String, nullable=False)
     employment_type = Column(String, nullable=False)
+    work_mode = Column(String, nullable=True)  # On-site / Remote / Hybrid
     location = Column(String, nullable=False)
     description = Column(Text, nullable=False)
     required_skills = Column(ARRAY(String), nullable=False)

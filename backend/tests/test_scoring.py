@@ -64,10 +64,13 @@ class TestScoreCandidate:
         assert 0 <= result["skills_score"] <= 100
         assert isinstance(result["duration_verified"], bool)
 
-    def test_weighted_overall_matches_formula(self):
-        # Two of three skills present -> 66.7 skills. With the zero-similarity
-        # stub, experience and education relevance are 0, so overall is purely
-        # the weighted skills contribution.
+    def test_weighted_overall_matches_formula(self, monkeypatch):
+        # Two of three skills present -> 66.7 skills. Force zero semantic
+        # relevance (so the test verifies the weighting maths, not the model,
+        # whether the real model or the lightweight stub is installed): with
+        # experience and education relevance at 0, overall is purely the
+        # weighted skills contribution.
+        monkeypatch.setattr("services.scoring.best_line_similarity", lambda *a, **k: 0.0)
         result = score_candidate(
             resume_text="Skills\nPython FastAPI",
             job_description="Backend",
