@@ -8,8 +8,8 @@ export default function AuthShell({ children }) {
   }, [])
 
   return (
-    <div className="min-h-screen w-full relative flex items-center justify-center overflow-hidden px-5 py-10"
-         style={{ background: '#070d18' }}>
+    <div className="min-h-screen w-full relative flex items-center justify-center overflow-hidden px-5 py-6 sm:py-10"
+         style={{ minHeight: '100dvh', background: '#070d18' }}>
 
       {/* colourful flowing background — gives the glass something to refract */}
       <div
