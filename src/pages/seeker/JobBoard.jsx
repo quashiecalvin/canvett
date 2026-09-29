@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate, Link, useSearchParams } from 'react-router-dom'
 import {
-  Search, Briefcase, MapPin, Clock, Bookmark, ArrowRight, PieChart, ChevronDown, Laptop,
+  Search, Briefcase, MapPin, Clock, Bookmark, ArrowRight, PieChart, ChevronDown,
 } from 'lucide-react'
 import {
   getPublicJobs, getSavedJobs, saveJob, unsaveJob, getMyApplications,
@@ -21,8 +21,6 @@ const STATUS_META = [
   { key: 'Under review', label: 'In review', color: 'var(--color-accent)' },
   { key: 'Shortlisted', label: 'Shortlisted', color: 'var(--color-success)' },
 ]
-
-const WORK_MODES = ['On-site', 'Remote', 'Hybrid']
 
 const COMPANY_COLORS = ['#2F6FB0', '#5A8F3C', '#C77D2E', '#B0505A', '#6E5AAE', '#2A9AA0', '#B85C9E']
 function companyColor(name) {
@@ -90,7 +88,6 @@ export default function JobBoard() {
   const [search, setSearch] = useState(searchParams.get('q') || '')
   const [locationFilter, setLocationFilter] = useState('All')
   const [typeFilter, setTypeFilter] = useState('All')
-  const [modeFilter, setModeFilter] = useState('All')
   const [savedIds, setSavedIds] = useState(new Set())
   const [apps, setApps] = useState([])
   const [showAll, setShowAll] = useState(false)
@@ -167,16 +164,15 @@ export default function JobBoard() {
   const filtered = jobs.filter((job) => {
     if (locationFilter !== 'All' && normalizeLocation(job.location) !== locationFilter) return false
     if (typeFilter !== 'All' && job.employment_type !== typeFilter) return false
-    if (modeFilter !== 'All' && job.work_mode !== modeFilter) return false
     if (!term) return true
     return [job.title, job.company, job.location, job.department]
       .filter(Boolean)
       .some((field) => field.toLowerCase().includes(term))
   })
-  const hasFilters = !!term || locationFilter !== 'All' || typeFilter !== 'All' || modeFilter !== 'All'
+  const hasFilters = !!term || locationFilter !== 'All' || typeFilter !== 'All'
 
   function clearFilters() {
-    setSearch(''); setLocationFilter('All'); setTypeFilter('All'); setModeFilter('All'); setShowAll(false)
+    setSearch(''); setLocationFilter('All'); setTypeFilter('All'); setShowAll(false)
   }
   function runSearch() {
     resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
@@ -347,18 +343,6 @@ export default function JobBoard() {
                       <ChevronDown size={15} className="absolute right-3 top-1/2 -translate-y-1/2 text-text-hint pointer-events-none" />
                     </div>
 
-                    <div className="relative w-full sm:w-40">
-                      <Laptop size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-hint pointer-events-none" />
-                      <select
-                        value={modeFilter}
-                        onChange={(e) => setModeFilter(e.target.value)}
-                        className="w-full h-11 pl-9 pr-8 rounded-btn bg-bg-surface border border-border text-[13px] text-text-body appearance-none cursor-pointer focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/15 transition-colors"
-                      >
-                        <option value="All">Any mode</option>
-                        {WORK_MODES.map((m) => <option key={m} value={m}>{m}</option>)}
-                      </select>
-                      <ChevronDown size={15} className="absolute right-3 top-1/2 -translate-y-1/2 text-text-hint pointer-events-none" />
-                    </div>
 
                     <button
                       onClick={runSearch}
