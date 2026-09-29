@@ -11,20 +11,16 @@ export default function AuthShell({ children }) {
 
   return (
     <div className="min-h-screen w-full relative flex items-center justify-center overflow-hidden px-5 py-6 sm:py-10"
-         style={{ minHeight: '100dvh', background: '#070d18' }}>
+         style={{ minHeight: '100dvh', background: 'radial-gradient(140% 120% at 50% 0%, #10203f 0%, #0a1526 45%, #070d18 100%)' }}>
 
-      {/* colourful flowing background — gives the glass something to refract */}
+      {/* soft blue glows in opposite corners */}
       <div
-        className="absolute w-[65%] h-[75%] max-w-[720px] rounded-full blur-[110px] pointer-events-none auth-glow-a motion-reduce:animate-none"
-        style={{ background: 'radial-gradient(circle, var(--color-accent) 0%, transparent 70%)', opacity: 0.55 }}
+        className="absolute -top-[15%] -right-[10%] w-[65%] h-[70%] max-w-[680px] rounded-full blur-[130px] pointer-events-none auth-glow-a motion-reduce:animate-none"
+        style={{ background: 'radial-gradient(circle, #2563EB 0%, transparent 70%)', opacity: 0.38 }}
       />
       <div
-        className="absolute right-0 bottom-0 w-[55%] h-[60%] max-w-[600px] rounded-full blur-[120px] pointer-events-none auth-glow-b motion-reduce:animate-none"
-        style={{ background: 'radial-gradient(circle, #6366F1 0%, transparent 70%)', opacity: 0.4 }}
-      />
-      <div
-        className="absolute left-0 top-1/4 w-[40%] h-[45%] max-w-[420px] rounded-full blur-[120px] pointer-events-none auth-glow-c motion-reduce:animate-none"
-        style={{ background: 'radial-gradient(circle, var(--color-accent-light) 0%, transparent 70%)', opacity: 0.25 }}
+        className="absolute -bottom-[15%] -left-[10%] w-[60%] h-[65%] max-w-[620px] rounded-full blur-[130px] pointer-events-none auth-glow-b motion-reduce:animate-none"
+        style={{ background: 'radial-gradient(circle, #1D4ED8 0%, transparent 70%)', opacity: 0.30 }}
       />
 
       {/* the card */}
@@ -36,7 +32,7 @@ export default function AuthShell({ children }) {
           transition: 'opacity 0.7s ease-out, transform 0.7s ease-out',
         }}
       >
-        <div className="flex items-center justify-center gap-2 mb-6">
+        <div className="flex items-center justify-center gap-2">
           <div className="w-8 h-8 rounded-[8px] bg-accent flex items-center justify-center shrink-0">
             <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
               <rect x="9" y="9" width="6" height="8" rx="1.75" fill="white" fillOpacity="0.9"/>
@@ -49,6 +45,7 @@ export default function AuthShell({ children }) {
             <span className="text-white">Can</span><span className="text-accent-light">vett</span>
           </span>
         </div>
+        <p className="text-center text-[13px] text-white/45 mt-2 mb-7">Smarter hiring. Better teams.</p>
 
         <div
           className="rounded-modal p-7 sm:p-8 border shadow-2xl shadow-black/50"

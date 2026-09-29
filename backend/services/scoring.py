@@ -63,7 +63,7 @@ def score_candidate(
     experience_source = sections.get("experience") or resume_text
     experience_relevance = calibrate(best_line_similarity(experience_target, experience_source))
 
-    candidate_years = extract_total_years(sections.get("experience") or "")
+    candidate_years = extract_total_years(sections.get("experience") or resume_text)
     required_years = extract_required_years(experience_requirement or "")
 
     # duration_verified reflects only whether the candidate's experience dates

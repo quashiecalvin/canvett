@@ -12,7 +12,11 @@ def _match_heading(line: str):
         return None
     for section, keywords in SECTION_KEYWORDS.items():
         for kw in keywords:
-            if cleaned == kw or cleaned.startswith(kw):
+            # A short heading line that contains the keyword anywhere counts, so
+            # variants like "PROFESSIONAL & PROJECT EXPERIENCE", "CORE
+            # COMPETENCIES" or "FEATURED DESIGN PROJECTS" are recognised, not only
+            # headings that begin with the exact keyword.
+            if kw in cleaned:
                 return section
     return None
 
