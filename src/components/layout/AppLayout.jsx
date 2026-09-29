@@ -9,6 +9,7 @@ import { useAuth } from '../../context/AuthContext'
 import { searchAll } from '../../lib/api'
 import { useActivity } from '../../context/ActivityContext'
 import { timeAgo } from '../../lib/time'
+import { setThemeColor, THEME_COLORS } from '../../lib/themeColor'
 
 function Logo() {
   return (
@@ -46,12 +47,14 @@ export default function AppLayout({ children }) {
       const isDark = localStorage.getItem('canvett_theme') === 'dark'
       setDark(isDark)
       document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light')
+      setThemeColor(isDark ? THEME_COLORS.dark : THEME_COLORS.light)
     } catch { /* ignore */ }
   }, [])
   function toggleTheme() {
     setDark((d) => {
       const nd = !d
       document.documentElement.setAttribute('data-theme', nd ? 'dark' : 'light')
+      setThemeColor(nd ? THEME_COLORS.dark : THEME_COLORS.light)
       try { localStorage.setItem('canvett_theme', nd ? 'dark' : 'light') } catch { /* ignore */ }
       return nd
     })

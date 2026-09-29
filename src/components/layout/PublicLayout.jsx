@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { Sun, Moon } from 'lucide-react'
 import Footer from './Footer'
+import { setThemeColor, THEME_COLORS } from '../../lib/themeColor'
 
 function Logo() {
   return (
@@ -31,6 +32,7 @@ export default function PublicLayout({ children }) {
       const isDark = localStorage.getItem('canvett_theme') === 'dark'
       setDark(isDark)
       document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light')
+      setThemeColor(isDark ? THEME_COLORS.dark : THEME_COLORS.light)
     } catch {
       /* ignore */
     }
@@ -39,6 +41,7 @@ export default function PublicLayout({ children }) {
     setDark((d) => {
       const nd = !d
       document.documentElement.setAttribute('data-theme', nd ? 'dark' : 'light')
+      setThemeColor(nd ? THEME_COLORS.dark : THEME_COLORS.light)
       try { localStorage.setItem('canvett_theme', nd ? 'dark' : 'light') } catch { /* ignore */ }
       return nd
     })

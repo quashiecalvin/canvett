@@ -4,6 +4,7 @@ import { Home, Bookmark, FileText, LogOut, Menu, X, Sun, Moon, Search } from 'lu
 import { useAuth } from '../../context/AuthContext'
 import OnboardingModal from '../seeker/OnboardingModal'
 import Footer from './Footer'
+import { setThemeColor, THEME_COLORS } from '../../lib/themeColor'
 
 const navItems = [
   { icon: Home, label: 'Home', to: '/seeker/jobs', end: true },
@@ -49,12 +50,14 @@ export default function SeekerLayout({ children }) {
       const isDark = localStorage.getItem('canvett_theme') === 'dark'
       setDark(isDark)
       document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light')
+      setThemeColor(isDark ? THEME_COLORS.dark : THEME_COLORS.light)
     } catch { /* ignore */ }
   }, [])
   function toggleTheme() {
     setDark((d) => {
       const nd = !d
       document.documentElement.setAttribute('data-theme', nd ? 'dark' : 'light')
+      setThemeColor(nd ? THEME_COLORS.dark : THEME_COLORS.light)
       try { localStorage.setItem('canvett_theme', nd ? 'dark' : 'light') } catch { /* ignore */ }
       return nd
     })

@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react'
+import { setThemeColor, THEME_COLORS } from '../../lib/themeColor'
 
 export default function AuthShell({ children }) {
   const [lit, setLit] = useState(false)
   useEffect(() => {
+    setThemeColor(THEME_COLORS.auth)
     const t = setTimeout(() => setLit(true), 60)
     return () => clearTimeout(t)
   }, [])
