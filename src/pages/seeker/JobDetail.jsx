@@ -235,9 +235,10 @@ export default function JobDetail() {
           )}
         </div>
 
-        {/* Right rail */}
-        <div className="flex flex-col gap-5">
-          <div className="bg-bg-surface border border-border rounded-card p-5 lg:sticky lg:top-6">
+        {/* Right rail - the whole rail sticks as one unit so the two cards move
+            together instead of one sliding under the other on scroll */}
+        <div className="flex flex-col gap-5 lg:sticky lg:top-6 self-start">
+          <div className="bg-bg-surface border border-border rounded-card p-5">
             <h2 className="text-[14px] font-medium text-text-primary mb-3">Job summary</h2>
             <div className="flex flex-col gap-3">
               {summary.map(({ icon: FactIcon, label, value }) => (

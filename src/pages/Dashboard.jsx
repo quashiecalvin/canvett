@@ -302,9 +302,13 @@ export default function Dashboard() {
               <div className="flex flex-col">
                 {topCandidates.map((c, i) => (
                   <div key={c.candidate_id} className={`flex items-center gap-3 py-2.5 ${i > 0 ? 'border-t border-border' : ''}`}>
-                    <div className="w-9 h-9 rounded-full bg-purple-tint flex items-center justify-center text-[11px] font-medium text-purple-text shrink-0">
-                      {initialsFromName(c.name)}
-                    </div>
+                    {c.photo ? (
+                      <img src={c.photo} alt={c.name} className="w-9 h-9 rounded-full object-cover shrink-0" />
+                    ) : (
+                      <div className="w-9 h-9 rounded-full bg-purple-tint flex items-center justify-center text-[11px] font-medium text-purple-text shrink-0">
+                        {initialsFromName(c.name)}
+                      </div>
+                    )}
                     <div className="flex-1 min-w-0">
                       <p className="text-[13px] font-medium text-text-primary leading-[1.4] truncate">{c.name}</p>
                       <p className="text-[11px] text-text-muted truncate">{c.job_title}</p>

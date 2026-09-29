@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func
 from datetime import datetime, timedelta, timezone
 from database.session import get_db
-from database import models_job, models_candidate, models_activity, models_user
+from database import models_job, models_candidate, models_activity, models_user, models_application
 from services.auth import require_recruiter
 
 router = APIRouter(prefix="/stats", tags=["Stats"])
@@ -141,7 +141,26 @@ def top_candidates(
             })
 
     top.sort(key=lambda c: c["overall_score"], reverse=True)
-    return top[:5]
+    top = top[:5]
+
+    # Attach the applicant's profile photo where the candidate applied through the
+    # portal (a seeker account), so the recruiter sees the same picture the seeker
+    # set rather than only their initials.
+    cids = [c["candidate_id"] for c in top]
+    if cids:
+        photo_map = {
+            cid: photo
+            for cid, photo in db.query(
+                models_application.Application.candidate_id, models_user.User.photo
+            )
+            .join(models_user.User, models_application.Application.user_id == models_user.User.id)
+            .filter(models_application.Application.candidate_id.in_(cids))
+            .all()
+        }
+        for c in top:
+            c["photo"] = photo_map.get(c["candidate_id"])
+
+    return top
 
 
 @router.get("/activity")
