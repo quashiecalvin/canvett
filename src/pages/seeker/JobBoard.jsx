@@ -158,7 +158,10 @@ export default function JobBoard() {
   }
 
   const locations = [...new Set(jobs.map((j) => normalizeLocation(j.location)).filter(Boolean))].sort()
-  const types = [...new Set(jobs.map((j) => j.employment_type).filter(Boolean))].sort()
+  // The standard employment types, always offered so seekers can filter even
+  // when a type has no postings yet (rather than showing only types that happen
+  // to exist in the current data).
+  const types = ['Full-time', 'Part-time', 'Contract', 'Internship']
   const popular = [...new Set(jobs.map((j) => j.department).filter(Boolean))].slice(0, 5)
   const term = search.trim().toLowerCase()
   const filtered = jobs.filter((job) => {
