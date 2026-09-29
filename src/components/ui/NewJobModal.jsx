@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { X } from 'lucide-react'
+import { X, ChevronDown } from 'lucide-react'
 import SkillsInput from './SkillsInput'
 import { LOCATIONS } from '../../lib/locations'
 import { createJob, updateJob } from '../../lib/api'
@@ -88,33 +88,42 @@ export default function NewJobModal({ onClose, onCreated, job }) {
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label className="block text-[12px] font-medium text-text-body mb-1.5">Department</label>
-              <select
-                value={form.department}
-                onChange={(e) => update('department', e.target.value)}
-                className="w-full h-10 px-3 rounded-btn border border-border-strong text-[13px] text-text-body focus:outline-none focus:border-accent focus:border-[1.5px] bg-bg-surface"
-              >
-                {DEPARTMENTS.map((d) => <option key={d} value={d}>{d}</option>)}
-              </select>
+              <div className="relative">
+                <select
+                  value={form.department}
+                  onChange={(e) => update('department', e.target.value)}
+                  className="w-full h-10 pl-3 pr-9 rounded-btn border border-border-strong text-[13px] text-text-body appearance-none cursor-pointer focus:outline-none focus:border-accent focus:border-[1.5px] bg-bg-surface"
+                >
+                  {DEPARTMENTS.map((d) => <option key={d} value={d}>{d}</option>)}
+                </select>
+                <ChevronDown size={15} className="absolute right-3 top-1/2 -translate-y-1/2 text-text-hint pointer-events-none" />
+              </div>
             </div>
             <div>
               <label className="block text-[12px] font-medium text-text-body mb-1.5">Employment type</label>
-              <select
-                value={form.employment_type}
-                onChange={(e) => update('employment_type', e.target.value)}
-                className="w-full h-10 px-3 rounded-btn border border-border-strong text-[13px] text-text-body focus:outline-none focus:border-accent focus:border-[1.5px] bg-bg-surface"
-              >
-                {EMPLOYMENT_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
-              </select>
+              <div className="relative">
+                <select
+                  value={form.employment_type}
+                  onChange={(e) => update('employment_type', e.target.value)}
+                  className="w-full h-10 pl-3 pr-9 rounded-btn border border-border-strong text-[13px] text-text-body appearance-none cursor-pointer focus:outline-none focus:border-accent focus:border-[1.5px] bg-bg-surface"
+                >
+                  {EMPLOYMENT_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
+                </select>
+                <ChevronDown size={15} className="absolute right-3 top-1/2 -translate-y-1/2 text-text-hint pointer-events-none" />
+              </div>
             </div>
             <div>
               <label className="block text-[12px] font-medium text-text-body mb-1.5">Work mode</label>
-              <select
-                value={form.work_mode}
-                onChange={(e) => update('work_mode', e.target.value)}
-                className="w-full h-10 px-3 rounded-btn border border-border-strong text-[13px] text-text-body focus:outline-none focus:border-accent focus:border-[1.5px] bg-bg-surface"
-              >
-                {WORK_MODES.map((w) => <option key={w} value={w}>{w}</option>)}
-              </select>
+              <div className="relative">
+                <select
+                  value={form.work_mode}
+                  onChange={(e) => update('work_mode', e.target.value)}
+                  className="w-full h-10 pl-3 pr-9 rounded-btn border border-border-strong text-[13px] text-text-body appearance-none cursor-pointer focus:outline-none focus:border-accent focus:border-[1.5px] bg-bg-surface"
+                >
+                  {WORK_MODES.map((w) => <option key={w} value={w}>{w}</option>)}
+                </select>
+                <ChevronDown size={15} className="absolute right-3 top-1/2 -translate-y-1/2 text-text-hint pointer-events-none" />
+              </div>
             </div>
           </div>
 
@@ -135,13 +144,16 @@ export default function NewJobModal({ onClose, onCreated, job }) {
           {isEdit && (
             <div>
               <label className="block text-[12px] font-medium text-text-body mb-1.5">Status</label>
-              <select
-                value={form.status}
-                onChange={(e) => update('status', e.target.value)}
-                className="w-full h-10 px-3 rounded-btn border border-border-strong text-[13px] text-text-body focus:outline-none focus:border-accent focus:border-[1.5px] bg-bg-surface"
-              >
-                {STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
-              </select>
+              <div className="relative">
+                <select
+                  value={form.status}
+                  onChange={(e) => update('status', e.target.value)}
+                  className="w-full h-10 pl-3 pr-9 rounded-btn border border-border-strong text-[13px] text-text-body appearance-none cursor-pointer focus:outline-none focus:border-accent focus:border-[1.5px] bg-bg-surface"
+                >
+                  {STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
+                </select>
+                <ChevronDown size={15} className="absolute right-3 top-1/2 -translate-y-1/2 text-text-hint pointer-events-none" />
+              </div>
             </div>
           )}
 

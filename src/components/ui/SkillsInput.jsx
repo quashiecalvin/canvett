@@ -2,6 +2,14 @@ import { useState, useRef, useEffect, useMemo } from 'react'
 import { X, Search } from 'lucide-react'
 import { SKILLS_TAXONOMY } from '../../lib/skillsTaxonomy'
 
+// A deliberately cross-industry starter set shown before the user types, so the
+// selector does not look tech-only (the full list simply happens to begin with
+// programming languages).
+const DEFAULT_SUGGESTIONS = [
+  'Communication', 'Leadership', 'Project Management', 'Customer Service',
+  'Sales', 'Accounting', 'Teaching', 'Data Analysis', 'Graphic Design', 'Nursing',
+]
+
 // Searchable, cross-industry skills selector. Users type to filter a broad list
 // and pick with the mouse or keyboard; anything not in the list can still be
 // added via the "Add ‘…’" option, so no field is ever a dead end. Props are the
@@ -20,7 +28,7 @@ export default function SkillsInput({ skills, setSkills }) {
   const query = input.trim().toLowerCase()
   const suggestions = useMemo(() => {
     const pool = SKILLS_TAXONOMY.filter((s) => !selectedLower.has(s.toLowerCase()))
-    if (!query) return pool.slice(0, 8)
+    if (!query) return DEFAULT_SUGGESTIONS.filter((s) => !selectedLower.has(s.toLowerCase())).slice(0, 8)
     const starts = pool.filter((s) => s.toLowerCase().startsWith(query))
     const contains = pool.filter(
       (s) => !s.toLowerCase().startsWith(query) && s.toLowerCase().includes(query),
