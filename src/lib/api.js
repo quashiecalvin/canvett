@@ -1,8 +1,22 @@
-import { getToken } from "./authStorage"
+import { getToken, clearSession } from "./authStorage"
 
 const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000"
 
 const NETWORK_MESSAGE = "Could not reach the server. Check your connection and try again."
+
+// When an authenticated request comes back 401, the stored token is missing,
+// expired, or otherwise invalid. Rather than leaving the user on an empty page
+// whose data silently failed to load, clear the session and send them to the
+// login screen with a notice. Guarded so it only redirects once.
+let redirectingToLogin = false
+function handleUnauthorized() {
+  clearSession()
+  if (redirectingToLogin) return
+  if (typeof window === "undefined") return
+  if (window.location.pathname === "/login") return
+  redirectingToLogin = true
+  window.location.replace("/login")
+}
 
 function authHeaders() {
   const token = getToken()
@@ -60,6 +74,11 @@ async function request(path, fallback, { method = "GET", json, body, auth = true
 
   if (!res.ok) {
     const err = await res.json().catch(() => ({}))
+    // An authenticated request rejected with 401 means the session is no longer
+    // valid; send the user to sign in again instead of failing silently.
+    if (res.status === 401 && auth) {
+      handleUnauthorized()
+    }
     throw apiError(errorMessage(err) || fallback, res.status)
   }
 
