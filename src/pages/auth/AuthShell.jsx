@@ -1,15 +1,12 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { setThemeColor, THEME_COLORS } from '../../lib/themeColor'
 
 const CONTACT_EMAIL = 'quashiecalvin13@gmail.com'
 
 export default function AuthShell({ children }) {
-  const [lit, setLit] = useState(false)
   useEffect(() => {
     setThemeColor(THEME_COLORS.auth)
-    const t = setTimeout(() => setLit(true), 60)
-    return () => clearTimeout(t)
   }, [])
 
   return (
@@ -17,14 +14,7 @@ export default function AuthShell({ children }) {
          style={{ minHeight: '100dvh', background: "#070d18 url('/auth-bg.jpg') center / cover no-repeat" }}>
 
       {/* the card */}
-      <div
-        className="relative w-full max-w-[420px]"
-        style={{
-          opacity: lit ? 1 : 0,
-          transform: lit ? 'translateY(0)' : 'translateY(14px)',
-          transition: 'opacity 0.7s ease-out, transform 0.7s ease-out',
-        }}
-      >
+      <div className="relative w-full max-w-[420px]">
         <div className="flex items-center justify-center gap-2">
           <div className="w-8 h-8 rounded-[8px] bg-accent flex items-center justify-center shrink-0">
             <svg width="32" height="32" viewBox="0 0 32 32" fill="none" aria-hidden="true">
