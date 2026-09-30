@@ -75,8 +75,8 @@ export default function NewJobModal({ onClose, onCreated, job }) {
 
         <div className="px-6 py-4 flex flex-col gap-4">
           <div>
-            <label className="block text-[12px] font-medium text-text-body mb-1.5">Job title</label>
-            <input
+            <label htmlFor="njm-1" className="block text-[12px] font-medium text-text-body mb-1.5">Job title</label>
+            <input id="njm-1"
               type="text"
               value={form.title}
               onChange={(e) => update('title', e.target.value)}
@@ -87,9 +87,9 @@ export default function NewJobModal({ onClose, onCreated, job }) {
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
-              <label className="block text-[12px] font-medium text-text-body mb-1.5">Department</label>
+              <label htmlFor="njm-2" className="block text-[12px] font-medium text-text-body mb-1.5">Department</label>
               <div className="relative">
-                <select
+                <select id="njm-2"
                   value={form.department}
                   onChange={(e) => update('department', e.target.value)}
                   className="w-full h-10 pl-3 pr-9 rounded-btn border border-border-strong text-[13px] text-text-body appearance-none cursor-pointer focus:outline-none focus:border-accent focus:border-[1.5px] bg-bg-surface"
@@ -100,9 +100,9 @@ export default function NewJobModal({ onClose, onCreated, job }) {
               </div>
             </div>
             <div>
-              <label className="block text-[12px] font-medium text-text-body mb-1.5">Employment type</label>
+              <label htmlFor="njm-3" className="block text-[12px] font-medium text-text-body mb-1.5">Employment type</label>
               <div className="relative">
-                <select
+                <select id="njm-3"
                   value={form.employment_type}
                   onChange={(e) => update('employment_type', e.target.value)}
                   className="w-full h-10 pl-3 pr-9 rounded-btn border border-border-strong text-[13px] text-text-body appearance-none cursor-pointer focus:outline-none focus:border-accent focus:border-[1.5px] bg-bg-surface"
@@ -113,9 +113,9 @@ export default function NewJobModal({ onClose, onCreated, job }) {
               </div>
             </div>
             <div>
-              <label className="block text-[12px] font-medium text-text-body mb-1.5">Work mode</label>
+              <label htmlFor="njm-4" className="block text-[12px] font-medium text-text-body mb-1.5">Work mode</label>
               <div className="relative">
-                <select
+                <select id="njm-4"
                   value={form.work_mode}
                   onChange={(e) => update('work_mode', e.target.value)}
                   className="w-full h-10 pl-3 pr-9 rounded-btn border border-border-strong text-[13px] text-text-body appearance-none cursor-pointer focus:outline-none focus:border-accent focus:border-[1.5px] bg-bg-surface"
@@ -128,8 +128,8 @@ export default function NewJobModal({ onClose, onCreated, job }) {
           </div>
 
           <div>
-            <label className="block text-[12px] font-medium text-text-body mb-1.5">Location</label>
-            <input
+            <label htmlFor="njm-5" className="block text-[12px] font-medium text-text-body mb-1.5">Location</label>
+            <input id="njm-5"
               type="text"
               list="job-locations"
               value={form.location}
@@ -143,9 +143,9 @@ export default function NewJobModal({ onClose, onCreated, job }) {
           </div>
           {isEdit && (
             <div>
-              <label className="block text-[12px] font-medium text-text-body mb-1.5">Status</label>
+              <label htmlFor="njm-6" className="block text-[12px] font-medium text-text-body mb-1.5">Status</label>
               <div className="relative">
-                <select
+                <select id="njm-6"
                   value={form.status}
                   onChange={(e) => update('status', e.target.value)}
                   className="w-full h-10 pl-3 pr-9 rounded-btn border border-border-strong text-[13px] text-text-body appearance-none cursor-pointer focus:outline-none focus:border-accent focus:border-[1.5px] bg-bg-surface"
@@ -158,8 +158,8 @@ export default function NewJobModal({ onClose, onCreated, job }) {
           )}
 
           <div>
-            <label className="block text-[12px] font-medium text-text-body mb-1.5">Job description</label>
-            <textarea
+            <label htmlFor="njm-7" className="block text-[12px] font-medium text-text-body mb-1.5">Job description</label>
+            <textarea id="njm-7"
               value={form.description}
               onChange={(e) => update('description', e.target.value)}
               placeholder="Describe the role, responsibilities, and requirements..."
@@ -169,8 +169,8 @@ export default function NewJobModal({ onClose, onCreated, job }) {
           </div>
 
           <div>
-            <label className="block text-[12px] font-medium text-text-body mb-1.5">Experience requirement</label>
-            <textarea
+            <label htmlFor="njm-8" className="block text-[12px] font-medium text-text-body mb-1.5">Experience requirement</label>
+            <textarea id="njm-8"
               value={form.experience_requirement}
               onChange={(e) => update('experience_requirement', e.target.value)}
               placeholder="e.g. 3+ years in a similar role"
@@ -180,8 +180,8 @@ export default function NewJobModal({ onClose, onCreated, job }) {
           </div>
 
           <div>
-            <label className="block text-[12px] font-medium text-text-body mb-1.5">Education requirement</label>
-            <textarea
+            <label htmlFor="njm-9" className="block text-[12px] font-medium text-text-body mb-1.5">Education requirement</label>
+            <textarea id="njm-9"
               value={form.education_requirement}
               onChange={(e) => update('education_requirement', e.target.value)}
               placeholder="e.g. BSc in a relevant field, or equivalent experience"

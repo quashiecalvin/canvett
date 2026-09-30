@@ -229,12 +229,12 @@ export default function RecruiterProfile() {
             <div className="flex flex-col sm:flex-row items-start gap-6">
               {LogoBlock()}
               <div className="min-w-0 flex-1 w-full grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div><label className={labelCls}>Company name</label><input value={companyName} onChange={(e) => setCompanyName(e.target.value)} placeholder="Your organisation" className={inputCls} /></div>
-                <div><label className={labelCls}>Your name</label><input value={fullName} onChange={(e) => setFullName(e.target.value)} className={inputCls} /></div>
-                <div><label className={labelCls}>Email</label><input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className={inputCls} /></div>
-                <div><label className={labelCls}>Phone</label><input value={phone} onChange={(e) => setPhone(e.target.value)} className={inputCls} /></div>
-                <div><label className={labelCls}>Company website</label><input value={website} onChange={(e) => setWebsite(e.target.value)} placeholder="https://…" className={inputCls} /></div>
-                <div><label className={labelCls}>Company location</label><input value={location} onChange={(e) => setLocation(e.target.value)} placeholder="City, Country" className={inputCls} /></div>
+                <div><label htmlFor="rp-1" className={labelCls}>Company name</label><input id="rp-1" value={companyName} onChange={(e) => setCompanyName(e.target.value)} placeholder="Your organisation" className={inputCls} /></div>
+                <div><label htmlFor="rp-2" className={labelCls}>Your name</label><input id="rp-2" value={fullName} onChange={(e) => setFullName(e.target.value)} className={inputCls} /></div>
+                <div><label htmlFor="rp-3" className={labelCls}>Email</label><input id="rp-3" type="email" value={email} onChange={(e) => setEmail(e.target.value)} className={inputCls} /></div>
+                <div><label htmlFor="rp-4" className={labelCls}>Phone</label><input id="rp-4" value={phone} onChange={(e) => setPhone(e.target.value)} className={inputCls} /></div>
+                <div><label htmlFor="rp-5" className={labelCls}>Company website</label><input id="rp-5" value={website} onChange={(e) => setWebsite(e.target.value)} placeholder="https://…" className={inputCls} /></div>
+                <div><label htmlFor="rp-6" className={labelCls}>Company location</label><input id="rp-6" value={location} onChange={(e) => setLocation(e.target.value)} placeholder="City, Country" className={inputCls} /></div>
               </div>
             </div>
           </div>

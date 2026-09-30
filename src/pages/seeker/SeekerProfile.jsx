@@ -289,13 +289,13 @@ export default function SeekerProfile() {
             <div className="flex flex-col sm:flex-row items-start gap-6">
               {AvatarBlock()}
               <div className="min-w-0 flex-1 w-full grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div><label className={labelCls}>Full name</label><input value={fullName} onChange={(e) => setFullName(e.target.value)} className={inputCls} /></div>
-                <div><label className={labelCls}>Job title</label><input value={headline} onChange={(e) => setHeadline(e.target.value)} placeholder="e.g. Accountant" className={inputCls} /></div>
-                <div><label className={labelCls}>Location</label><input value={location} onChange={(e) => setLocation(e.target.value)} placeholder="City, Country" className={inputCls} /></div>
-                <div><label className={labelCls}>Phone</label><input value={phone} onChange={(e) => setPhone(e.target.value)} className={inputCls} /></div>
-                <div><label className={labelCls}>Email</label><input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className={inputCls} /></div>
-                <div><label className={labelCls}>Website / LinkedIn</label><input value={website} onChange={(e) => setWebsite(e.target.value)} placeholder="https://…" className={inputCls} /></div>
-                <div><label className={labelCls}>Languages</label><input value={languages} onChange={(e) => setLanguages(e.target.value)} placeholder="e.g. English, Twi" className={inputCls} /></div>
+                <div><label htmlFor="sp-1" className={labelCls}>Full name</label><input id="sp-1" value={fullName} onChange={(e) => setFullName(e.target.value)} className={inputCls} /></div>
+                <div><label htmlFor="sp-2" className={labelCls}>Job title</label><input id="sp-2" value={headline} onChange={(e) => setHeadline(e.target.value)} placeholder="e.g. Accountant" className={inputCls} /></div>
+                <div><label htmlFor="sp-3" className={labelCls}>Location</label><input id="sp-3" value={location} onChange={(e) => setLocation(e.target.value)} placeholder="City, Country" className={inputCls} /></div>
+                <div><label htmlFor="sp-4" className={labelCls}>Phone</label><input id="sp-4" value={phone} onChange={(e) => setPhone(e.target.value)} className={inputCls} /></div>
+                <div><label htmlFor="sp-5" className={labelCls}>Email</label><input id="sp-5" type="email" value={email} onChange={(e) => setEmail(e.target.value)} className={inputCls} /></div>
+                <div><label htmlFor="sp-6" className={labelCls}>Website / LinkedIn</label><input id="sp-6" value={website} onChange={(e) => setWebsite(e.target.value)} placeholder="https://…" className={inputCls} /></div>
+                <div><label htmlFor="sp-7" className={labelCls}>Languages</label><input id="sp-7" value={languages} onChange={(e) => setLanguages(e.target.value)} placeholder="e.g. English, Twi" className={inputCls} /></div>
               </div>
             </div>
           </div>
@@ -321,7 +321,7 @@ export default function SeekerProfile() {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div><label className={labelCls}>Field</label><PrefSelect value={prefField} onChange={(e) => setPrefField(e.target.value)} options={FIELD_OPTIONS} /></div>
               <div><label className={labelCls}>Job type</label><PrefSelect value={prefType} onChange={(e) => setPrefType(e.target.value)} options={TYPE_OPTIONS} /></div>
-              <div><label className={labelCls}>Work style</label><PrefSelect value={prefWorkMode} onChange={(e) => setPrefWorkMode(e.target.value)} options={WORK_OPTIONS} /></div>
+              <div><label htmlFor="sp-8" className={labelCls}>Work style</label><PrefSelect value={prefWorkMode} onChange={(e) => setPrefWorkMode(e.target.value)} options={WORK_OPTIONS} /></div>
             </div>
           </div>
 
@@ -425,7 +425,7 @@ export default function SeekerProfile() {
                 </button>
               ) : (
                 <div className="flex flex-col gap-3 max-w-md">
-                  <input type="password" value={currentPw} onChange={(e) => setCurrentPw(e.target.value)} autoComplete="current-password" placeholder="Current password" className={inputCls} />
+                  <input id="sp-8" type="password" value={currentPw} onChange={(e) => setCurrentPw(e.target.value)} autoComplete="current-password" placeholder="Current password" className={inputCls} />
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <input type="password" value={newPw} onChange={(e) => setNewPw(e.target.value)} autoComplete="new-password" placeholder="New password" className={inputCls} />
                     <input type="password" value={confirmPw} onChange={(e) => setConfirmPw(e.target.value)} autoComplete="new-password" placeholder="Confirm new" className={inputCls} />
