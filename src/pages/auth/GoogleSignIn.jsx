@@ -97,17 +97,25 @@ export default function GoogleSignIn() {
       })
     }
 
-    // Google renders the button in several passes (blank -> button, with small
-    // height changes). Keep it invisible until that churn goes quiet, then fade
-    // it in - so the user never sees the internal flicker.
-    let mo = null
-    let settleTimer = null
+    // The Google button is a cross-origin iframe, so we cannot watch it paint
+    // internally - DOM "settling" misses that and reveals mid-paint (the flicker).
+    // Keep a look-alike placeholder visible until the iframe has actually loaded,
+    // then show the real button. Because the placeholder matches the finished
+    // button, the swap is invisible even if the timing is not perfect.
     let capTimer = null
+    let pollTimer = null
+    let bufferTimer = null
     const reveal = () => { if (!cancelled) setReady(true) }
-    const bumpSettle = () => {
+
+    const waitForIframe = () => {
       if (cancelled) return
-      clearTimeout(settleTimer)
-      settleTimer = setTimeout(reveal, 220)
+      const iframe = buttonRef.current && buttonRef.current.querySelector('iframe')
+      if (iframe) {
+        iframe.addEventListener('load', () => { bufferTimer = setTimeout(reveal, 200) }, { once: true })
+        bufferTimer = setTimeout(reveal, 900) // in case load already fired
+      } else {
+        pollTimer = setTimeout(waitForIframe, 50)
+      }
     }
 
     loadGis()
@@ -117,19 +125,17 @@ export default function GoogleSignIn() {
         requestAnimationFrame(renderBtn)
         ro = new ResizeObserver(() => renderBtn())
         ro.observe(buttonRef.current)
-        mo = new MutationObserver(bumpSettle)
-        mo.observe(buttonRef.current, { childList: true, subtree: true, attributes: true })
-        bumpSettle()
-        capTimer = setTimeout(reveal, 1200) // always reveal eventually
+        waitForIframe()
+        capTimer = setTimeout(reveal, 2500) // always reveal eventually
       })
       .catch((err) => { setError(err.message); reveal() })
 
     return () => {
       cancelled = true
       if (ro) ro.disconnect()
-      if (mo) mo.disconnect()
-      clearTimeout(settleTimer)
       clearTimeout(capTimer)
+      clearTimeout(pollTimer)
+      clearTimeout(bufferTimer)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -146,12 +152,15 @@ export default function GoogleSignIn() {
 
       {/* Google's own rendered button - full width of the card, re-rendered on resize. */}
       <div className="relative w-full h-[44px] [color-scheme:light]">
-        {!ready && (
-          <div className="absolute inset-0 rounded-full bg-white/[0.06]" aria-hidden="true" />
-        )}
+        {/* Look-alike placeholder sits behind the real button at all times, so
+            there is never a blank gap or a mid-paint flash while Google renders. */}
+        <div className="absolute inset-0 rounded-full bg-white border border-[#dadce0] flex items-center justify-center gap-2" aria-hidden="true">
+          <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.72v2.26h2.92c1.71-1.57 2.68-3.89 2.68-6.62z"/><path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.92-2.26c-.81.54-1.84.86-3.04.86-2.34 0-4.32-1.58-5.03-3.7H.96v2.33A9 9 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.97 10.72a5.4 5.4 0 0 1 0-3.44V4.95H.96a9 9 0 0 0 0 8.1l3.01-2.33z"/><path fill="#EA4335" d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.58C13.47.9 11.43 0 9 0A9 9 0 0 0 .96 4.95l3.01 2.33C4.68 5.16 6.66 3.58 9 3.58z"/></svg>
+          <span className="text-[14px] font-medium text-[#3c4043]">Continue with Google</span>
+        </div>
         <div
           ref={buttonRef}
-          className="w-full h-[44px] flex items-center justify-center transition-opacity duration-300"
+          className="relative w-full h-[44px] flex items-center justify-center transition-opacity duration-150"
           style={{ opacity: ready ? 1 : 0 }}
         />
       </div>
