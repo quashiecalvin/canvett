@@ -15,6 +15,8 @@ class Candidate(Base):
     status = Column(String, nullable=False, server_default="New")
     location = Column(String, nullable=True)
     years_experience = Column(Float, nullable=True)
+    email = Column(String, nullable=True, index=True)
+    recruiter_notes = Column(Text, nullable=True)
 
 
 class Score(Base):

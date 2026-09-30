@@ -3,10 +3,10 @@ import { useSearchParams, Link } from 'react-router-dom'
 import FilterDropdown from '../components/ui/FilterDropdown'
 import { initialsFromName } from '../lib/initials'
 import { scoreToneClass } from '../lib/scoreColor'
-import { getRanking, getCandidateDetail, rerankJob, deleteCandidate, updateCandidateStatus } from '../lib/api'
+import { getRanking, getCandidateDetail, rerankJob, deleteCandidate, updateCandidateStatus, updateCandidateNotes } from '../lib/api'
 import { useJob } from '../context/JobContext'
 import { exportToCsv } from '../lib/csv'
-import { RefreshCw, Download, Trash2, ChevronRight, ChevronLeft, ChevronDown, Search, AlertTriangle, Sparkles, Check, FileText, Info, Bookmark, BookmarkCheck, MoreVertical, Filter } from 'lucide-react'
+import { RefreshCw, Download, Trash2, ChevronRight, ChevronLeft, ChevronDown, Search, AlertTriangle, Sparkles, Check, FileText, Info, Bookmark, BookmarkCheck, MoreVertical, Filter, User, Eye, EyeOff, ArrowUp, ArrowDown } from 'lucide-react'
 
 const STATUS_OPTIONS = ['New', 'In review', 'Shortlisted', 'Rejected']
 const PAGE_SIZE = 8
@@ -18,7 +18,8 @@ function avatarColor(name) {
   return AVATAR_COLORS[h % AVATAR_COLORS.length]
 }
 
-function Avatar({ name, photo, size = 'w-10 h-10', text = 'text-[12px]' }) {
+function Avatar({ name, photo, size = 'w-10 h-10', text = 'text-[12px]', blind = false }) {
+  if (blind) return <div className={`${size} rounded-full flex items-center justify-center bg-bg-subtle text-text-hint shrink-0`}><User size={16} /></div>
   if (photo) return <img src={photo} alt={name} className={`${size} rounded-full object-cover shrink-0`} />
   return (
     <div className={`${size} ${text} rounded-full flex items-center justify-center font-semibold text-white shrink-0`} style={{ background: avatarColor(name) }}>
@@ -93,8 +94,8 @@ function Bar({ label, value, thick = false }) {
     </div>
   )
 }
-function buildSummary(c) {
-  const first = c.name.split(' ')[0]
+function buildSummary(c, displayName) {
+  const first = displayName || c.name.split(' ')[0]
   const dims = [[c.skills_score, 'skills alignment'], [c.experience_score, 'experience'], [c.education_score, 'education']]
   const strong = dims.filter(([v]) => v >= 75).map(([, l]) => l)
   const weak = dims.filter(([v]) => v < 50).map(([, l]) => l)
@@ -203,6 +204,10 @@ export default function CandidateRanking() {
   const [detailLoading, setDetailLoading] = useState(false)
   const [tab, setTab] = useState('overview')
   const [notes, setNotes] = useState('')
+  const notesTimer = useRef(null)
+  const [blind, setBlind] = useState(() => { try { return localStorage.getItem('canvett_blind') === '1' } catch { return false } })
+  const [prevRanks, setPrevRanks] = useState({})
+  const [lastRanked, setLastRanked] = useState(null)
   const [searchParams, setSearchParams] = useSearchParams()
 
   useEffect(() => {
@@ -213,6 +218,12 @@ export default function CandidateRanking() {
     if (jobParam || candParam) setSearchParams({}, { replace: true })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  function toggleBlind() {
+    setBlind((b) => { const n = !b; try { localStorage.setItem('canvett_blind', n ? '1' : '0') } catch { /* ignore */ } return n })
+  }
+
+  useEffect(() => { setPrevRanks({}); setLastRanked(null) }, [selectedJobId])
 
   const loadRanking = useCallback(() => {
     if (!selectedJobId) { setCandidates([]); setLoading(false); return }
@@ -236,17 +247,20 @@ export default function CandidateRanking() {
     if (!selectedId) { setDetail(null); return }
     setDetailLoading(true)
     setTab('overview')
-    try { setNotes(localStorage.getItem(`canvett_notes_${selectedId}`) || '') } catch { setNotes('') }
     getCandidateDetail(selectedId)
-      .then((d) => { setDetail(d); setDetailLoading(false) })
-      .catch(() => { setDetail(null); setDetailLoading(false) })
+      .then((d) => { setDetail(d); setNotes(d.recruiter_notes || ''); setDetailLoading(false) })
+      .catch(() => { setDetail(null); setNotes(''); setDetailLoading(false) })
   }, [selectedId])
 
   useEffect(() => { setPage(1) }, [search, statusFilter, expFilter, locFilter, sortOrder])
 
   function saveNotes(v) {
     setNotes(v)
-    try { localStorage.setItem(`canvett_notes_${selectedId}`, v) } catch { /* ignore */ }
+    const id = selectedId
+    if (notesTimer.current) clearTimeout(notesTimer.current)
+    notesTimer.current = setTimeout(() => {
+      updateCandidateNotes(id, v).catch(() => { /* transient; kept in the field */ })
+    }, 600)
   }
   async function setStatus(id, status) {
     setCandidates((prev) => prev.map((c) => c.candidate_id === id ? { ...c, status } : c))
@@ -255,8 +269,10 @@ export default function CandidateRanking() {
   }
   async function handleRerank() {
     if (!selectedJobId) return
+    const snapshot = {}
+    candidates.forEach((c, i) => { snapshot[c.candidate_id] = i + 1 })
     setLoading(true); setError(null)
-    try { await rerankJob(selectedJobId); loadRanking() }
+    try { await rerankJob(selectedJobId); setPrevRanks(snapshot); setLastRanked(Date.now()); loadRanking() }
     catch (err) { setError(`Could not re-rank the candidates: ${err.message}`); setLoading(false) }
   }
   async function handleDeleteCandidate(candidateId) {
@@ -308,6 +324,7 @@ export default function CandidateRanking() {
   const rangeEnd = Math.min(pageC * PAGE_SIZE, filtered.length)
 
   const selected = candidates.find((c) => c.candidate_id === selectedId) || null
+  const selectedRank = selected ? candidates.indexOf(selected) + 1 : 0
   const hasList = candidates.length > 0
 
   const TABS = [
@@ -350,9 +367,15 @@ export default function CandidateRanking() {
               <h1 className="font-outfit text-[22px] font-semibold text-text-primary leading-[1.2]">Candidate ranking</h1>
               <p className="text-[13px] text-text-muted mt-1">
                 {candidates.length} candidate{candidates.length === 1 ? '' : 's'} scored and ranked by relevance{selectedJob ? ` to ${selectedJob.title}` : ''}.
+                {lastRanked && <span className="text-text-hint"> · Re-ranked just now — arrows show how each candidate moved.</span>}
               </p>
             </div>
             <div className="flex items-center gap-3 shrink-0">
+              <button onClick={toggleBlind} aria-pressed={blind}
+                title={blind ? 'Blind review on — names and photos hidden' : 'Turn on blind review to hide names and photos'}
+                className={`flex items-center justify-center gap-2 h-10 px-4 rounded-btn border text-[13px] transition-colors ${blind ? 'border-accent bg-accent-tint text-accent' : 'border-border-strong text-text-body hover:bg-bg-subtle'}`}>
+                {blind ? <EyeOff size={14} /> : <Eye size={14} />} Blind review
+              </button>
               <button onClick={handleRerank}
                 className="flex items-center justify-center gap-2 h-10 px-4 rounded-btn border border-border-strong text-[13px] text-text-body hover:bg-bg-subtle transition-colors">
                 <RefreshCw size={14} /> Re-rank
@@ -406,17 +429,25 @@ export default function CandidateRanking() {
 
                 {paged.map((c) => {
                   const rank = candidates.indexOf(c) + 1
+                  const delta = prevRanks[c.candidate_id] ? prevRanks[c.candidate_id] - rank : 0
                   const isSel = c.candidate_id === selectedId
                   const score = Math.round(c.overall_score)
                   const shortlisted = c.status === 'Shortlisted'
                   return (
                     <div key={c.candidate_id} role="button" tabIndex={0} onClick={() => setSelectedId(c.candidate_id)}
                       className={`flex items-center gap-3 px-3 py-3 mb-1 last:mb-0 rounded-lg cursor-pointer transition-colors ${isSel ? 'bg-accent-tint ring-1 ring-inset ring-accent/50' : 'hover:bg-bg-subtle'}`}>
-                      <span className={`w-6 text-center font-mono text-[13px] shrink-0 ${rank === 1 ? 'text-accent font-semibold' : 'text-text-hint'}`}>{rank}</span>
-                      <Avatar name={c.name} photo={c.photo} size="w-10 h-10" text="text-[12px]" />
+                      <span className={`w-6 text-center font-mono text-[13px] shrink-0 ${rank === 1 ? 'text-accent font-semibold' : 'text-text-hint'}`}>
+                        {rank}
+                        {delta !== 0 && (
+                          <span className={`flex items-center justify-center text-[9px] font-semibold ${delta > 0 ? 'text-success' : 'text-danger'}`} title={`Moved ${Math.abs(delta)} ${delta > 0 ? 'up' : 'down'} after re-rank`}>
+                            {delta > 0 ? <ArrowUp size={9} /> : <ArrowDown size={9} />}{Math.abs(delta)}
+                          </span>
+                        )}
+                      </span>
+                      <Avatar name={c.name} photo={c.photo} size="w-10 h-10" text="text-[12px]" blind={blind} />
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
-                          <h3 className="text-[14px] font-medium text-text-primary leading-[1.3] truncate">{c.name}</h3>
+                          <h3 className="text-[14px] font-medium text-text-primary leading-[1.3] truncate">{blind ? `Candidate ${rank}` : c.name}</h3>
                           {rank === 1 && <span className="text-[10px] font-medium text-accent bg-bg-surface border border-accent/30 px-1.5 py-0.5 rounded-pill shrink-0">Top match</span>}
                           {c.source === 'portal'
                             ? <span className="text-[10px] font-medium text-success-text bg-success-tint px-1.5 py-0.5 rounded-pill shrink-0">Applied directly</span>
@@ -482,9 +513,9 @@ export default function CandidateRanking() {
               <div className="bg-bg-surface border border-border rounded-card overflow-hidden">
                 <div className="p-5">
                   <div className="flex items-start gap-3">
-                    <Avatar name={selected.name} photo={selected.photo} size="w-12 h-12" text="text-[14px]" />
+                    <Avatar name={selected.name} photo={selected.photo} size="w-12 h-12" text="text-[14px]" blind={blind} />
                     <div className="flex-1 min-w-0">
-                      <h2 className="text-[16px] font-semibold text-text-primary leading-[1.3] truncate">{selected.name}</h2>
+                      <h2 className="text-[16px] font-semibold text-text-primary leading-[1.3] truncate">{blind ? `Candidate ${selectedRank}` : selected.name}</h2>
                       <p className="text-[12px] text-text-muted mt-0.5 truncate">{selectedJob ? selectedJob.title : 'Candidate'}</p>
                       {metaLine(selected) && <p className="text-[11.5px] text-text-hint mt-0.5 truncate">{metaLine(selected)}</p>}
                     </div>
@@ -524,7 +555,7 @@ export default function CandidateRanking() {
                           <Sparkles size={14} className="text-accent" fill="currentColor" strokeWidth={1.5} />
                           <h4 className="text-[12px] font-semibold uppercase tracking-wider text-text-hint">AI summary</h4>
                         </div>
-                        <p className="text-[12.5px] text-text-body leading-relaxed">{buildSummary(selected)}</p>
+                        <p className="text-[12.5px] text-text-body leading-relaxed">{buildSummary(selected, blind ? `Candidate ${selectedRank}` : undefined)}</p>
                         {(() => {
                           const sc = Math.round(selected.overall_score)
                           const good = sc >= 75, ok = sc >= 50

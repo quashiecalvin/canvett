@@ -24,7 +24,7 @@ from services.notify import create_notification
 from schemas.score import ScoreOut, RankedCandidate
 
 from pydantic import BaseModel
-from services.profile import extract_location, extract_years
+from services.profile import extract_location, extract_years, extract_email
 
 router = APIRouter(prefix="/candidates", tags=["Candidates"])
 
@@ -84,11 +84,29 @@ def upload_resume(
             detail="We couldn't read any text from that file. Please check it and try again.",
         )
 
+    # Duplicate detection: same email already uploaded for this job.
+    email = extract_email(resume_text)
+    if email:
+        existing = (
+            db.query(models_candidate.Candidate)
+            .filter(
+                models_candidate.Candidate.job_id == job_id,
+                models_candidate.Candidate.email == email,
+            )
+            .first()
+        )
+        if existing:
+            raise HTTPException(
+                status_code=409,
+                detail=f"A candidate with the email {email} was already uploaded for this job ({existing.name}). Delete the existing entry to replace it.",
+            )
+
     candidate = models_candidate.Candidate(
         name=extract_name(resume_text),
         filename=filename,
         resume_text=resume_text,
         job_id=job_id,
+        email=email,
         location=extract_location(resume_text),
         years_experience=extract_years(resume_text),
     )
@@ -265,12 +283,18 @@ def get_candidate_detail(
         "status": candidate.status,
         "location": candidate.location,
         "years_experience": candidate.years_experience,
+        "email": candidate.email,
+        "recruiter_notes": candidate.recruiter_notes,
         "photo": seeker.photo if seeker else None,
     }
 
 
 class StatusUpdate(BaseModel):
     status: str
+
+
+class NotesUpdate(BaseModel):
+    notes: str = ""
 
 
 ALLOWED_STATUSES = {"New", "In review", "Shortlisted", "Rejected"}
@@ -318,3 +342,16 @@ def update_candidate_status(
             )
     db.commit()
     return {"candidate_id": candidate.id, "status": candidate.status}
+
+
+@router.patch("/{candidate_id}/notes")
+def update_candidate_notes(
+    candidate_id: int,
+    payload: NotesUpdate,
+    db: Session = Depends(get_db),
+    user: models_user.User = Depends(require_recruiter),
+):
+    candidate = _own_candidate_or_404(db, candidate_id, user)
+    candidate.recruiter_notes = (payload.notes or "").strip() or None
+    db.commit()
+    return {"candidate_id": candidate.id}

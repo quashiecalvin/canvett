@@ -99,6 +99,8 @@ export default function UploadResumes() {
   }
 
   const parsedCount = files.filter((f) => f.status === 'parsed').length
+  const failedCount = files.filter((f) => f.status === 'error').length
+  const uploadingCount = files.filter((f) => f.status === 'uploading').length
 
   return (
     <div className="p-6">
@@ -160,7 +162,12 @@ export default function UploadResumes() {
         <>
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-[15px] font-medium text-text-primary leading-[1.4]">Uploaded files</h2>
-            <span className="text-[12px] text-text-muted">{parsedCount} of {files.length} parsed</span>
+            <div className="flex items-center gap-3 text-[12px]">
+              <span className="text-success-text font-medium">{parsedCount} succeeded</span>
+              {failedCount > 0 && <span className="text-danger-text font-medium">{failedCount} failed</span>}
+              {uploadingCount > 0 && <span className="text-text-muted">{uploadingCount} uploading…</span>}
+              <span className="text-text-hint">· {files.length} total</span>
+            </div>
           </div>
 
           <div className="flex flex-col gap-3">

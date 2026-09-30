@@ -285,6 +285,12 @@ export function searchAll(q) {
   return request(`/stats/search?q=${encodeURIComponent(q)}`, "Search failed")
 }
 
+export function updateCandidateNotes(candidateId, notes) {
+  return request(`/candidates/${candidateId}/notes`, "Failed to save notes", {
+    method: "PATCH", json: { notes }, parse: false,
+  })
+}
+
 export function updateCandidateStatus(candidateId, status) {
   return request(`/candidates/${candidateId}/status`, "Failed to update candidate status", { method: "PATCH", json: { status } })
 }

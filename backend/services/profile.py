@@ -39,3 +39,11 @@ def extract_location(resume_text):
             if city and country and 2 <= len(country) <= 25 and len(city) <= 30 and any(ch.isalpha() for ch in city):
                 return f"{city}, {country}"
     return None
+
+
+def extract_email(resume_text):
+    """Pull the first email address out of resume text, lower-cased, or None."""
+    if not resume_text:
+        return None
+    m = re.search(r"[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}", resume_text)
+    return m.group(0).lower() if m else None
