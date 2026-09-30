@@ -73,10 +73,11 @@ export default function ResetPassword() {
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <div>
-              <label className="block text-[12.5px] font-medium text-white/70 mb-2">New password</label>
+              <label htmlFor="rp-new" className="block text-[13px] font-medium text-white/75 mb-2">New password</label>
               <div className="relative">
                 <Lock size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/30" />
                 <input
+                  id="rp-new"
                   type="password"
                   value={pw}
                   onChange={(e) => setPw(e.target.value)}
@@ -89,10 +90,11 @@ export default function ResetPassword() {
             </div>
 
             <div>
-              <label className="block text-[12.5px] font-medium text-white/70 mb-2">Confirm new password</label>
+              <label htmlFor="rp-confirm" className="block text-[13px] font-medium text-white/75 mb-2">Confirm new password</label>
               <div className="relative">
                 <Lock size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/30" />
                 <input
+                  id="rp-confirm"
                   type="password"
                   value={confirm}
                   onChange={(e) => setConfirm(e.target.value)}

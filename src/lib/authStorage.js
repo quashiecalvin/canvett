@@ -26,7 +26,7 @@ export function clearAppData() {
     const keys = []
     for (let i = 0; i < localStorage.length; i++) {
       const k = localStorage.key(i)
-      if (k && k.startsWith('canvett_notes_')) keys.push(k)
+      if (k && (k.startsWith('canvett_notes_') || k.startsWith('canvett_apply_draft_'))) keys.push(k)
     }
     keys.forEach((k) => localStorage.removeItem(k))
   } catch {

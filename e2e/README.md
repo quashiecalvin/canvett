@@ -41,3 +41,24 @@ npm run screenshots    # writes PNGs to ./shots/<theme>/
 
 - `PW_CHROMIUM` (optional) points Playwright at a pre-installed Chromium binary
   for CI; leave it unset locally so Playwright uses its own managed browser.
+
+## Accessibility & the full test matrix (added)
+
+- `seeker-journey.spec.js` — seeker logs in, finds a job, applies via the form; empty states.
+- `recruiter-journey.spec.js` — recruiter **registers through the UI** (role selector + Terms/Privacy consent), reaches the dashboard, signs out.
+- `status-flow.spec.js` — recruiter posts → seeker applies → recruiter shortlists → the seeker sees the **Shortlisted** status and a notification.
+- `a11y.spec.js` — automated **axe-core** WCAG 2 A/AA scan of the public pages (fails on serious/critical issues).
+
+Install the axe dependency once, then run:
+
+```bash
+npm install                 # picks up @axe-core/playwright
+npx playwright install      # browser binaries, first run only
+npm run e2e                 # backend on :8000 must be running
+```
+
+Backend tests (pytest) live in `backend/tests/` — run them with a throwaway Postgres for the integration tests:
+
+```bash
+DATABASE_URL=postgresql://postgres@127.0.0.1:5433/canvett_test SECRET_KEY=test pytest
+```

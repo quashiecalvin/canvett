@@ -67,7 +67,7 @@ test('a seeker can log in, find a job, and apply through the guided form', async
 
   // 5. Fill and submit
   await page.getByPlaceholder(/short paragraph/i).fill('QA engineer experienced with Python and Playwright automated testing.')
-  await page.getByPlaceholder(/Python, FastAPI/i).fill('Python, Playwright, Testing')
+  await page.getByPlaceholder(/Communication, Microsoft Excel/i).fill('Python, Playwright, Testing')
   await page.getByRole('button', { name: /submit application/i }).click()
 
   // 6. Confirmation receipt

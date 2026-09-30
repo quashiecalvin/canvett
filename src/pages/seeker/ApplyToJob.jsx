@@ -87,6 +87,53 @@ export default function ApplyToJob() {
   const [skillsText, setSkillsText] = useState('')
   const [experience, setExperience] = useState([{ ...emptyExperience }])
   const [education, setEducation] = useState([{ ...emptyEducation }])
+  const draftKey = `canvett_apply_draft_${id}`
+  const restored = useRef(false)
+
+  // Restore a saved draft for this job's form (once).
+  useEffect(() => {
+    if (restored.current) return
+    restored.current = true
+    try {
+      const raw = localStorage.getItem(draftKey)
+      if (raw) {
+        const d = JSON.parse(raw)
+        if (d.phone) setPhone(d.phone)
+        if (d.summary) setSummary(d.summary)
+        if (d.skillsText) setSkillsText(d.skillsText)
+        if (Array.isArray(d.experience) && d.experience.length) setExperience(d.experience)
+        if (Array.isArray(d.education) && d.education.length) setEducation(d.education)
+      }
+    } catch { /* ignore unreadable storage */ }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id])
+
+  const formDirty = Boolean(summary || skillsText || phone
+    || experience.some((e) => e.job_title || e.company || e.description)
+    || education.some((e) => e.qualification || e.institution))
+
+  // Autosave the form draft while editing.
+  useEffect(() => {
+    if (path !== 'form' || receipt) return
+    if (!formDirty) return
+    try { localStorage.setItem(draftKey, JSON.stringify({ phone, summary, skillsText, experience, education })) } catch { /* ignore */ }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phone, summary, skillsText, experience, education, path, receipt])
+
+  // Clear the draft once the application is submitted.
+  useEffect(() => {
+    if (receipt) { try { localStorage.removeItem(draftKey) } catch { /* ignore */ } }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [receipt])
+
+  // Warn before leaving (refresh/close) with unsaved form content.
+  useEffect(() => {
+    function onBeforeUnload(e) {
+      if (path === 'form' && formDirty && !receipt) { e.preventDefault(); e.returnValue = '' }
+    }
+    window.addEventListener('beforeunload', onBeforeUnload)
+    return () => window.removeEventListener('beforeunload', onBeforeUnload)
+  }, [path, formDirty, receipt])
 
   useEffect(() => {
     getPublicJob(id).then(setJob).catch((err) => setLoadError(err.message))

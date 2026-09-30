@@ -134,6 +134,8 @@ def _startup_migrate_and_backfill():
         "ALTER TABLE applications ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT now()",
         "ALTER TABLE candidates ADD COLUMN IF NOT EXISTS email VARCHAR",
         "ALTER TABLE candidates ADD COLUMN IF NOT EXISTS recruiter_notes TEXT",
+        "ALTER TABLE candidates ADD COLUMN IF NOT EXISTS cv_filename VARCHAR",
+        "ALTER TABLE candidates ADD COLUMN IF NOT EXISTS cv_path VARCHAR",
         # Google accounts have no password of their own.
         "ALTER TABLE users ALTER COLUMN password_hash DROP NOT NULL",
         "CREATE TABLE IF NOT EXISTS saved_jobs (id SERIAL PRIMARY KEY, user_id INTEGER NOT NULL REFERENCES users(id), job_id INTEGER NOT NULL REFERENCES jobs(id), created_at TIMESTAMPTZ DEFAULT now(), CONSTRAINT uq_saved_user_job UNIQUE (user_id, job_id))",

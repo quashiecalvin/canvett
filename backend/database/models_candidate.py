@@ -17,6 +17,8 @@ class Candidate(Base):
     years_experience = Column(Float, nullable=True)
     email = Column(String, nullable=True, index=True)
     recruiter_notes = Column(Text, nullable=True)
+    cv_filename = Column(String, nullable=True)
+    cv_path = Column(String, nullable=True)
 
 
 class Score(Base):

@@ -249,6 +249,21 @@ export function getApplicationStatus(jobId) {
   return request(`/applications/status/${jobId}`, "Failed to check application status")
 }
 
+export function getLastCv() {
+  return request("/applications/last-cv", "Failed to check your last CV")
+}
+
+export function reuseCv(jobId) {
+  return request(`/applications/reuse/${jobId}`, "Failed to reuse your CV", { method: "POST" })
+}
+
+export async function getCvBlobUrl(applicationId) {
+  const res = await fetch(`${BASE_URL}/applications/${applicationId}/cv`, { headers: authHeaders() })
+  if (!res.ok) throw apiError("Could not open the CV file.", res.status)
+  const blob = await res.blob()
+  return URL.createObjectURL(blob)
+}
+
 // ---------- Notifications ----------
 
 export function getNotifications() {

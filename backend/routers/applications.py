@@ -1,4 +1,7 @@
+import os
+import uuid
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
@@ -18,10 +21,12 @@ from services.notify import create_notification
 
 router = APIRouter(prefix="/applications", tags=["Applications"])
 
+UPLOAD_DIR = "uploads"
+
 
 # ---------- shared: score resume text and record the application ----------
 
-def _create_application(db, job, user, resume_text, method, phone=None):
+def _create_application(db, job, user, resume_text, method, phone=None, cv_filename=None, cv_path=None):
     already = (
         db.query(models_application.Application)
         .filter(
@@ -40,6 +45,9 @@ def _create_application(db, job, user, resume_text, method, phone=None):
         filename=f"{method}:{user.email}",
         resume_text=resume_text,
         job_id=job.id,
+        email=user.email,
+        cv_filename=cv_filename,
+        cv_path=cv_path,
         location=extract_location(resume_text),
         years_experience=extract_years(resume_text),
     )
@@ -108,7 +116,17 @@ async def apply_by_upload(
             detail="We couldn't read any text from that file. Please check it and try again, or use the application form instead.",
         )
 
-    return _create_application(db, job, user, resume_text, "upload")
+    # Store the file so the seeker can reuse it for later applications and view it.
+    stored_path = None
+    try:
+        os.makedirs(UPLOAD_DIR, exist_ok=True)
+        stored_path = os.path.join(UPLOAD_DIR, f"{uuid.uuid4().hex}{os.path.splitext(filename)[1].lower()}")
+        with open(stored_path, "wb") as buffer:
+            buffer.write(contents)
+    except OSError:
+        stored_path = None  # non-fatal: application still proceeds on the parsed text
+
+    return _create_application(db, job, user, resume_text, "upload", cv_filename=filename, cv_path=stored_path)
 
 
 # ---------- path 2: structured form ----------
@@ -239,3 +257,82 @@ def application_status_for_job(
         "applied_on": app.created_at,
         "updated_at": app.updated_at,
     }
+
+
+# ---------- reuse a previously uploaded CV ----------
+
+def _latest_reusable(db, user):
+    """The seeker's most recent upload application whose candidate still has a
+    resume on record — the CV we offer to reuse."""
+    apps = (
+        db.query(models_application.Application)
+        .filter(
+            models_application.Application.user_id == user.id,
+            models_application.Application.method == "upload",
+        )
+        .order_by(models_application.Application.created_at.desc())
+        .all()
+    )
+    for app in apps:
+        cand = db.query(models_candidate.Candidate).filter(models_candidate.Candidate.id == app.candidate_id).first()
+        if cand and cand.resume_text and cand.resume_text.strip():
+            job = db.query(models_job.Job).filter(models_job.Job.id == app.job_id).first()
+            return app, cand, job
+    return None, None, None
+
+
+@router.get("/last-cv")
+def last_cv(
+    db: Session = Depends(get_db),
+    user: models_user.User = Depends(require_seeker),
+):
+    app, cand, job = _latest_reusable(db, user)
+    if not cand:
+        return {"found": False}
+    can_view = bool(cand.cv_path and os.path.exists(cand.cv_path))
+    return {
+        "found": True,
+        "application_id": app.id,
+        "filename": cand.cv_filename or "Your CV",
+        "applied_on": app.created_at,
+        "job_title": job.title if job else None,
+        "can_view": can_view,
+    }
+
+
+@router.post("/reuse/{job_id}")
+def reuse_cv(
+    job_id: int,
+    db: Session = Depends(get_db),
+    user: models_user.User = Depends(require_seeker),
+):
+    job = get_active_job_or_404(db, job_id)
+    _app, cand, _job = _latest_reusable(db, user)
+    if not cand:
+        raise HTTPException(status_code=404, detail="You have no previously uploaded CV to reuse.")
+    return _create_application(
+        db, job, user, cand.resume_text, "upload",
+        cv_filename=cand.cv_filename, cv_path=cand.cv_path,
+    )
+
+
+@router.get("/{application_id}/cv")
+def download_cv(
+    application_id: int,
+    db: Session = Depends(get_db),
+    user: models_user.User = Depends(require_seeker),
+):
+    app = (
+        db.query(models_application.Application)
+        .filter(
+            models_application.Application.id == application_id,
+            models_application.Application.user_id == user.id,
+        )
+        .first()
+    )
+    if not app:
+        raise HTTPException(status_code=404, detail="Application not found.")
+    cand = db.query(models_candidate.Candidate).filter(models_candidate.Candidate.id == app.candidate_id).first()
+    if not cand or not cand.cv_path or not os.path.exists(cand.cv_path):
+        raise HTTPException(status_code=404, detail="No stored file for this application.")
+    return FileResponse(cand.cv_path, filename=cand.cv_filename or "cv")
