@@ -33,6 +33,7 @@ export default function GoogleSignIn() {
   const [pending, setPending] = useState(null) // { credential, email, full_name }
   const [role, setRole] = useState('seeker')
   const [company, setCompany] = useState('')
+  const [ready, setReady] = useState(false)
 
   function finish(data) {
     login(data.access_token, data.user)
@@ -96,6 +97,19 @@ export default function GoogleSignIn() {
       })
     }
 
+    // Google renders the button in several passes (blank -> button, with small
+    // height changes). Keep it invisible until that churn goes quiet, then fade
+    // it in - so the user never sees the internal flicker.
+    let mo = null
+    let settleTimer = null
+    let capTimer = null
+    const reveal = () => { if (!cancelled) setReady(true) }
+    const bumpSettle = () => {
+      if (cancelled) return
+      clearTimeout(settleTimer)
+      settleTimer = setTimeout(reveal, 220)
+    }
+
     loadGis()
       .then(() => {
         if (cancelled || !buttonRef.current) return
@@ -103,12 +117,19 @@ export default function GoogleSignIn() {
         requestAnimationFrame(renderBtn)
         ro = new ResizeObserver(() => renderBtn())
         ro.observe(buttonRef.current)
+        mo = new MutationObserver(bumpSettle)
+        mo.observe(buttonRef.current, { childList: true, subtree: true, attributes: true })
+        bumpSettle()
+        capTimer = setTimeout(reveal, 1200) // always reveal eventually
       })
-      .catch((err) => setError(err.message))
+      .catch((err) => { setError(err.message); reveal() })
 
     return () => {
       cancelled = true
       if (ro) ro.disconnect()
+      if (mo) mo.disconnect()
+      clearTimeout(settleTimer)
+      clearTimeout(capTimer)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -124,8 +145,15 @@ export default function GoogleSignIn() {
       </div>
 
       {/* Google's own rendered button - full width of the card, re-rendered on resize. */}
-      <div className="w-full [color-scheme:light]">
-        <div ref={buttonRef} className="w-full h-[44px] flex items-center justify-center" />
+      <div className="relative w-full h-[44px] [color-scheme:light]">
+        {!ready && (
+          <div className="absolute inset-0 rounded-full bg-white/[0.06]" aria-hidden="true" />
+        )}
+        <div
+          ref={buttonRef}
+          className="w-full h-[44px] flex items-center justify-center transition-opacity duration-300"
+          style={{ opacity: ready ? 1 : 0 }}
+        />
       </div>
 
       {error && !pending && (
