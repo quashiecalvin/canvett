@@ -141,7 +141,7 @@
 /* Page background is solid and the rubber-band bounce is disabled so no
    white gap shows under the full-width footer when you over-scroll. */
 html, body { background-color: var(--color-bg-page); }
-html { overscroll-behavior-y: none; }
+html { overscroll-behavior-y: none; scrollbar-gutter: stable; }
 
 /* On the dark auth screens, stop Chrome/Edge from repainting autofilled inputs
    with a light background (Safari does not do this). The long transition delay
