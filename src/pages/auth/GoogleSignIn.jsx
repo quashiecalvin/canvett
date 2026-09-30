@@ -73,15 +73,18 @@ export default function GoogleSignIn() {
     if (!CLIENT_ID) return
     let cancelled = false
     let ro = null
+    // Only re-render when the container WIDTH actually changes. Rendering the
+    // button changes the element's height, which would otherwise re-trigger the
+    // ResizeObserver and cause an endless render loop (the flicker).
+    let lastWidth = -1
 
-    // Render (and re-render) Google's button at the live container width. Google
-    // needs a width between 200-400px; measuring before layout can give 0, which
-    // is what left the button blank on narrow screens. rAF + ResizeObserver fix it.
     const renderBtn = () => {
       const el = buttonRef.current
       if (cancelled || !el || !window.google?.accounts?.id) return
       const measured = Math.round(el.offsetWidth || 0)
       const width = Math.max(240, Math.min(400, measured || 320))
+      if (width === lastWidth) return
+      lastWidth = width
       el.innerHTML = ''
       window.google.accounts.id.renderButton(el, {
         theme: 'outline',
@@ -98,7 +101,7 @@ export default function GoogleSignIn() {
         if (cancelled || !buttonRef.current) return
         window.google.accounts.id.initialize({ client_id: CLIENT_ID, callback: handleCredential })
         requestAnimationFrame(renderBtn)
-        ro = new ResizeObserver(() => requestAnimationFrame(renderBtn))
+        ro = new ResizeObserver(() => renderBtn())
         ro.observe(buttonRef.current)
       })
       .catch((err) => setError(err.message))
