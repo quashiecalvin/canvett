@@ -88,7 +88,7 @@ export default function Footer() {
               <span className="text-white">Can</span>
               <span className="text-accent-light">vett</span>
             </span>
-            <p className="mt-3 text-[13px] leading-[1.6] text-foot-hint">
+            <p className="mt-3 text-[13px] leading-[1.6] text-foot-text">
               Intelligent matching. Better hiring.
             </p>
           </div>

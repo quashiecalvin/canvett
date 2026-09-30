@@ -26,6 +26,13 @@ def validate_resume_upload(filename: str | None, contents: bytes) -> str:
     if len(contents) > MAX_RESUME_SIZE:
         raise ValueError("Resume files must be 5 MB or smaller.")
 
+    # Verify the bytes actually match the claimed type, not just the extension.
+    # A real PDF starts with "%PDF"; a DOCX is a ZIP container starting "PK\x03\x04".
+    if extension == ".pdf" and not contents.startswith(b"%PDF"):
+        raise ValueError("This file is not a valid PDF.")
+    if extension == ".docx" and not contents.startswith(b"PK\x03\x04"):
+        raise ValueError("This file is not a valid DOCX document.")
+
     return sanitized_filename
 
 

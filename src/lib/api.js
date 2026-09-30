@@ -15,7 +15,9 @@ function handleUnauthorized() {
   if (typeof window === "undefined") return
   if (window.location.pathname === "/login") return
   redirectingToLogin = true
-  window.location.replace("/login")
+  const here = window.location.pathname + window.location.search
+  const params = new URLSearchParams({ expired: "1", next: here })
+  window.location.replace(`/login?${params.toString()}`)
 }
 
 function authHeaders() {
@@ -241,6 +243,24 @@ export function applyWithForm(jobId, details) {
 
 export function getMyApplications() {
   return request("/applications/mine", "Failed to fetch your applications")
+}
+
+export function getApplicationStatus(jobId) {
+  return request(`/applications/status/${jobId}`, "Failed to check application status")
+}
+
+// ---------- Notifications ----------
+
+export function getNotifications() {
+  return request("/notifications", "Failed to fetch notifications")
+}
+
+export function markNotificationRead(id) {
+  return request(`/notifications/${id}/read`, "Failed to update notification", { method: "POST", parse: false })
+}
+
+export function markAllNotificationsRead() {
+  return request("/notifications/read-all", "Failed to update notifications", { method: "POST", parse: false })
 }
 
 // ---------- Profile ----------

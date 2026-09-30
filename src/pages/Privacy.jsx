@@ -40,6 +40,7 @@ const NAV = [
   'How we share it',
   'Data security',
   'Your rights',
+  'Ghana Data Protection Act',
   'Changes to this policy',
 ]
 
@@ -130,7 +131,22 @@ export default function Privacy() {
             <Bullets items={['View and edit your profile at any time', 'Delete your account, which removes your account and the application it created', 'Contact us with any question about your data']} />
           </Section>
 
-          <Section n={6} title="Changes to this policy" icon={<><rect x="5" y="3" width="14" height="18" rx="2" /><path d="M9 8h6M9 12h6M9 16h4" /></>}>
+          <Section n={6} title="Ghana Data Protection Act, 2012" icon={<><path d="M3 6l9-3 9 3" /><path d="M4 10h16v9H4z" /><path d="M9 14h6" /></>}>
+            <p className="text-[14px] leading-[1.7] text-text-body">
+              Canvett is designed to operate in line with Ghana's Data Protection Act, 2012 (Act 843).
+              Under the Act you are a data subject, and you have the right to know what personal data we
+              hold about you, to have inaccurate data corrected, and to have your data deleted.
+            </p>
+            <p className="mt-2 text-[14px] leading-[1.7] text-text-body">
+              We process personal data on the basis of your consent and to provide the service you
+              request. Where a recruiter uploads a candidate's CV on that candidate's behalf, the
+              recruiter is responsible for having obtained that candidate's consent to do so, in keeping
+              with the Act. For any request relating to your rights under the Act, contact us at{' '}
+              <a href={`mailto:${CONTACT}`} className="font-semibold text-accent hover:underline">{CONTACT}</a>.
+            </p>
+          </Section>
+
+          <Section n={7} title="Changes to this policy" icon={<><rect x="5" y="3" width="14" height="18" rx="2" /><path d="M9 8h6M9 12h6M9 16h4" /></>}>
             <p className="text-[14px] leading-[1.7] text-text-body">
               We may update this policy from time to time. When we do, we'll post the updated version here with a new date. Questions? Email{' '}
               <a href={`mailto:${CONTACT}`} className="font-semibold text-accent hover:underline">{CONTACT}</a>.

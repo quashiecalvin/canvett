@@ -4,6 +4,7 @@ import { Home, Bookmark, FileText, LogOut, Menu, X, Sun, Moon, Search } from 'lu
 import { useAuth } from '../../context/AuthContext'
 import OnboardingModal from '../seeker/OnboardingModal'
 import Footer from './Footer'
+import NotificationBell from '../ui/NotificationBell'
 import { setThemeColor, THEME_COLORS } from '../../lib/themeColor'
 
 const navItems = [
@@ -157,6 +158,7 @@ export default function SeekerLayout({ children }) {
           </form>
 
           <div className="ml-auto flex items-center gap-2 md:gap-3">
+            <NotificationBell />
             <button onClick={toggleTheme} aria-label="Toggle theme"
               className="w-10 h-10 rounded-btn border border-border bg-bg-surface flex items-center justify-center text-text-muted hover:bg-bg-subtle transition-colors">
               {dark ? <Sun size={17} /> : <Moon size={17} />}

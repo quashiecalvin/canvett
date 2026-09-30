@@ -15,5 +15,6 @@ class Application(Base):
     method = Column(String, nullable=False)   # "upload" or "form"
     contact_email = Column(String, nullable=True)
     contact_phone = Column(String, nullable=True)
-    status = Column(String, nullable=False, default="Under review")
+    status = Column(String, nullable=False, default="Submitted")
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())

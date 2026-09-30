@@ -151,3 +151,36 @@ html { overscroll-behavior-y: none; }
   caret-color: #ffffff;
   transition: background-color 9999s ease-in-out 0s;
 }
+
+
+/* ─────────────────────────────────────────────────────────────
+   Accessibility
+   ───────────────────────────────────────────────────────────── */
+
+/* Always show a clear focus indicator for keyboard users, even on components
+   that cleared the default outline for mouse focus. */
+:focus-visible {
+  outline: 2px solid var(--color-accent-2);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+.auth-scope :focus-visible {
+  outline-color: var(--color-accent-light);
+}
+
+/* Comfortable touch targets on touch devices (WCAG 2.5.5). */
+@media (pointer: coarse) {
+  button,
+  [role="button"],
+  [role="radio"],
+  [role="switch"],
+  select {
+    min-height: 44px;
+  }
+}
+
+/* Placeholder contrast on the dark auth screens (>= 60% white). */
+.auth-scope input::placeholder,
+.auth-scope textarea::placeholder {
+  color: rgba(255, 255, 255, 0.6) !important;
+}

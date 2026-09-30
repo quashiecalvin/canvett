@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react'
-import { TOKEN_KEY, USER_KEY } from '../lib/authStorage'
+import { TOKEN_KEY, USER_KEY, clearAppData } from '../lib/authStorage'
 
 const AuthContext = createContext(null)
 
@@ -19,12 +19,12 @@ export function AuthProvider({ children }) {
     } catch (err) {
       // Unreadable storage would keep failing on every load, so clear it and
       // treat the visitor as logged out.
-      console.error('Could not restore the stored session:', err)
+      if (import.meta.env.DEV) console.error('Could not restore the stored session:', err)
       try {
         localStorage.removeItem(TOKEN_KEY)
         localStorage.removeItem(USER_KEY)
       } catch (clearErr) {
-        console.error('Could not clear the stored session:', clearErr)
+        if (import.meta.env.DEV) console.error('Could not clear the stored session:', clearErr)
       }
     }
     setLoading(false)
@@ -43,8 +43,7 @@ export function AuthProvider({ children }) {
   }, [])
 
   const logout = useCallback(() => {
-    localStorage.removeItem(TOKEN_KEY)
-    localStorage.removeItem(USER_KEY)
+    clearAppData()
     setToken(null)
     setUser(null)
   }, [])

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import PublicPage from './PublicPage'
 
 function IconCircle({ tint = 'bg-accent-tint', color = 'text-accent', children }) {
@@ -113,6 +114,14 @@ export default function About() {
             We combine natural language processing, intelligent matching and explainable
             results to make recruitment simple, transparent and effective.
           </p>
+          <div className="mt-7 flex flex-wrap items-center gap-3">
+            <Link to="/register" className="inline-flex h-11 items-center justify-center rounded-btn bg-[#2563EB] px-6 text-[14px] font-semibold text-white transition-colors hover:bg-[#1D4ED8] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-accent/30">
+              Get started
+            </Link>
+            <Link to="/login" className="inline-flex h-11 items-center justify-center rounded-btn border border-border-strong px-6 text-[14px] font-semibold text-text-body transition-colors hover:bg-bg-subtle focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-accent/20">
+              Sign in
+            </Link>
+          </div>
         </div>
         <HeroArt />
       </section>
@@ -165,7 +174,10 @@ export default function About() {
       <div className="border-y border-border bg-bg-surface">
         <section className="mx-auto grid max-w-6xl items-center gap-11 px-6 py-14 md:grid-cols-[1.05fr_0.95fr]">
           <div className="rounded-[16px] border border-border bg-bg-page p-3.5 shadow-[0_20px_50px_rgba(20,40,80,0.10)]">
-            <div className="mb-2.5 px-1 font-outfit text-[13px] font-bold text-text-primary">Top candidates</div>
+            <div className="mb-2.5 flex items-center justify-between px-1">
+              <span className="font-outfit text-[13px] font-bold text-text-primary">Top candidates</span>
+              <span className="rounded-full bg-bg-subtle px-2 py-[2px] text-[10px] font-semibold uppercase tracking-wide text-text-muted border border-border">Example</span>
+            </div>
             {CANDIDATES.map(([name, role, score, pill]) => (
               <div key={name} className="mb-2 flex items-center justify-between rounded-[10px] bg-bg-subtle px-2.5 py-2.5">
                 <div className="flex items-center gap-2.5">
@@ -214,8 +226,13 @@ export default function About() {
             </p>
           </div>
         </div>
-        <div className="shrink-0 font-outfit text-[26px] font-bold italic leading-[1.05] text-accent-2 md:text-right">
-          Better<br />together
+        <div className="flex shrink-0 flex-col items-start gap-4 md:items-end">
+          <div className="font-outfit text-[26px] font-bold italic leading-[1.05] text-accent-2 md:text-right">
+            Better<br />together
+          </div>
+          <Link to="/register" className="inline-flex h-11 items-center justify-center rounded-btn bg-[#2563EB] px-6 text-[14px] font-semibold text-white transition-colors hover:bg-[#1D4ED8] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-accent/30">
+            Create your account
+          </Link>
         </div>
       </section>
     </PublicPage>

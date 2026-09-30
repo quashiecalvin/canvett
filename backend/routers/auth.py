@@ -39,12 +39,13 @@ from services.auth import (
     verify_google_token,
 )
 from services.email import send_email
+from services.ratelimit import rate_limit
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
 
 @router.post("/register", response_model=TokenOut, status_code=status.HTTP_201_CREATED)
-def register(payload: UserRegister, db: Session = Depends(get_db)):
+def register(payload: UserRegister, db: Session = Depends(get_db), _rl=Depends(rate_limit("register"))):
     existing = (
         db.query(models_user.User)
         .filter(models_user.User.email == payload.email.lower())
@@ -72,7 +73,7 @@ def register(payload: UserRegister, db: Session = Depends(get_db)):
 
 
 @router.post("/login", response_model=TokenOut)
-def login(payload: UserLogin, db: Session = Depends(get_db)):
+def login(payload: UserLogin, db: Session = Depends(get_db), _rl=Depends(rate_limit("login"))):
     user = (
         db.query(models_user.User)
         .filter(models_user.User.email == payload.email.lower())
@@ -98,7 +99,7 @@ def login(payload: UserLogin, db: Session = Depends(get_db)):
 
 
 @router.post("/google", response_model=GoogleAuthResult)
-def google_auth(payload: GoogleAuth, db: Session = Depends(get_db)):
+def google_auth(payload: GoogleAuth, db: Session = Depends(get_db), _rl=Depends(rate_limit("google"))):
     """Sign in or sign up with Google.
 
     Google verifies the person's identity; we still decide their Canvett role.
@@ -336,7 +337,7 @@ def _frontend_base() -> str:
 
 
 @router.post("/forgot-password")
-def forgot_password(payload: ForgotPasswordRequest, db: Session = Depends(get_db)):
+def forgot_password(payload: ForgotPasswordRequest, db: Session = Depends(get_db), _rl=Depends(rate_limit("forgot"))):
     # Always return the same response whether or not the email exists, so the
     # endpoint cannot be used to discover which emails have accounts.
     generic = {"message": "If an account exists for that email, a reset link has been sent."}
@@ -381,7 +382,7 @@ def forgot_password(payload: ForgotPasswordRequest, db: Session = Depends(get_db
 
 
 @router.post("/reset-password")
-def reset_password(payload: ResetPasswordConfirm, db: Session = Depends(get_db)):
+def reset_password(payload: ResetPasswordConfirm, db: Session = Depends(get_db), _rl=Depends(rate_limit("reset"))):
     invalid = HTTPException(
         status_code=status.HTTP_400_BAD_REQUEST,
         detail="This reset link is invalid or has expired. Please request a new one.",

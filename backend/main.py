@@ -17,7 +17,7 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
-from routers import jobs, candidates, stats, settings, auth, applications, public_jobs, saved
+from routers import jobs, candidates, stats, settings, auth, applications, public_jobs, saved, notifications
 from services.parser import ResumeParseError
 from sqlalchemy import text
 from database.connection import engine, SessionLocal, Base
@@ -32,6 +32,7 @@ from database import (
     models_settings,
     models_activity,
     models_reset,
+    models_notification,
 )
 from services.profile import extract_location, extract_years
 
@@ -50,7 +51,9 @@ app = FastAPI(
     openapi_url="/openapi.json" if enable_api_docs else None,
 )
 
-allowed_origins = os.getenv("ALLOWED_ORIGINS", "http://localhost:5173").split(",")
+allowed_origins = os.getenv(
+    "ALLOWED_ORIGINS", "http://localhost:5173,https://canvett.vercel.app"
+).split(",")
 
 app.add_middleware(
     CORSMiddleware,
@@ -59,6 +62,19 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.middleware("http")
+async def security_headers(request: Request, call_next):
+    # Baseline hardening headers on every response. HSTS only takes effect over
+    # HTTPS (Fly.io terminates TLS), and is inert on plain-HTTP local dev.
+    response = await call_next(request)
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    response.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()"
+    response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+    return response
 
 
 @app.exception_handler(ResumeParseError)
@@ -115,6 +131,7 @@ def _startup_migrate_and_backfill():
         "ALTER TABLE users ADD COLUMN IF NOT EXISTS auth_provider VARCHAR NOT NULL DEFAULT 'password'",
         "ALTER TABLE jobs ADD COLUMN IF NOT EXISTS work_mode VARCHAR",
         "ALTER TABLE users ADD COLUMN IF NOT EXISTS pref_work_mode VARCHAR",
+        "ALTER TABLE applications ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT now()",
         # Google accounts have no password of their own.
         "ALTER TABLE users ALTER COLUMN password_hash DROP NOT NULL",
         "CREATE TABLE IF NOT EXISTS saved_jobs (id SERIAL PRIMARY KEY, user_id INTEGER NOT NULL REFERENCES users(id), job_id INTEGER NOT NULL REFERENCES jobs(id), created_at TIMESTAMPTZ DEFAULT now(), CONSTRAINT uq_saved_user_job UNIQUE (user_id, job_id))",
@@ -152,8 +169,22 @@ app.include_router(auth.router)
 app.include_router(applications.router)
 app.include_router(public_jobs.router)
 app.include_router(saved.router)
+app.include_router(notifications.router)
 
 
 @app.get("/")
 def read_root():
     return {"message": "Canvett backend is running"}
+
+
+@app.get("/health")
+def health_check():
+    # Cheap liveness/readiness probe for Fly.io health checks and uptime pings.
+    # Confirms the process is up and the database is reachable.
+    db_ok = True
+    try:
+        with engine.connect() as conn:
+            conn.execute(text("SELECT 1"))
+    except Exception:
+        db_ok = False
+    return {"status": "ok" if db_ok else "degraded", "database": "up" if db_ok else "down"}

@@ -14,6 +14,7 @@ from services.parser import (
 from services.scoring import score_for_job, build_score
 from services.activity import log_activity
 from services.jobs import get_active_job_or_404, company_name_for_job, company_logo_for_job
+from services.notify import create_notification
 
 router = APIRouter(prefix="/applications", tags=["Applications"])
 
@@ -56,6 +57,17 @@ def _create_application(db, job, user, resume_text, method, phone=None):
         contact_phone=(phone or "").strip() or None,
     )
     db.add(application)
+    db.flush()
+
+    # Confirmation notification for the applicant.
+    create_notification(
+        db,
+        user.id,
+        title="Application submitted",
+        body=f"You applied to \u201c{job.title}\u201d. We'll let you know when the status changes.",
+        link="/seeker/applications",
+    )
+
     db.commit()
     db.refresh(application)
 
@@ -198,5 +210,32 @@ def my_applications(
             "method": app.method,
             "status": app.status,
             "applied_on": app.created_at,
+            "updated_at": app.updated_at,
         })
     return result
+
+
+@router.get("/status/{job_id}")
+def application_status_for_job(
+    job_id: int,
+    db: Session = Depends(get_db),
+    user: models_user.User = Depends(require_seeker),
+):
+    """Whether the current seeker has already applied to this job, for the
+    "Applied on <date>" state on the job pages."""
+    app = (
+        db.query(models_application.Application)
+        .filter(
+            models_application.Application.job_id == job_id,
+            models_application.Application.user_id == user.id,
+        )
+        .first()
+    )
+    if not app:
+        return {"applied": False}
+    return {
+        "applied": True,
+        "status": app.status,
+        "applied_on": app.created_at,
+        "updated_at": app.updated_at,
+    }

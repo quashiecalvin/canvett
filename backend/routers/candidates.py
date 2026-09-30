@@ -1,6 +1,7 @@
 import logging
 import os
 import uuid
+from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form
 from sqlalchemy.orm import Session
@@ -19,6 +20,7 @@ from services.parser import (
 from services.scoring import score_for_job, build_score, apply_score
 from services.activity import log_activity
 from services.jobs import get_owned_job_or_404
+from services.notify import create_notification
 from schemas.score import ScoreOut, RankedCandidate
 
 from pydantic import BaseModel
@@ -285,14 +287,34 @@ def update_candidate_status(
     if payload.status not in ALLOWED_STATUSES:
         raise HTTPException(status_code=400, detail="Invalid status")
     candidate.status = payload.status
-    # Mirror the recruiter's decision onto the seeker-facing application, if one exists.
-    # Only "Shortlisted" surfaces to the seeker; every other state reads as "Under review".
-    # Rejections are handled off-app (e.g. by email) and are never shown as "Rejected".
-    seeker_status = "Shortlisted" if payload.status == "Shortlisted" else "Under review"
-    (
+
+    # Mirror the recruiter's decision onto the seeker-facing application status, and
+    # notify the applicant when it actually changes. The seeker vocabulary is a
+    # softened view of the recruiter's pipeline.
+    CANDIDATE_TO_SEEKER = {
+        "New": "Submitted",
+        "In review": "Under review",
+        "Shortlisted": "Shortlisted",
+        "Rejected": "Not selected",
+    }
+    seeker_status = CANDIDATE_TO_SEEKER.get(payload.status, "Under review")
+    job = db.query(models_job.Job).filter(models_job.Job.id == candidate.job_id).first()
+    job_title = job.title if job else "a role"
+    apps = (
         db.query(models_application.Application)
         .filter(models_application.Application.candidate_id == candidate.id)
-        .update({"status": seeker_status})
+        .all()
     )
+    for app in apps:
+        if app.status != seeker_status:
+            app.status = seeker_status
+            app.updated_at = datetime.now(timezone.utc)
+            create_notification(
+                db,
+                app.user_id,
+                title="Application update",
+                body=f"Your application for \u201c{job_title}\u201d is now: {seeker_status}.",
+                link="/seeker/applications",
+            )
     db.commit()
     return {"candidate_id": candidate.id, "status": candidate.status}

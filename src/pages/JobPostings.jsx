@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom'
-import { Plus, ArrowUpDown } from 'lucide-react'
+import { Plus, ArrowUpDown, Trash2 } from 'lucide-react'
 import FilterDropdown from '../components/ui/FilterDropdown'
 import StatusBadge from '../components/ui/StatusBadge'
 import NewJobModal from '../components/ui/NewJobModal'
@@ -24,6 +24,8 @@ export default function JobPostings() {
   const [sortOrder, setSortOrder] = useState('Newest')
   const [searchParams, setSearchParams] = useSearchParams()
   const [highlightId, setHighlightId] = useState(null)
+  const [confirmDelete, setConfirmDelete] = useState(null)
+  const [deleting, setDeleting] = useState(false)
   const highlightRef = useRef(null)
 
   useEffect(() => {
@@ -55,14 +57,18 @@ export default function JobPostings() {
         setLoading(false)
       })
   }
-  async function handleDelete(jobId) {
-    if (!confirm('Delete this job posting? This will also remove its candidates and rankings.')) return
+  async function performDelete() {
+    if (!confirmDelete) return
+    setDeleting(true)
     try {
-      await deleteJob(jobId)
+      await deleteJob(confirmDelete.id)
+      setConfirmDelete(null)
       loadJobs()
       refreshJobs()
     } catch (err) {
       setError(`Could not delete the job posting: ${err.message}`)
+    } finally {
+      setDeleting(false)
     }
   }
 
@@ -176,7 +182,7 @@ export default function JobPostings() {
                 <JobActionsMenu
                   onViewCandidates={() => { setSelectedJobId(job.id); navigate('/ranking') }}
                   onEdit={() => { setEditingJob(job); setShowModal(true) }}
-                  onDelete={() => handleDelete(job.id)}
+                  onDelete={() => setConfirmDelete(job)}
                 />
               </div>
             </div>
@@ -190,6 +196,47 @@ export default function JobPostings() {
           onClose={() => { setShowModal(false); setEditingJob(null) }}
           onCreated={() => { loadJobs(); refreshJobs() }}
         />
+      )}
+
+      {confirmDelete && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center px-5"
+          style={{ background: 'rgba(15,23,42,0.45)' }}
+          onClick={() => !deleting && setConfirmDelete(null)}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="del-title"
+            className="w-full max-w-[420px] rounded-modal border border-border bg-bg-surface p-6 shadow-2xl anim-modal"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex h-11 w-11 items-center justify-center rounded-full bg-danger-tint text-danger-text">
+              <Trash2 size={20} />
+            </div>
+            <h2 id="del-title" className="mt-4 font-outfit text-[18px] font-bold text-text-primary">Delete this job posting?</h2>
+            <p className="mt-1.5 text-[13.5px] leading-[1.6] text-text-muted">
+              <span className="font-medium text-text-body">{confirmDelete.title}</span> and all of its
+              candidates and rankings will be permanently removed. This cannot be undone.
+            </p>
+            <div className="mt-6 flex justify-end gap-2.5">
+              <button
+                onClick={() => setConfirmDelete(null)}
+                disabled={deleting}
+                className="h-10 px-4 rounded-btn border border-border-strong text-[13.5px] font-medium text-text-body hover:bg-bg-subtle transition-colors disabled:opacity-50 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-accent/20"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={performDelete}
+                disabled={deleting}
+                className="h-10 px-4 rounded-btn bg-danger text-white text-[13.5px] font-semibold hover:bg-danger/90 transition-colors disabled:opacity-50 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-danger/30"
+              >
+                {deleting ? 'Deleting…' : 'Delete posting'}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   )

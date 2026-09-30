@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react'
+import { validateUploadFile, ACCEPTED_UPLOAD_LABEL } from '../lib/uploads'
 import { CloudUpload, Folder, CheckCircle2, File, X } from 'lucide-react'
 import { uploadResume } from '../lib/api'
 import { useJob } from '../context/JobContext'
@@ -13,10 +14,27 @@ function formatTime(date) {
 export default function UploadResumes() {
   const { selectedJobId } = useJob()
   const [files, setFiles] = useState([])
+  const [consent, setConsent] = useState(false)
   const fileInputRef = useRef(null)
 
   async function handleFiles(selectedFiles) {
     const fileArray = Array.from(selectedFiles)
+
+    if (!consent) {
+      setFiles((prev) => [
+        ...prev,
+        ...fileArray.map((file) => ({
+          id: `${file.name}-${Date.now()}`,
+          name: file.name,
+          size: `${Math.round((file.size || 0) / 1024)} KB`,
+          type: file.name.toLowerCase().endsWith('.pdf') ? 'pdf' : 'docx',
+          status: 'error',
+          error: 'Confirm you have the candidate\'s consent before uploading their CV.',
+          uploadedAt: new Date(),
+        })),
+      ])
+      return
+    }
 
     if (!selectedJobId) {
       setFiles((prev) => [
@@ -36,6 +54,22 @@ export default function UploadResumes() {
 
     for (const file of fileArray) {
       const type = file.name.toLowerCase().endsWith('.pdf') ? 'pdf' : 'docx'
+      const invalid = validateUploadFile(file)
+      if (invalid) {
+        setFiles((prev) => [
+          ...prev,
+          {
+            id: `${file.name}-${Date.now()}`,
+            name: file.name,
+            size: `${Math.round((file.size || 0) / 1024)} KB`,
+            type,
+            status: 'error',
+            error: invalid,
+            uploadedAt: new Date(),
+          },
+        ])
+        continue
+      }
       const entry = {
         id: `${file.name}-${Date.now()}`,
         name: file.name,
@@ -79,14 +113,28 @@ export default function UploadResumes() {
         </div>
       </header>
 
+      <label className="mb-5 flex items-start gap-3 rounded-btn border border-border bg-bg-surface px-4 py-3.5 cursor-pointer select-none">
+        <input
+          type="checkbox"
+          checked={consent}
+          onChange={(e) => setConsent(e.target.checked)}
+          className="mt-0.5 h-4 w-4 shrink-0 accent-[#2563EB] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
+        />
+        <span className="text-[13px] leading-[1.5] text-text-body">
+          I confirm I have each candidate's consent to upload and process their CV on Canvett, in
+          keeping with Ghana's Data Protection Act, 2012 (Act&nbsp;843).
+        </span>
+      </label>
+
       <div
-        onClick={() => fileInputRef.current?.click()}
+        onClick={() => { if (consent) fileInputRef.current?.click() }}
         onDragOver={(e) => e.preventDefault()}
         onDrop={(e) => {
           e.preventDefault()
           handleFiles(e.dataTransfer.files)
         }}
-        className="bg-bg-surface border-[1.5px] border-dashed border-accent-light rounded-modal px-10 py-16 min-h-[460px] flex flex-col items-center justify-center text-center mb-6 cursor-pointer hover:border-accent transition-colors"
+        aria-disabled={!consent}
+        className={`bg-bg-surface border-[1.5px] border-dashed rounded-modal px-10 py-16 min-h-[460px] flex flex-col items-center justify-center text-center mb-6 transition-colors ${consent ? 'border-accent-light cursor-pointer hover:border-accent' : 'border-border opacity-60 cursor-not-allowed'}`}
       >
         <div className="w-20 h-20 rounded-full bg-accent-tint flex items-center justify-center text-accent mb-5">
           <CloudUpload size={40} />
@@ -97,7 +145,7 @@ export default function UploadResumes() {
           <Folder size={15} />
           Browse files
         </button>
-        <p className="text-[12px] text-text-hint mt-6">Supported formats: PDF, DOCX • Max 10MB per file</p>
+        <p className="text-[12px] text-text-hint mt-6">Supported formats: PDF, DOCX • Max 5 MB per file</p>
         <input
           ref={fileInputRef}
           type="file"
