@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, Fragment } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { MapPin, Briefcase, ChevronRight, ChevronDown, FileSearch, Upload, FileText } from 'lucide-react'
+import { MapPin, Briefcase, ChevronRight, ChevronDown, FileSearch, Upload, FileText, Check, X } from 'lucide-react'
 import { getMyApplications } from '../../lib/api'
 import { formatLongDate } from '../../lib/time'
 
@@ -20,12 +20,52 @@ function companyMark(name, logo) {
     : <div className="w-12 h-12 text-[13px] rounded-xl flex items-center justify-center text-white font-semibold shrink-0" style={{ background: companyColor(name) }}>{monogram(name)}</div>
 }
 
-// Seeker-facing statuses (Rejected is intentionally not surfaced to seekers)
+// Seeker-facing statuses, in pipeline order.
 const GROUPS = [
+  { status: 'Submitted', label: 'Submitted', pill: 'bg-info-tint text-info-text' },
   { status: 'Under review', label: 'In review', pill: 'bg-warning-tint text-warning-text' },
   { status: 'Shortlisted', label: 'Shortlisted', pill: 'bg-success-tint text-success-text' },
+  { status: 'Not selected', label: 'Not selected', pill: 'bg-danger-tint text-danger-text' },
 ]
 const STATUS_META = Object.fromEntries(GROUPS.map((g) => [g.status, g]))
+
+// Three-step pipeline; the third step is the outcome (shortlisted or not selected).
+function StatusSteps({ status }) {
+  const decided = status === 'Shortlisted' || status === 'Not selected'
+  const rejected = status === 'Not selected'
+  const reached = status === 'Submitted' ? 0 : status === 'Under review' ? 1 : 2
+  const steps = [
+    { label: 'Submitted' },
+    { label: 'Under review' },
+    { label: decided ? (rejected ? 'Not selected' : 'Shortlisted') : 'Decision' },
+  ]
+  return (
+    <div className="mt-2 flex items-center gap-1 flex-wrap">
+      {steps.map((s, i) => {
+        const done = i <= reached
+        const isOutcome = i === 2 && decided
+        const dotCls = !done
+          ? 'bg-bg-subtle text-text-hint border border-border'
+          : isOutcome && rejected
+            ? 'bg-danger text-white'
+            : isOutcome
+              ? 'bg-success text-white'
+              : 'bg-accent text-white'
+        return (
+          <Fragment key={i}>
+            <span className="inline-flex items-center gap-1">
+              <span className={`flex h-4 w-4 items-center justify-center rounded-full text-[9px] font-bold ${dotCls}`}>
+                {done ? (isOutcome && rejected ? <X size={9} /> : <Check size={9} />) : i + 1}
+              </span>
+              <span className={`text-[11px] ${done ? 'text-text-body font-medium' : 'text-text-hint'}`}>{s.label}</span>
+            </span>
+            {i < steps.length - 1 && <span className={`h-px w-3 ${i < reached ? 'bg-accent/50' : 'bg-border'}`} />}
+          </Fragment>
+        )
+      })}
+    </div>
+  )
+}
 
 export default function MyApplications() {
   const [apps, setApps] = useState([])
@@ -54,9 +94,11 @@ export default function MyApplications() {
   }, [apps, sort])
 
   const tabs = [
-    { key: 'all', label: 'All Applications', count: apps.length },
+    { key: 'all', label: 'All', count: apps.length },
+    { key: 'Submitted', label: 'Submitted', count: counts['Submitted'] || 0 },
     { key: 'Under review', label: 'In review', count: counts['Under review'] || 0 },
     { key: 'Shortlisted', label: 'Shortlisted', count: counts['Shortlisted'] || 0 },
+    { key: 'Not selected', label: 'Not selected', count: counts['Not selected'] || 0 },
   ]
 
   const groups = GROUPS
@@ -66,11 +108,12 @@ export default function MyApplications() {
   const Row = (a) => {
     const meta = STATUS_META[a.status] || { label: a.status, pill: 'bg-bg-subtle text-text-muted' }
     const MethodIcon = a.method === 'upload' ? Upload : FileText
+    const changed = a.updated_at && a.applied_on && new Date(a.updated_at) - new Date(a.applied_on) > 60000
     return (
       <div
         key={a.application_id}
         onClick={() => a.job_id && navigate(`/seeker/jobs/${a.job_id}`)}
-        className="group flex items-center gap-4 p-4 cursor-pointer hover:bg-bg-subtle transition-colors"
+        className="group flex items-start gap-4 p-4 cursor-pointer hover:bg-bg-subtle transition-colors"
       >
         {companyMark(a.company, a.company_logo)}
         <div className="min-w-0 flex-1">
@@ -80,17 +123,18 @@ export default function MyApplications() {
             {a.location && <span className="inline-flex items-center gap-1.5"><MapPin size={12.5} className="text-text-hint" />{a.location}</span>}
             {a.department && <span className="inline-flex items-center gap-1.5"><Briefcase size={12.5} className="text-text-hint" />{a.department}</span>}
             <span className="inline-flex items-center gap-1.5 text-text-hint"><MethodIcon size={12.5} />Applied {formatLongDate(a.applied_on)}</span>
+            {changed && <span className="text-text-hint">· Updated {formatLongDate(a.updated_at)}</span>}
           </div>
+          <StatusSteps status={a.status} />
         </div>
         <span className={`shrink-0 rounded-full px-3 py-1 text-[11.5px] font-medium ${meta.pill}`}>{meta.label}</span>
-        <ChevronRight size={16} className="text-text-hint shrink-0 transition-transform group-hover:translate-x-0.5 group-hover:text-accent" />
+        <ChevronRight size={16} className="text-text-hint shrink-0 mt-1 transition-transform group-hover:translate-x-0.5 group-hover:text-accent" />
       </div>
     )
   }
 
   return (
     <div className="p-6 flex flex-col gap-5">
-      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
         <div>
           <h1 className="text-[22px] font-medium text-text-primary leading-[1.2]">My Applications</h1>
@@ -101,6 +145,7 @@ export default function MyApplications() {
             <select
               value={sort}
               onChange={(e) => setSort(e.target.value)}
+              aria-label="Sort applications"
               className="h-10 pl-3 pr-9 rounded-btn border border-border bg-bg-surface text-[13px] text-text-body appearance-none cursor-pointer focus:outline-none focus:border-accent transition-colors"
             >
               <option value="recent">Sort by: Recently applied</option>
@@ -135,7 +180,6 @@ export default function MyApplications() {
 
       {!loading && !error && apps.length > 0 && (
         <>
-          {/* Tabs */}
           <div className="flex items-center gap-1 border-b border-border overflow-x-auto">
             {tabs.map((t) => (
               <button
@@ -152,7 +196,6 @@ export default function MyApplications() {
             ))}
           </div>
 
-          {/* Groups */}
           {groups.every((g) => g.items.length === 0) ? (
             <div className="bg-bg-surface border border-border rounded-card px-4 py-12 text-center">
               <p className="text-[13px] text-text-muted">No applications in this category.</p>
