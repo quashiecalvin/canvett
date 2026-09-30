@@ -208,7 +208,7 @@ export default function NewJobModal({ onClose, onCreated, job }) {
           <button
             onClick={handleSubmit}
             disabled={submitting}
-            className="h-10 px-4 rounded-btn bg-accent text-white text-[13px] font-medium hover:bg-accent/90 transition-colors disabled:opacity-50"
+            className="h-10 px-4 rounded-btn bg-accent-2 text-white text-[13px] font-medium hover:bg-accent-hover transition-colors disabled:opacity-50"
           >
             {submitting ? 'Saving...' : isEdit ? 'Save changes' : 'Create job posting'}
           </button>

@@ -1,6 +1,5 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { Sun, Moon } from 'lucide-react'
 import Footer from './Footer'
 import { setThemeColor, THEME_COLORS } from '../../lib/themeColor'
 
@@ -23,31 +22,19 @@ function Logo() {
   )
 }
 
-// Slim header for logged-out visitors: logo flush to the left, a theme toggle,
-// and Sign in. (Signed-in users see the full app shell instead - see PublicPage.)
+// Slim header for logged-out visitors. The entire logged-out experience
+// (marketing + auth) is a fixed dark brand zone, so there is no theme toggle
+// here - the light/dark choice lives inside the app, for signed-in users.
+// (Signed-in viewers of these pages get the full app shell instead, and keep
+// their own theme - see PublicPage.)
 export default function PublicLayout({ children }) {
-  const [dark, setDark] = useState(false)
-  useEffect(() => {
-    try {
-      const isDark = localStorage.getItem('canvett_theme') === 'dark'
-      setDark(isDark)
-      document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light')
-      setThemeColor(isDark ? THEME_COLORS.dark : THEME_COLORS.light)
-    } catch {
-      /* ignore */
-    }
-  }, [])
-  function toggleTheme() {
-    setDark((d) => {
-      const nd = !d
-      document.documentElement.setAttribute('data-theme', nd ? 'dark' : 'light')
-      setThemeColor(nd ? THEME_COLORS.dark : THEME_COLORS.light)
-      try { localStorage.setItem('canvett_theme', nd ? 'dark' : 'light') } catch { /* ignore */ }
-      return nd
-    })
-  }
-
   const { pathname } = useLocation()
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', 'dark')
+    setThemeColor(THEME_COLORS.dark)
+  }, [])
+
   useEffect(() => {
     window.scrollTo(0, 0)
   }, [pathname])
@@ -60,16 +47,9 @@ export default function PublicLayout({ children }) {
             <Logo />
           </Link>
           <div className="flex items-center gap-2 md:gap-3">
-            <button
-              onClick={toggleTheme}
-              aria-label="Toggle theme"
-              className="flex h-10 w-10 items-center justify-center rounded-btn border border-border bg-bg-surface text-text-muted transition-colors hover:bg-bg-subtle"
-            >
-              {dark ? <Sun size={17} /> : <Moon size={17} />}
-            </button>
             <Link
               to="/login"
-              className="inline-flex h-10 items-center rounded-btn bg-accent px-4 text-[13px] font-medium text-white transition-opacity hover:opacity-90"
+              className="inline-flex h-10 items-center rounded-btn bg-accent-2 px-4 text-[13px] font-medium text-white transition-colors hover:bg-accent-hover"
             >
               Sign in
             </Link>

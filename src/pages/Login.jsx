@@ -118,7 +118,7 @@ export default function Login() {
         <button
           type="submit"
           disabled={submitting}
-          className="group h-12 mt-1 rounded-btn bg-[#2563EB] text-white text-[14px] font-semibold hover:bg-[#1D4ED8] active:scale-[0.99] transition-all disabled:opacity-50 disabled:active:scale-100 flex items-center justify-center gap-2 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-accent/30"
+          className="group h-12 mt-1 rounded-btn bg-accent-2 text-white text-[14px] font-semibold hover:bg-accent-hover active:scale-[0.99] transition-all disabled:opacity-50 disabled:active:scale-100 flex items-center justify-center gap-2 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-accent/30"
         >
           {submitting ? 'Signing in…' : 'Sign in'}
           {!submitting && <ArrowRight size={16} className="transition-transform group-hover:translate-x-0.5" />}

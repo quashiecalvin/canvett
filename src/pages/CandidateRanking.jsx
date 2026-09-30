@@ -381,7 +381,7 @@ export default function CandidateRanking() {
                 <RefreshCw size={14} /> Re-rank
               </button>
               <button onClick={handleExport} disabled={candidates.length === 0}
-                className="flex items-center justify-center gap-2 h-10 px-4 rounded-btn bg-accent text-white text-[13px] font-medium hover:bg-accent/90 transition-colors disabled:opacity-50">
+                className="flex items-center justify-center gap-2 h-10 px-4 rounded-btn bg-accent-2 text-white text-[13px] font-medium hover:bg-accent-hover transition-colors disabled:opacity-50">
                 <Download size={14} /> Export
               </button>
             </div>
@@ -646,7 +646,7 @@ export default function CandidateRanking() {
                     </button>
                   ) : (
                     <button onClick={() => setStatus(selected.candidate_id, 'Shortlisted')}
-                      className="flex items-center justify-center gap-2 h-10 px-4 rounded-btn bg-accent text-white text-[13px] font-medium hover:bg-accent/90 transition-colors">
+                      className="flex items-center justify-center gap-2 h-10 px-4 rounded-btn bg-accent-2 text-white text-[13px] font-medium hover:bg-accent-hover transition-colors">
                       <Bookmark size={14} /> Shortlist
                     </button>
                   )}

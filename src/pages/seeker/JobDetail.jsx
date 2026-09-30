@@ -138,7 +138,7 @@ export default function JobDetail() {
                   <Link to="/seeker/applications" className="text-[12.5px] font-medium text-accent hover:underline underline-offset-2">Track application →</Link>
                 </>
               ) : (
-                <button onClick={() => setChooserOpen(true)} className="h-10 px-5 rounded-btn bg-accent text-white text-[13px] font-medium hover:bg-accent-2 active:scale-[0.99] transition-all">
+                <button onClick={() => setChooserOpen(true)} className="h-10 px-5 rounded-btn bg-accent-2 text-white text-[13px] font-medium hover:bg-accent-hover active:scale-[0.99] transition-all">
                   Apply Now
                 </button>
               )}

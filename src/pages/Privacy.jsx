@@ -172,7 +172,7 @@ export default function Privacy() {
             </div>
             <h4 className="mb-1.5 font-outfit text-[16px] font-bold text-text-primary">Questions?</h4>
             <p className="text-[12.5px] leading-[1.6] text-text-muted">If you have any question about your data or this policy, get in touch.</p>
-            <a href={`mailto:${CONTACT}`} className="mt-3.5 flex h-10 items-center justify-center gap-2 rounded-[10px] bg-accent text-[13px] font-semibold text-white transition-opacity hover:opacity-90">
+            <a href={`mailto:${CONTACT}`} className="mt-3.5 flex h-10 items-center justify-center gap-2 rounded-[10px] bg-accent-2 text-[13px] font-semibold text-white transition-colors hover:bg-accent-hover">
               <S width="15" height="15"><rect x="3" y="5" width="18" height="14" rx="2" /><path d="M3 7l9 6 9-6" /></S>
               Contact us
             </a>

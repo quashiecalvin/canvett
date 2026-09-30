@@ -143,7 +143,7 @@ export default function UploadResumes() {
         </div>
         <h3 className="text-[18px] font-medium text-text-primary leading-[1.4]">Drag and drop resumes here</h3>
         <p className="text-[14px] text-text-muted mt-1.5">or click to browse your files</p>
-        <button className="mt-6 flex items-center gap-2 h-11 px-5 rounded-btn bg-accent text-white text-[13.5px] font-medium hover:bg-accent/90 transition-colors">
+        <button className="mt-6 flex items-center gap-2 h-11 px-5 rounded-btn bg-accent-2 text-white text-[13.5px] font-medium hover:bg-accent-hover transition-colors">
           <Folder size={15} />
           Browse files
         </button>

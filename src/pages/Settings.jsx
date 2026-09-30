@@ -136,7 +136,7 @@ export default function Settings() {
           <button
             onClick={handleSave}
             disabled={saving || !weightsValid}
-            className="flex flex-1 items-center justify-center gap-2 h-10 px-4 rounded-btn bg-accent text-white text-[13px] font-medium whitespace-nowrap hover:bg-accent/90 transition-colors disabled:opacity-50 sm:flex-none"
+            className="flex flex-1 items-center justify-center gap-2 h-10 px-4 rounded-btn bg-accent-2 text-white text-[13px] font-medium whitespace-nowrap hover:bg-accent-hover transition-colors disabled:opacity-50 sm:flex-none"
           >
             <Save size={14} />
             {saving ? 'Saving...' : 'Save changes'}

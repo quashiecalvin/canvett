@@ -210,7 +210,7 @@ export default function GoogleSignIn() {
             <button
               type="submit"
               disabled={busy}
-              className="w-full h-12 mt-6 rounded-btn bg-[#2563EB] text-white text-[14px] font-semibold hover:bg-[#1D4ED8] active:scale-[0.99] transition-all disabled:opacity-50 disabled:active:scale-100 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-accent/30"
+              className="w-full h-12 mt-6 rounded-btn bg-accent-2 text-white text-[14px] font-semibold hover:bg-accent-hover active:scale-[0.99] transition-all disabled:opacity-50 disabled:active:scale-100 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-accent/30"
             >
               {busy ? 'Setting up…' : 'Continue'}
             </button>

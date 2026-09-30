@@ -228,7 +228,7 @@ export default function SeekerProfile() {
         type="button"
         onClick={() => photoInputRef.current?.click()}
         disabled={photoBusy}
-        className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-accent text-white flex items-center justify-center ring-2 ring-bg-surface hover:bg-accent-2 transition-colors disabled:opacity-60"
+        className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-accent-2 text-white flex items-center justify-center ring-2 ring-bg-surface hover:bg-accent-hover transition-colors disabled:opacity-60"
         aria-label="Change photo"
       >
         <Camera size={15} />
@@ -260,7 +260,7 @@ export default function SeekerProfile() {
         {!editing ? (
           <button
             onClick={startEdit}
-            className="inline-flex items-center gap-2 h-10 px-4 rounded-btn bg-accent text-white text-[13px] font-medium hover:bg-accent-2 transition-colors shrink-0"
+            className="inline-flex items-center gap-2 h-10 px-4 rounded-btn bg-accent-2 text-white text-[13px] font-medium hover:bg-accent-hover transition-colors shrink-0"
           >
             <Pencil size={15} /> Edit Profile
           </button>
@@ -271,7 +271,7 @@ export default function SeekerProfile() {
               Cancel
             </button>
             <button onClick={save} disabled={saving || !fullName.trim()}
-              className="inline-flex items-center gap-2 h-10 px-5 rounded-btn bg-accent text-white text-[13px] font-medium hover:bg-accent-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+              className="inline-flex items-center gap-2 h-10 px-5 rounded-btn bg-accent-2 text-white text-[13px] font-medium hover:bg-accent-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
               {saving ? 'Saving…' : 'Save changes'}
             </button>
           </div>
@@ -327,7 +327,7 @@ export default function SeekerProfile() {
 
           <div className="sticky bottom-0 -mx-6 px-6 py-3 bg-bg-page/95 backdrop-blur border-t border-border flex items-center justify-end gap-2 sm:hidden">
             <button onClick={() => setEditing(false)} disabled={saving} className="h-10 px-4 rounded-btn text-[13px] font-medium text-text-muted hover:bg-bg-subtle transition-colors">Cancel</button>
-            <button onClick={save} disabled={saving || !fullName.trim()} className="inline-flex items-center gap-2 h-10 px-5 rounded-btn bg-accent text-white text-[13px] font-medium hover:bg-accent-2 transition-colors disabled:opacity-50">{saving ? 'Saving…' : 'Save changes'}</button>
+            <button onClick={save} disabled={saving || !fullName.trim()} className="inline-flex items-center gap-2 h-10 px-5 rounded-btn bg-accent-2 text-white text-[13px] font-medium hover:bg-accent-hover transition-colors disabled:opacity-50">{saving ? 'Saving…' : 'Save changes'}</button>
           </div>
         </div>
       ) : (
@@ -432,7 +432,7 @@ export default function SeekerProfile() {
                   </div>
                   <div className="flex items-center gap-2 pt-1">
                     <button onClick={savePassword} disabled={savingPw || !currentPw || !newPw || !confirmPw}
-                      className="h-9 px-4 rounded-btn bg-accent text-white text-[12.5px] font-medium hover:bg-accent-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                      className="h-9 px-4 rounded-btn bg-accent-2 text-white text-[12.5px] font-medium hover:bg-accent-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
                       {savingPw ? 'Changing…' : 'Update password'}
                     </button>
                     <button onClick={() => { setShowPassword(false); setCurrentPw(''); setNewPw(''); setConfirmPw(''); setPwErr(null) }} disabled={savingPw}
@@ -463,7 +463,7 @@ export default function SeekerProfile() {
                   {deleteErr && <span className="text-[12px] text-danger-text">{deleteErr}</span>}
                   <div className="flex items-center gap-2">
                     <button onClick={handleDeleteAccount} disabled={deleteBusy || !deletePw}
-                      className="h-9 px-4 rounded-btn bg-danger text-white text-[12.5px] font-medium hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed">
+                      className="h-9 px-4 rounded-btn bg-danger text-white text-[12.5px] font-medium hover:bg-danger-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
                       {deleteBusy ? 'Deleting…' : 'Permanently delete'}
                     </button>
                     <button onClick={() => { setShowDelete(false); setDeletePw(''); setDeleteErr(null) }} disabled={deleteBusy}

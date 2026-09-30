@@ -175,12 +175,12 @@ export default function OnboardingModal({ user, onDone }) {
             )}
             {step < TOTAL - 1 ? (
               <button onClick={() => setStep((s) => s + 1)} disabled={busy}
-                className="inline-flex items-center gap-1.5 h-10 px-5 rounded-btn bg-accent text-white text-[13px] font-medium hover:bg-accent-2 transition-colors">
+                className="inline-flex items-center gap-1.5 h-10 px-5 rounded-btn bg-accent-2 text-white text-[13px] font-medium hover:bg-accent-hover transition-colors">
                 Next <ArrowRight size={15} />
               </button>
             ) : (
               <button onClick={() => finish(false)} disabled={busy}
-                className="inline-flex items-center gap-1.5 h-10 px-5 rounded-btn bg-accent text-white text-[13px] font-medium hover:bg-accent-2 transition-colors disabled:opacity-60">
+                className="inline-flex items-center gap-1.5 h-10 px-5 rounded-btn bg-accent-2 text-white text-[13px] font-medium hover:bg-accent-hover transition-colors disabled:opacity-60">
                 {busy ? 'Saving…' : 'Finish setup'}
               </button>
             )}

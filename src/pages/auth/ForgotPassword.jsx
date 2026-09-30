@@ -79,7 +79,7 @@ export default function ForgotPassword() {
             <button
               type="submit"
               disabled={submitting}
-              className="group h-12 mt-1 rounded-btn bg-white text-bg-base text-[14px] font-semibold hover:bg-white/90 active:scale-[0.99] transition-all disabled:opacity-50 disabled:active:scale-100 flex items-center justify-center gap-2"
+              className="group h-12 mt-1 rounded-btn bg-accent-2 text-white text-[14px] font-semibold hover:bg-accent-hover active:scale-[0.99] transition-all disabled:opacity-50 disabled:active:scale-100 flex items-center justify-center gap-2"
             >
               {submitting ? 'Sending…' : 'Send reset link'}
               {!submitting && <ArrowRight size={16} className="transition-transform group-hover:translate-x-0.5" />}

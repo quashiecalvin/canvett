@@ -115,7 +115,7 @@ export default function About() {
             results to make recruitment simple, transparent and effective.
           </p>
           <div className="mt-7 flex flex-wrap items-center gap-3">
-            <Link to="/register" className="inline-flex h-11 items-center justify-center rounded-btn bg-[#2563EB] px-6 text-[14px] font-semibold text-white transition-colors hover:bg-[#1D4ED8] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-accent/30">
+            <Link to="/register" className="inline-flex h-11 items-center justify-center rounded-btn bg-accent-2 px-6 text-[14px] font-semibold text-white transition-colors hover:bg-accent-hover focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-accent/30">
               Get started
             </Link>
             <Link to="/login" className="inline-flex h-11 items-center justify-center rounded-btn border border-border-strong px-6 text-[14px] font-semibold text-text-body transition-colors hover:bg-bg-subtle focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-accent/20">
@@ -230,7 +230,7 @@ export default function About() {
           <div className="font-outfit text-[26px] font-bold italic leading-[1.05] text-accent-2 md:text-right">
             Better<br />together
           </div>
-          <Link to="/register" className="inline-flex h-11 items-center justify-center rounded-btn bg-[#2563EB] px-6 text-[14px] font-semibold text-white transition-colors hover:bg-[#1D4ED8] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-accent/30">
+          <Link to="/register" className="inline-flex h-11 items-center justify-center rounded-btn bg-accent-2 px-6 text-[14px] font-semibold text-white transition-colors hover:bg-accent-hover focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-accent/30">
             Create your account
           </Link>
         </div>

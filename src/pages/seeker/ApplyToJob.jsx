@@ -371,7 +371,7 @@ export default function ApplyToJob() {
             <button
               onClick={submitUpload}
               disabled={submitting || !file}
-              className="h-11 px-8 rounded-btn bg-accent text-[14px] font-semibold text-white transition-all hover:bg-accent-2 active:scale-[0.99] disabled:opacity-50"
+              className="h-11 px-8 rounded-btn bg-accent-2 text-[14px] font-semibold text-white transition-all hover:bg-accent-hover active:scale-[0.99] disabled:opacity-50"
             >
               {submitting ? 'Submitting...' : 'Submit application'}
             </button>
@@ -500,7 +500,7 @@ export default function ApplyToJob() {
           <button
             onClick={submitForm}
             disabled={submitting}
-            className="h-12 rounded-btn bg-accent text-[14.5px] font-semibold text-white transition-all hover:bg-accent-2 active:scale-[0.99] disabled:opacity-50 sm:self-start sm:px-10"
+            className="h-12 rounded-btn bg-accent-2 text-[14.5px] font-semibold text-white transition-all hover:bg-accent-hover active:scale-[0.99] disabled:opacity-50 sm:self-start sm:px-10"
           >
             {submitting ? 'Submitting...' : 'Submit application'}
           </button>

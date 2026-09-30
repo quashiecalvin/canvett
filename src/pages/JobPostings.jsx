@@ -130,7 +130,7 @@ export default function JobPostings() {
               />
               <button
                 onClick={() => { setEditingJob(null); setShowModal(true) }}
-                className="flex items-center justify-center gap-2 h-10 px-4 rounded-btn bg-accent text-white text-[13px] font-medium hover:bg-accent/90 transition-colors shrink-0 whitespace-nowrap"
+                className="flex items-center justify-center gap-2 h-10 px-4 rounded-btn bg-accent-2 text-white text-[13px] font-medium hover:bg-accent-hover transition-colors shrink-0 whitespace-nowrap"
               >
                 <Plus size={14} />
                 <span className="hidden sm:inline">New job posting</span>
@@ -230,7 +230,7 @@ export default function JobPostings() {
               <button
                 onClick={performDelete}
                 disabled={deleting}
-                className="h-10 px-4 rounded-btn bg-danger text-white text-[13.5px] font-semibold hover:bg-danger/90 transition-colors disabled:opacity-50 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-danger/30"
+                className="h-10 px-4 rounded-btn bg-danger text-white text-[13.5px] font-semibold hover:bg-danger-hover transition-colors disabled:opacity-50 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-danger/30"
               >
                 {deleting ? 'Deleting…' : 'Delete posting'}
               </button>

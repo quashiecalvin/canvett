@@ -17,7 +17,7 @@ export default function NotFound() {
       </p>
       <Link
         to={home}
-        className="mt-7 inline-flex items-center justify-center h-11 px-6 rounded-btn bg-[#2563EB] text-white text-[14px] font-semibold hover:bg-[#1D4ED8] transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-accent/30"
+        className="mt-7 inline-flex items-center justify-center h-11 px-6 rounded-btn bg-accent-2 text-white text-[14px] font-semibold hover:bg-accent-hover transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-accent/30"
       >
         {homeLabel}
       </Link>

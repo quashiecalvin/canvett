@@ -6,6 +6,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#070d18" />
     <meta name="description" content="Canvett is an AI-powered recruitment platform that ranks and vets candidates against a job using natural language processing, with a transparent, explainable score breakdown." />
+    <script>
+      // Set the theme before first paint to avoid a flash. The logged-out zone
+      // (marketing + auth) is always dark; signed-in users get their saved theme.
+      (function () {
+        try {
+          var token = localStorage.getItem('canvett_token');
+          var stored = localStorage.getItem('canvett_theme');
+          var dark = token ? (stored === 'dark') : true;
+          document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+        } catch (e) {}
+      })();
+    </script>
     <title>Canvett—AI-Powered Resume Ranking</title>
     <!-- Open Graph / social preview -->
     <meta property="og:type" content="website" />

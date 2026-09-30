@@ -320,7 +320,7 @@ export default function Profile() {
               <button
                 onClick={saveProfile}
                 disabled={savingProfile || !profileChanged || !fullName.trim()}
-                className="h-10 px-5 rounded-btn bg-accent text-white text-[13px] font-medium hover:bg-accent-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="h-10 px-5 rounded-btn bg-accent-2 text-white text-[13px] font-medium hover:bg-accent-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {savingProfile ? 'Saving...' : 'Save changes'}
               </button>
@@ -380,7 +380,7 @@ export default function Profile() {
               <button
                 onClick={savePassword}
                 disabled={savingPw || !currentPw || !newPw || !confirmPw}
-                className="h-10 px-5 rounded-btn bg-accent text-white text-[13px] font-medium hover:bg-accent-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="h-10 px-5 rounded-btn bg-accent-2 text-white text-[13px] font-medium hover:bg-accent-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {savingPw ? 'Changing...' : 'Update password'}
               </button>
@@ -440,7 +440,7 @@ export default function Profile() {
                   <button
                     onClick={handleDeleteAccount}
                     disabled={deleteBusy || !deletePw}
-                    className="h-10 px-5 rounded-btn bg-danger text-white text-[13px] font-medium hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="h-10 px-5 rounded-btn bg-danger text-white text-[13px] font-medium hover:bg-danger-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {deleteBusy ? 'Deleting…' : 'Permanently delete'}
                   </button>

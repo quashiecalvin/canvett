@@ -89,7 +89,7 @@ export default function ApplyChooserModal({ jobId, jobTitle, onClose }) {
                   )}
                 </div>
                 <button onClick={handleReuse} disabled={reusing}
-                  className="mt-3 w-full h-11 rounded-btn bg-accent-2 text-white text-[13.5px] font-semibold hover:bg-[#1D4ED8] active:scale-[0.99] transition-all disabled:opacity-50 flex items-center justify-center gap-2 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-accent/30">
+                  className="mt-3 w-full h-11 rounded-btn bg-accent-2 text-white text-[13.5px] font-semibold hover:bg-accent-hover active:scale-[0.99] transition-all disabled:opacity-50 flex items-center justify-center gap-2 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-accent/30">
                   {reusing ? 'Submitting…' : 'Use this CV'}
                   {!reusing && <ArrowRight size={15} />}
                 </button>

@@ -349,7 +349,7 @@ export default function JobBoard() {
 
                     <button
                       onClick={runSearch}
-                      className="h-11 px-5 rounded-btn bg-accent text-white text-[13px] font-medium hover:bg-accent-2 transition-colors shrink-0 whitespace-nowrap"
+                      className="h-11 px-5 rounded-btn bg-accent-2 text-white text-[13px] font-medium hover:bg-accent-hover transition-colors shrink-0 whitespace-nowrap"
                     >
                       Search Jobs
                     </button>

@@ -114,7 +114,7 @@ export default function ParseReceipt({ receipt, jobTitle, company, jobId }) {
             </Link>
             <Link
               to="/seeker/jobs"
-              className="flex h-11 flex-1 items-center justify-center gap-2 rounded-btn bg-accent px-6 text-[14px] font-semibold text-white transition-all hover:bg-accent-2 active:scale-[0.99]"
+              className="flex h-11 flex-1 items-center justify-center gap-2 rounded-btn bg-accent-2 px-6 text-[14px] font-semibold text-white transition-all hover:bg-accent-hover active:scale-[0.99]"
             >
               Browse More Jobs <ArrowRight size={15} />
             </Link>
