@@ -8,7 +8,7 @@ import {
   getPublicJob, getPublicJobs, getMyApplications, getSavedJobs, saveJob, unsaveJob,
 } from '../../lib/api'
 import ApplyChooserModal from '../../components/seeker/ApplyChooserModal'
-import { daysAgo } from '../../lib/time'
+import { daysAgo, formatLongDate } from '../../lib/time'
 
 const COMPANY_COLORS = ['#2F6FB0', '#5A8F3C', '#C77D2E', '#B0505A', '#6E5AAE', '#2A9AA0', '#B85C9E']
 function companyColor(name) {
@@ -26,7 +26,7 @@ function companyMark(name, logo, box = 'w-14 h-14', txt = 'text-[15px]') {
     : <div className={`${box} ${txt} rounded-xl flex items-center justify-center text-white font-semibold shrink-0`} style={{ background: companyColor(name) }}>{monogram(name)}</div>
 }
 
-const STATUS_LABEL = { 'Under review': 'In review', Shortlisted: 'Shortlisted' }
+const STATUS_LABEL = { Submitted: 'Submitted', 'Under review': 'In review', Shortlisted: 'Shortlisted', 'Not selected': 'Not selected' }
 
 const TABS = [
   { key: 'description', label: 'Job Description' },
@@ -127,8 +127,13 @@ export default function JobDetail() {
             <div className="flex flex-wrap items-center gap-2.5 mt-5 pt-5 border-t border-border">
               {myApp ? (
                 <>
-                  <span className="inline-flex items-center gap-2 h-10 px-4 rounded-btn bg-success-tint text-success-text text-[13px] font-medium">
-                    <CheckCircle2 size={16} /> Applied · {STATUS_LABEL[myApp.status] || myApp.status}
+                  <span className={`inline-flex items-center gap-2 h-10 px-4 rounded-btn text-[13px] font-medium ${
+                    myApp.status === 'Shortlisted' ? 'bg-success-tint text-success-text'
+                    : myApp.status === 'Not selected' ? 'bg-danger-tint text-danger-text'
+                    : myApp.status === 'Under review' ? 'bg-warning-tint text-warning-text'
+                    : 'bg-info-tint text-info-text'
+                  }`}>
+                    <CheckCircle2 size={16} /> Applied on {formatLongDate(myApp.applied_on)} · {STATUS_LABEL[myApp.status] || myApp.status}
                   </span>
                   <Link to="/seeker/applications" className="text-[12.5px] font-medium text-accent hover:underline underline-offset-2">Track application →</Link>
                 </>
