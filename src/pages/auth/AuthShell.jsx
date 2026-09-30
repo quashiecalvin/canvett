@@ -33,7 +33,9 @@ export default function AuthShell({ children }) {
         <div
           className="rounded-modal p-7 sm:p-8 border shadow-2xl shadow-black/50"
           style={{
-            background: 'rgba(14, 21, 36, 0.94)',
+            background: 'rgba(15, 23, 42, 0.55)',
+            backdropFilter: 'blur(24px)',
+            WebkitBackdropFilter: 'blur(24px)',
             borderColor: 'rgba(255,255,255,0.12)',
           }}
         >

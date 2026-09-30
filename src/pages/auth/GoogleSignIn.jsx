@@ -125,7 +125,7 @@ export default function GoogleSignIn() {
 
       {/* Google's own rendered button - full width of the card, re-rendered on resize. */}
       <div className="w-full [color-scheme:light]">
-        <div ref={buttonRef} className="w-full min-h-[44px] flex justify-center" />
+        <div ref={buttonRef} className="w-full h-[44px] flex items-center justify-center" />
       </div>
 
       {error && !pending && (
