@@ -140,6 +140,9 @@
 
 /* Page background is solid and the rubber-band bounce is disabled so no
    white gap shows under the full-width footer when you over-scroll. */
+:root { color-scheme: light; }
+:root[data-theme="dark"] { color-scheme: dark; }
+
 html, body { background-color: var(--color-bg-page); }
 html { overscroll-behavior-y: none; scrollbar-gutter: stable; }
 
@@ -153,7 +156,8 @@ html { overscroll-behavior-y: none; scrollbar-gutter: stable; }
 .auth-scope input:-webkit-autofill:active {
   -webkit-text-fill-color: var(--color-text-primary);
   caret-color: var(--color-text-primary);
-  transition: background-color 9999s ease-in-out 0s;
+  -webkit-box-shadow: 0 0 0 1000px var(--color-bg-subtle) inset;
+  box-shadow: 0 0 0 1000px var(--color-bg-subtle) inset;
 }
 
 
