@@ -67,7 +67,8 @@ export default function AuthShell({ children }) {
           <span className="text-border" aria-hidden="true">·</span>
           <Link to="/privacy" className="transition-colors hover:text-text-primary focus-visible:outline-none focus-visible:underline">Privacy</Link>
           <span className="text-border" aria-hidden="true">·</span>
-          <Link to="/terms" className="transition-colors hover:text-text-primary">Terms</Link>
+          <Link to="/terms" className="transition-colors hover:text-text-primary focus-visible:outline-none focus-visible:underline">Terms</Link>
+          <span className="text-border" aria-hidden="true">·</span>
           <a href={`mailto:${CONTACT_EMAIL}`} className="transition-colors hover:text-text-primary focus-visible:outline-none focus-visible:underline">Contact</a>
         </nav>
       </div>
