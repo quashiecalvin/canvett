@@ -3,8 +3,9 @@ import { Link, useLocation } from 'react-router-dom'
 import {
   ArrowRight, Check, Sparkles, Eye, SlidersHorizontal, ShieldCheck, Users, Sun, Moon,
   Search, Bell, Home as HomeIcon, Briefcase, FileText, Settings as SettingsIcon, LayoutGrid,
-  Bookmark, User as UserIcon, MapPin,
+  Bookmark, MapPin,
 } from 'lucide-react'
+import './Landing.css'
 import { setThemeColor, THEME_COLORS } from '../lib/themeColor'
 
 const CONTACT_EMAIL = 'quashiecalvin13@gmail.com'
@@ -29,7 +30,7 @@ function Logo() {
 
 function FeatureCard({ icon, title, children }) {
   return (
-    <div className="flex-1 min-w-[180px]">
+    <div className="landing-feature min-w-0">
       <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-[12px] bg-accent-2 text-white">{icon}</div>
       <h3 className="text-[16px] font-semibold text-text-primary">{title}</h3>
       <p className="mt-2 text-[13.5px] leading-[1.6] text-text-muted">{children}</p>
@@ -54,7 +55,7 @@ function Step({ n, title, children, last }) {
 
 function RecruiterMockup() {
   return (
-    <div className="relative hidden md:block" aria-hidden="true">
+    <div className="landing-preview relative" aria-hidden="true">
       <div className="overflow-hidden rounded-[16px] border border-border bg-bg-surface shadow-2xl shadow-black/20">
         <div className="flex items-center gap-1.5 border-b border-border px-4 py-2.5">
           <span className="h-2.5 w-2.5 rounded-full bg-text-hint/40" /><span className="h-2.5 w-2.5 rounded-full bg-text-hint/40" /><span className="h-2.5 w-2.5 rounded-full bg-text-hint/40" />
@@ -62,7 +63,7 @@ function RecruiterMockup() {
         <div className="flex">
           <div className="hidden w-[118px] shrink-0 border-r border-border p-3 text-[11px] text-text-muted lg:block">
             <div className="mb-3 flex items-center gap-1.5 font-semibold text-text-primary"><LayoutGrid size={13} className="text-accent" /> Canvett</div>
-            {[['Home', HomeIcon, true], ['Job Postings', Briefcase], ['Candidates', Users], ['Applications', FileText], ['Settings', SettingsIcon]].map(([l, Ic, active]) => (
+            {[['Dashboard', HomeIcon, true], ['Job Postings', Briefcase], ['Upload Resumes', FileText], ['Candidates', Users], ['Analytics', SlidersHorizontal], ['Settings', SettingsIcon]].map(([l, Ic, active]) => (
               <div key={l} className={'mb-1 flex items-center gap-1.5 rounded-md px-2 py-1.5 ' + (active ? 'bg-accent-2/15 text-accent' : 'text-text-muted')}><Ic size={12} /> {l}</div>
             ))}
           </div>
@@ -118,7 +119,7 @@ function RecruiterMockup() {
 }
 function SeekerMockup() {
   return (
-    <div className="relative hidden md:block" aria-hidden="true">
+    <div className="landing-preview relative" aria-hidden="true">
       <div className="overflow-hidden rounded-[16px] border border-border bg-bg-surface shadow-2xl shadow-black/20">
         <div className="flex items-center gap-1.5 border-b border-border px-4 py-2.5">
           <span className="h-2.5 w-2.5 rounded-full bg-text-hint/40" /><span className="h-2.5 w-2.5 rounded-full bg-text-hint/40" /><span className="h-2.5 w-2.5 rounded-full bg-text-hint/40" />
@@ -126,7 +127,7 @@ function SeekerMockup() {
         <div className="flex">
           <div className="hidden w-[118px] shrink-0 border-r border-border p-3 text-[11px] text-text-muted lg:block">
             <div className="mb-3 flex items-center gap-1.5 font-semibold text-text-primary"><LayoutGrid size={13} className="text-accent" /> Canvett</div>
-            {[['Jobs', Briefcase, true], ['Saved', Bookmark], ['Applications', FileText], ['Profile', UserIcon]].map(([l, Ic, active]) => (
+            {[['Home', HomeIcon, true], ['Saved Jobs', Bookmark], ['My Applications', FileText]].map(([l, Ic, active]) => (
               <div key={l} className={'mb-1 flex items-center gap-1.5 rounded-md px-2 py-1.5 ' + (active ? 'bg-accent-2/15 text-accent' : 'text-text-muted')}><Ic size={12} /> {l}</div>
             ))}
           </div>
@@ -142,7 +143,7 @@ function SeekerMockup() {
             </div>
             {[['Backend Engineer', 'Sunrise Trading · Accra', '92%'], ['Data Analyst', 'MTN Ghana · Accra', '85%'], ['Product Designer', 'Hubtel · Remote', '78%'], ['Marketing Officer', 'Melcom · Tema', '71%']].map(([r, c, m]) => (
               <div key={r} className="mb-1.5 flex items-center gap-2 rounded-md border border-border bg-bg-subtle px-2.5 py-2">
-                <Briefcase size={13} className="shrink-0 text-accent" />
+                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-accent-2/10 text-[9px] font-bold text-accent">{c.split(" · ")[0].split(" ").map(word => word[0]).slice(0, 2).join("")}</span>
                 <div className="min-w-0 flex-1">
                   <div className="truncate text-[10.5px] font-medium text-text-body">{r}</div>
                   <div className="flex items-center gap-1 truncate text-[9px] text-text-muted"><MapPin size={8} /> {c}</div>
@@ -169,10 +170,10 @@ function SeekerMockup() {
 const AUD = {
   recruiter: {
     pill: 'Smarter hiring. Better teams.',
-    titleLead: 'Find the right talent, faster with ',
+    titleLead: 'Great teams start with ',
     sub: 'Canvett helps organisations find, rank and hire the best candidates with explainable AI. Smarter tools, fairer decisions, better teams.',
     bullets: ['AI-powered ranking', 'Explainable scores', 'Built for Ghana'],
-    cta: 'Get started',
+    cta: 'Start hiring',
     steps: [
       ['Create a job', 'Add the role, description and requirements.'],
       ['Review candidates', 'AI matches and ranks the best fits.'],
@@ -182,10 +183,10 @@ const AUD = {
   },
   seeker: {
     pill: 'Smarter applications. Better matches.',
-    titleLead: 'Land your next role, faster with ',
+    titleLead: 'Your next chapter starts with ',
     sub: 'Canvett matches your CV to roles that fit, shows you exactly how you rank, and lets you apply and track everything in one place.',
     bullets: ['Matched to the right roles', 'See how you rank', 'Apply & track with ease'],
-    cta: 'Find a job',
+    cta: 'Find my next role',
     steps: [
       ['Build your profile', 'Add your CV or fill a quick form.'],
       ['Get matched', 'See roles that fit, ranked by match.'],
@@ -196,42 +197,41 @@ const AUD = {
 }
 export default function Landing() {
   const { pathname } = useLocation()
-  const [dark, setDark] = useState(false)
+  const [dark, setDark] = useState(() => {
+    try {
+      const saved = localStorage.getItem('canvett_theme')
+      return saved ? saved === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches
+    } catch { return false }
+  })
   const [audience, setAudience] = useState('recruiter')
   useEffect(() => {
-    try {
-      const isDark = localStorage.getItem('canvett_theme') === 'dark'
-      setDark(isDark)
-      document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light')
-      setThemeColor(isDark ? THEME_COLORS.dark : THEME_COLORS.light)
-    } catch { /* ignore */ }
-  }, [])
+    document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light')
+    setThemeColor(dark ? THEME_COLORS.dark : THEME_COLORS.light)
+  }, [dark])
   function toggleTheme() {
-    setDark((d) => {
-      const nd = !d
-      document.documentElement.setAttribute('data-theme', nd ? 'dark' : 'light')
-      setThemeColor(nd ? THEME_COLORS.dark : THEME_COLORS.light)
-      try { localStorage.setItem('canvett_theme', nd ? 'dark' : 'light') } catch { /* ignore */ }
-      return nd
-    })
+    const next = !dark
+    setDark(next)
+    try { localStorage.setItem('canvett_theme', next ? 'dark' : 'light') } catch { /* ignore */ }
   }
   useEffect(() => { window.scrollTo(0, 0) }, [pathname])
 
   const a = AUD[audience]
 
   return (
-    <div className="brand-bg min-h-screen w-full overflow-x-hidden text-text-primary">
-      <div className="flex min-h-screen flex-col">
-        <header className="relative z-20 mx-auto flex w-full max-w-[1200px] items-center justify-between px-5 py-5 md:px-8">
+    <div className="canvett-landing brand-bg min-h-screen w-full overflow-x-hidden text-text-primary">
+      <div className="landing-intro flex flex-col">
+        <div className="hero-corners" aria-hidden="true"><i /><i /></div>
+        <header className="landing-header relative z-20 mx-auto flex w-full max-w-[1200px] items-center justify-between px-5 py-5 md:px-8">
           <Link to="/" aria-label="Canvett home"><Logo /></Link>
-          <nav className="hidden items-center gap-8 text-[14px] text-text-muted md:flex">
+          <nav aria-label="Main navigation" className="hidden items-center gap-8 text-[14px] text-text-muted md:flex">
             <Link to="/" className="font-medium text-text-primary">Home</Link>
             <Link to="/about" className="transition-colors hover:text-text-primary">About</Link>
             <Link to="/privacy" className="transition-colors hover:text-text-primary">Privacy</Link>
+            <Link to="/terms" className="transition-colors hover:text-text-primary">Terms</Link>
             <a href={`mailto:${CONTACT_EMAIL}`} className="transition-colors hover:text-text-primary">Contact</a>
           </nav>
           <div className="flex items-center gap-2.5">
-            <button onClick={toggleTheme} aria-label="Toggle theme" className="flex h-10 w-10 items-center justify-center rounded-btn border border-border text-text-muted transition-colors hover:bg-bg-subtle">
+            <button onClick={toggleTheme} aria-label={dark ? "Switch to light theme" : "Switch to dark theme"} className="flex h-10 w-10 items-center justify-center rounded-btn border border-border text-text-muted transition-colors hover:bg-bg-subtle">
               {dark ? <Sun size={17} /> : <Moon size={17} />}
             </button>
             <Link to="/login" className="inline-flex h-10 items-center rounded-btn border border-border-strong px-4 text-[13.5px] font-medium text-text-body transition-colors hover:bg-bg-subtle">Log in</Link>
@@ -239,20 +239,20 @@ export default function Landing() {
           </div>
         </header>
 
-        <section className="relative z-10 mx-auto grid w-full max-w-[1200px] flex-1 items-center gap-12 px-5 pb-12 md:grid-cols-2 md:px-8">
+        <section className="landing-hero relative z-10 mx-auto grid w-full max-w-[1200px] flex-1 items-center gap-12 px-5 pb-12 md:grid-cols-2 md:px-8">
           <div>
             {/* audience toggle */}
-            <div role="tablist" aria-label="Who are you?" className="mb-6 inline-flex rounded-full border border-border bg-bg-surface p-1 text-[13px] font-medium">
-              <button role="tab" aria-selected={audience === 'recruiter'} onClick={() => setAudience('recruiter')}
+            <div role="group" aria-label="Choose your audience" className="mb-6 inline-flex rounded-full border border-border bg-bg-surface p-1 text-[13px] font-medium">
+              <button aria-pressed={audience === 'recruiter'} onClick={() => setAudience('recruiter')}
                 className={'rounded-full px-4 py-1.5 transition-colors ' + (audience === 'recruiter' ? 'bg-accent-2 text-white' : 'text-text-muted hover:text-text-primary')}>For recruiters</button>
-              <button role="tab" aria-selected={audience === 'seeker'} onClick={() => setAudience('seeker')}
+              <button aria-pressed={audience === 'seeker'} onClick={() => setAudience('seeker')}
                 className={'rounded-full px-4 py-1.5 transition-colors ' + (audience === 'seeker' ? 'bg-accent-2 text-white' : 'text-text-muted hover:text-text-primary')}>For job seekers</button>
             </div>
 
             <span className="flex w-fit items-center gap-1.5 rounded-full border border-border bg-bg-surface px-3.5 py-1.5 text-[12.5px] font-medium text-text-muted">
               <Sparkles size={14} className="text-accent-2" /> {a.pill}
             </span>
-            <h1 className="mt-5 font-outfit text-[42px] font-bold leading-[1.05] tracking-[-1px] text-text-primary sm:text-[52px]">
+            <h1 className="landing-title mt-5 font-outfit text-[42px] font-bold leading-[1.05] tracking-[-1px] text-text-primary sm:text-[52px]">
               {a.titleLead}<span className="text-accent">Canvett</span>
             </h1>
             <p className="mt-5 max-w-[460px] text-[15px] leading-[1.65] text-text-muted">{a.sub}</p>
@@ -260,7 +260,7 @@ export default function Landing() {
               <Link to="/register" className="group inline-flex h-12 items-center gap-2 rounded-btn bg-accent-2 px-6 text-[14.5px] font-semibold text-white transition-colors hover:bg-accent-hover focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-accent/30">
                 {a.cta} <ArrowRight size={17} className="transition-transform group-hover:translate-x-0.5" />
               </Link>
-              <a href="#features" className="inline-flex h-12 items-center rounded-btn border border-border-strong px-6 text-[14.5px] font-semibold text-text-body transition-colors hover:bg-bg-subtle">Learn more</a>
+              <a href="#features" className="inline-flex h-12 items-center rounded-btn border border-border-strong px-6 text-[14.5px] font-semibold text-text-body transition-colors hover:bg-bg-subtle">See how it works <ArrowRight size={16} className="ml-2" /></a>
             </div>
             <div className="mt-7 flex flex-wrap items-center gap-x-6 gap-y-3 text-[13px] text-text-body">
               {a.bullets.map((t) => (
@@ -271,7 +271,14 @@ export default function Landing() {
             </div>
           </div>
 
-          {audience === 'recruiter' ? <RecruiterMockup /> : <SeekerMockup />}
+          <div className="landing-visual">
+            <div className="landing-decor" aria-hidden="true">
+              {Array.from({ length: 3 }, (_, i) => <span key={i} />)}
+            </div>
+            <div className="landing-preview-label"><span className="landing-live-dot" /> {audience === 'recruiter' ? 'A clearer view of your next hire' : 'Your job search, all in one place'}<span>PRODUCT PREVIEW</span></div>
+            {audience === 'recruiter' ? <RecruiterMockup /> : <SeekerMockup />}
+            <p className="landing-preview-note">Illustrative preview · Built around your workflow</p>
+          </div>
         </section>
       </div>
       {/* ===== Why Canvett (below the fold) ===== */}
@@ -279,11 +286,11 @@ export default function Landing() {
         <div className="mx-auto max-w-[1200px] px-5 py-16 md:px-8">
           <p className="text-[12.5px] font-semibold uppercase tracking-[0.12em] text-accent">Why Canvett</p>
           <h2 className="mt-2 font-outfit text-[30px] font-bold tracking-[-0.5px] text-text-primary">Everything you need to hire — and get hired — smarter</h2>
-          <div className="mt-10 flex flex-wrap gap-8">
+          <div className="landing-features mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-5">
             <FeatureCard icon={<Sparkles size={20} />} title="AI-Powered Matching">Candidates and roles matched by meaning, not just keywords, using semantic similarity and embeddings.</FeatureCard>
             <FeatureCard icon={<Eye size={20} />} title="Explainable Results">Clear skill, experience and education breakdowns, so everyone sees exactly why a match ranks where it does.</FeatureCard>
             <FeatureCard icon={<SlidersHorizontal size={20} />} title="Customisable Weights">Recruiters tune how much skills, experience and education count, for every role.</FeatureCard>
-            <FeatureCard icon={<ShieldCheck size={20} />} title="Secure & Reliable">Your data stays protected with industry best practices and secure hosting.</FeatureCard>
+            <FeatureCard icon={<ShieldCheck size={20} />} title="Privacy by design">Your data stays protected with industry best practices and secure hosting.</FeatureCard>
             <FeatureCard icon={<Users size={20} />} title="Built for Ghana">Designed with local context and the Ghanaian job market in mind.</FeatureCard>
           </div>
 
@@ -328,10 +335,11 @@ export default function Landing() {
       <footer className="relative z-10 border-t border-border px-5 py-8 md:px-8">
         <div className="mx-auto flex max-w-[1200px] flex-col items-center justify-between gap-4 sm:flex-row">
           <Logo />
-          <nav className="flex items-center gap-5 text-[13px] text-text-muted">
+          <nav aria-label="Footer navigation" className="flex flex-wrap justify-center items-center gap-5 text-[13px] text-text-muted">
             <Link to="/" className="transition-colors hover:text-text-primary">Home</Link>
             <Link to="/about" className="transition-colors hover:text-text-primary">About</Link>
             <Link to="/privacy" className="transition-colors hover:text-text-primary">Privacy</Link>
+            <Link to="/terms" className="transition-colors hover:text-text-primary">Terms</Link>
             <a href={`mailto:${CONTACT_EMAIL}`} className="transition-colors hover:text-text-primary">Contact</a>
           </nav>
           <p className="text-[12px] text-text-hint">&copy; {new Date().getFullYear()} Canvett</p>

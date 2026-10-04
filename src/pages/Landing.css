@@ -1,0 +1,41 @@
+.canvett-landing { background: var(--color-bg-page); }
+.canvett-landing .landing-intro { position: relative; isolation: isolate; overflow: hidden; }
+.canvett-landing .landing-intro::before { content: ''; position: absolute; inset: 0; z-index: -1; background: radial-gradient(ellipse at 85% 45%, #3979e51a, transparent 55%), radial-gradient(ellipse at 5% 10%, #3979e50b, transparent 50%); }
+.canvett-landing .landing-header { min-height: 92px; }
+.canvett-landing .landing-hero { padding-top: 70px; padding-bottom: 100px; gap: 56px; grid-template-columns: 1fr 1.08fr; }
+.canvett-landing .landing-title { max-width: 530px; font-size: clamp(42px, 4.6vw, 64px); line-height: 1.06; letter-spacing: -2.3px; }
+.canvett-landing .landing-visual { min-width: 0; position: relative; padding: 24px 0 18px; }
+.canvett-landing .landing-visual::before { content: ''; position: absolute; inset: -20px -25px; z-index: -1; border-radius: 40px; background: linear-gradient(145deg, #3979e512, #3979e504); border: 1px solid #3979e51a; transform: rotate(-3deg); }
+.canvett-landing .landing-preview-label { display: flex; align-items: center; gap: 7px; margin-bottom: 15px; font-size: 11px; font-weight: 600; color: var(--color-text-muted); }
+.canvett-landing .landing-preview-label > span:last-child { margin-left: auto; font-size: 8px; letter-spacing: 1px; }
+.canvett-landing .landing-live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--color-accent-2); }
+.canvett-landing .landing-preview-note { margin-top: 32px; font-size: 10px; color: var(--color-text-muted); }
+.canvett-landing .landing-preview > div:first-child { box-shadow: 0 24px 60px #102e5c16; }
+.canvett-landing .landing-feature { padding: 24px; border: 1px solid var(--color-border); border-radius: 16px; background: var(--color-bg-surface); }
+.canvett-landing .landing-feature > div:first-child { background: color-mix(in srgb, var(--color-accent-2) 10%, transparent); color: var(--color-accent); }
+.canvett-landing #features { scroll-margin-top: 24px; }
+.canvett-landing a:focus-visible, .canvett-landing button:focus-visible { outline: 3px solid var(--color-accent); outline-offset: 4px; }
+[data-theme='dark'] .canvett-landing .landing-preview > div:first-child { box-shadow: 0 24px 60px #0004; }
+@media (max-width: 900px) { .canvett-landing .landing-hero { gap: 35px; grid-template-columns: 1fr 1fr; } .canvett-landing .landing-title { font-size: 46px; } }
+@media (max-width: 767px) { .canvett-landing .landing-header { min-height: 80px; padding: 18px 20px; } .canvett-landing .landing-header > div { gap: 7px; } .canvett-landing .landing-header > div > a { padding: 0 12px; font-size: 12px; } .canvett-landing .landing-hero { grid-template-columns: 1fr; padding-top: 35px; padding-bottom: 60px; gap: 40px; } .canvett-landing .landing-title { max-width: 540px; font-size: clamp(40px, 8vw, 54px); letter-spacing: -1.5px; } .canvett-landing .landing-visual { margin: 0 6px; } .canvett-landing .landing-visual::before { inset: -8px -10px; } .canvett-landing .landing-preview-label > span:last-child { display: none; } .canvett-landing .landing-preview > div:last-child { right: -5px; } }
+@media (max-width: 380px) { .canvett-landing .landing-header > div > a:last-child { display: none; } }
+@media (prefers-reduced-motion: reduce) { .canvett-landing *, .canvett-landing *::before { animation: none !important; transition: none !important; scroll-behavior: auto !important; } }
+
+/* Corner geometry stays attached to the hero, independent of the preview. */
+.canvett-landing .hero-corners { position: absolute; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
+.canvett-landing .hero-corners i { position: absolute; width: clamp(340px, 48vw, 760px); aspect-ratio: 1; border: 1px solid #3979e526; border-radius: 50%; background: linear-gradient(145deg, #3979e509, #3979e502); }
+.canvett-landing .hero-corners i:first-child { top: 0; right: 0; transform: translate(44%, -72%); }
+.canvett-landing .hero-corners i:last-child { bottom: 0; left: 0; transform: translate(-62%, 66%); }
+.canvett-landing .landing-visual { isolation: isolate; }
+.canvett-landing .landing-visual::before { inset: -30px; transform: none; border: 0; background: radial-gradient(ellipse, #3979e512, transparent 72%); }
+.canvett-landing .landing-decor { position: absolute; inset: 0; z-index: -1; pointer-events: none; }
+.canvett-landing .landing-decor span { position: absolute; width: 92px; height: 92px; border: 1px solid #3979e539; border-radius: 13px; background: linear-gradient(145deg, #3979e514, #3979e507); transform: rotate(-14deg); }
+.canvett-landing .landing-decor span:nth-child(1) { right: 16%; top: -20px; }
+.canvett-landing .landing-decor span:nth-child(2) { left: -17px; top: 35%; width: 68px; height: 68px; }
+.canvett-landing .landing-decor span:nth-child(3) { right: 12%; bottom: -15px; width: 76px; height: 76px; }
+[data-theme='dark'] .canvett-landing .landing-intro::before { background: radial-gradient(ellipse at 83% 42%, #0b3b8c24, transparent 65%), linear-gradient(120deg, #0a1425, #09132a); }
+[data-theme='dark'] .canvett-landing .hero-corners i { border-color: #3678f538; background: linear-gradient(145deg, #1245a222, #1245a207); }
+[data-theme='dark'] .canvett-landing .landing-decor span { border-color: #4387ff40; background: linear-gradient(145deg, #1452c22c, #1452c211); }
+[data-theme='dark'] .canvett-landing .landing-preview > div:first-child { border-color: #4387ff35; box-shadow: 0 20px 60px #0004; }
+@media (min-width: 768px) and (max-width: 1023px) { .canvett-landing .landing-hero { grid-template-columns: 1fr; gap: 50px; padding-top: 40px; padding-bottom: 65px; } .canvett-landing .landing-title { font-size: 54px; max-width: 620px; } .canvett-landing .landing-visual { width: 100%; max-width: 620px; justify-self: center; } }
+@media (max-width: 767px) { .canvett-landing .hero-corners i { width: 340px; } .canvett-landing .hero-corners i:first-child { transform: translate(62%, -70%); } .canvett-landing .hero-corners i:last-child { transform: translate(-72%, 76%); } .canvett-landing .landing-decor span:nth-child(1) { width: 60px; height: 60px; top: -9px; right: 13%; } .canvett-landing .landing-decor span:nth-child(2) { display: none; } .canvett-landing .landing-decor span:nth-child(3) { width: 52px; height: 52px; bottom: -8px; } }
