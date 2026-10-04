@@ -64,7 +64,7 @@ export default function Privacy() {
               <span className="flex h-5.5 w-5.5 items-center justify-center rounded-md bg-purple-tint text-purple-text" style={{ height: '22px', width: '22px' }}>
                 <S width="13" height="13"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z" /></S>
               </span>
-              Last updated: September 2026
+              Last updated: October 2026
             </div>
           </div>
           <div className="relative hidden h-[300px] items-center justify-center md:flex">
@@ -107,13 +107,14 @@ export default function Privacy() {
             <p className="text-[14px] leading-[1.7] text-text-body">We collect information you give us directly, and some that's gathered automatically as you use the platform.</p>
             <p className="mt-3.5 text-[13.5px] font-bold text-text-primary">Information you provide</p>
             <Bullets items={['Account details: your name, email address and password', 'Profile information: location, skills, and an optional photo', 'Applications: the CV you upload or the form you fill in']} />
-            <p className="mt-3.5 text-[13.5px] font-bold text-text-primary">Information collected automatically</p>
-            <Bullets items={['Usage data such as the pages you visit and features you use', 'Basic device and browser information', 'Cookies used to keep you signed in']} />
+            <p className="mt-3.5 text-[13.5px] font-bold text-text-primary">Stored in your browser</p>
+            <Bullets items={['A sign-in token kept in your browser so you stay logged in', 'Your theme preference (light or dark)']} />
+            <p className="mt-2.5 text-[13px] leading-[1.6] text-text-muted">Canvett does not use third-party analytics or advertising trackers, and does not collect your device details or browsing history.</p>
           </Section>
 
           <Section n={2} title="How we use it" icon={<><circle cx="12" cy="12" r="3" /><path d="M19 12a7 7 0 0 0-.1-1l2-1.6-2-3.4-2.3 1a7 7 0 0 0-1.7-1l-.3-2.5h-4l-.3 2.5a7 7 0 0 0-1.7 1l-2.3-1-2 3.4 2 1.6a7 7 0 0 0 0 2l-2 1.6 2 3.4 2.3-1a7 7 0 0 0 1.7 1l.3 2.5h4l.3-2.5a7 7 0 0 0 1.7-1l2.3 1 2-3.4-2-1.6a7 7 0 0 0 .1-1Z" /></>}>
             <p className="text-[14px] leading-[1.7] text-text-body">Your information is used to run the service:</p>
-            <Bullets items={['Sign you in and maintain your profile', 'Read your CV and match it to a job so recruiters see a score and ranking', 'Keep the platform secure and improve how it works']} />
+            <Bullets items={['Sign you in and maintain your profile', 'Read your CV and match it to a job so recruiters see a score and ranking', 'Keep the platform secure and running reliably']} />
             <p className="mt-2 text-[14px] leading-[1.7] text-text-body">Scoring is done automatically by the system. The final hiring decision is always made by the recruiter, not the tool.</p>
           </Section>
 

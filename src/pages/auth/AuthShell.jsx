@@ -56,7 +56,7 @@ export default function AuthShell({ children }) {
             <span className="text-text-primary">Can</span><span className="text-accent">vett</span>
           </span>
         </div>
-        <p className="mb-7 mt-2 text-center text-[13px] text-text-muted">Smarter hiring. Better teams.</p>
+        <p className="mb-7 mt-2 text-center text-[13px] text-text-muted">Smarter hiring. Better matches.</p>
 
         <div className="glass-card rounded-modal p-7 shadow-xl shadow-black/10 sm:p-8">
           {children}

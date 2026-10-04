@@ -24,7 +24,7 @@ export default function Terms() {
             These terms govern your use of Canvett. By creating an account or using the platform,
             you agree to them.
           </p>
-          <p className="mt-4 text-[12.5px] text-text-muted">Last updated: September 2026</p>
+          <p className="mt-4 text-[12.5px] text-text-muted">Last updated: October 2026</p>
         </section>
       </div>
 
