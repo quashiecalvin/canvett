@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import {
   ArrowRight, Check, Sparkles, Eye, SlidersHorizontal, ShieldCheck, Users, Sun, Moon,
-  Search, Bell, Home as HomeIcon, Briefcase, FileText, Settings as SettingsIcon, LayoutGrid, Plus,
+  Search, Bell, Home as HomeIcon, Briefcase, FileText, Settings as SettingsIcon, LayoutGrid,
+  Bookmark, User as UserIcon, MapPin,
 } from 'lucide-react'
 import { setThemeColor, THEME_COLORS } from '../lib/themeColor'
 
@@ -51,9 +52,152 @@ function Step({ n, title, children, last }) {
   )
 }
 
+function RecruiterMockup() {
+  return (
+    <div className="relative hidden md:block" aria-hidden="true">
+      <div className="overflow-hidden rounded-[16px] border border-border bg-bg-surface shadow-2xl shadow-black/20">
+        <div className="flex items-center gap-1.5 border-b border-border px-4 py-2.5">
+          <span className="h-2.5 w-2.5 rounded-full bg-text-hint/40" /><span className="h-2.5 w-2.5 rounded-full bg-text-hint/40" /><span className="h-2.5 w-2.5 rounded-full bg-text-hint/40" />
+        </div>
+        <div className="flex">
+          <div className="hidden w-[118px] shrink-0 border-r border-border p-3 text-[11px] text-text-muted lg:block">
+            <div className="mb-3 flex items-center gap-1.5 font-semibold text-text-primary"><LayoutGrid size={13} className="text-accent" /> Canvett</div>
+            {[['Home', HomeIcon, true], ['Job Postings', Briefcase], ['Candidates', Users], ['Applications', FileText], ['Settings', SettingsIcon]].map(([l, Ic, active]) => (
+              <div key={l} className={'mb-1 flex items-center gap-1.5 rounded-md px-2 py-1.5 ' + (active ? 'bg-accent-2/15 text-accent' : 'text-text-muted')}><Ic size={12} /> {l}</div>
+            ))}
+          </div>
+          <div className="flex-1 p-3.5">
+            <div className="mb-3 flex items-center gap-2">
+              <div className="flex h-7 flex-1 items-center gap-1.5 rounded-md border border-border bg-bg-subtle px-2 text-[10px] text-text-hint"><Search size={11} /> Search candidates or postings…</div>
+              <Bell size={13} className="text-text-hint" />
+              <span className="h-5 w-5 rounded-full bg-avatar-bg" />
+            </div>
+            <div className="mb-3 flex items-stretch gap-2.5">
+              <div className="flex-1 rounded-lg bg-accent-2 p-3 text-white">
+                <div className="text-[9px] uppercase tracking-wide text-white/70">Good evening, Hunter</div>
+                <div className="mt-1 text-[13px] font-semibold leading-tight">Rank your next hire with confidence</div>
+                <div className="mt-2 inline-flex items-center gap-1 rounded-md bg-white/20 px-2 py-1 text-[9.5px] font-medium">Review rankings <ArrowRight size={10} /></div>
+              </div>
+              <div className="flex w-[108px] shrink-0 flex-col items-center justify-center rounded-lg border border-border bg-bg-subtle p-2">
+                <div className="text-[8.5px] text-text-muted">Average match</div>
+                <svg width="46" height="46" viewBox="0 0 46 46" className="my-1">
+                  <circle cx="23" cy="23" r="18" fill="none" stroke="currentColor" strokeWidth="5" className="text-border" />
+                  <circle cx="23" cy="23" r="18" fill="none" stroke="currentColor" strokeWidth="5" strokeLinecap="round" className="text-accent-2" strokeDasharray="113" strokeDashoffset="35" transform="rotate(-90 23 23)" />
+                  <text x="23" y="26" textAnchor="middle" className="fill-text-primary text-[10px] font-bold">69%</text>
+                </svg>
+              </div>
+            </div>
+            <div className="mb-3 grid grid-cols-3 gap-2">
+              {[['Active postings', '3'], ['Total applicants', '12'], ['Resumes ranked', '12']].map(([l, v]) => (
+                <div key={l} className="rounded-lg border border-border bg-bg-subtle p-2">
+                  <div className="text-[8.5px] text-text-muted">{l}</div>
+                  <div className="text-[15px] font-semibold text-text-primary">{v}</div>
+                </div>
+              ))}
+            </div>
+            <div className="mb-2 text-[10px] font-semibold text-text-body">Recent job postings</div>
+            {[['Marketing Director', 'Active'], ['UI/UX Designer', 'In review'], ['Software Engineer', 'Active']].map(([r, st]) => (
+              <div key={r} className="mb-1.5 flex items-center justify-between rounded-md border border-border bg-bg-subtle px-2 py-1.5">
+                <span className="text-[10px] text-text-body">{r}</span>
+                <span className={'rounded-full px-1.5 py-0.5 text-[8px] ' + (st === 'Active' ? 'bg-success-tint text-success-text' : 'bg-warning-tint text-warning-text')}>{st}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+      <div className="absolute -right-3 -bottom-4 w-[180px] rounded-[12px] border border-border bg-bg-surface p-3 shadow-2xl shadow-black/25">
+        <div className="mb-2 text-[9.5px] font-semibold text-text-muted">Top candidate</div>
+        <div className="flex items-center gap-2">
+          <span className="flex h-7 w-7 items-center justify-center rounded-full bg-avatar-bg text-[10px] font-semibold text-avatar-text">KM</span>
+          <div className="flex-1"><div className="text-[11px] font-semibold text-text-primary">Kwame Mensah</div><div className="text-[9px] text-text-muted">Software Engineer</div></div>
+          <span className="rounded-full bg-success-tint px-1.5 py-0.5 text-[9px] font-semibold text-success-text">100%</span>
+        </div>
+      </div>
+    </div>
+  )
+}
+function SeekerMockup() {
+  return (
+    <div className="relative hidden md:block" aria-hidden="true">
+      <div className="overflow-hidden rounded-[16px] border border-border bg-bg-surface shadow-2xl shadow-black/20">
+        <div className="flex items-center gap-1.5 border-b border-border px-4 py-2.5">
+          <span className="h-2.5 w-2.5 rounded-full bg-text-hint/40" /><span className="h-2.5 w-2.5 rounded-full bg-text-hint/40" /><span className="h-2.5 w-2.5 rounded-full bg-text-hint/40" />
+        </div>
+        <div className="flex">
+          <div className="hidden w-[118px] shrink-0 border-r border-border p-3 text-[11px] text-text-muted lg:block">
+            <div className="mb-3 flex items-center gap-1.5 font-semibold text-text-primary"><LayoutGrid size={13} className="text-accent" /> Canvett</div>
+            {[['Jobs', Briefcase, true], ['Saved', Bookmark], ['Applications', FileText], ['Profile', UserIcon]].map(([l, Ic, active]) => (
+              <div key={l} className={'mb-1 flex items-center gap-1.5 rounded-md px-2 py-1.5 ' + (active ? 'bg-accent-2/15 text-accent' : 'text-text-muted')}><Ic size={12} /> {l}</div>
+            ))}
+          </div>
+          <div className="flex-1 p-3.5">
+            <div className="mb-3 flex items-center gap-2">
+              <div className="flex h-7 flex-1 items-center gap-1.5 rounded-md border border-border bg-bg-subtle px-2 text-[10px] text-text-hint"><Search size={11} /> Search roles…</div>
+              <Bell size={13} className="text-text-hint" />
+              <span className="h-5 w-5 rounded-full bg-avatar-bg" />
+            </div>
+            <div className="mb-2 flex items-center justify-between">
+              <span className="text-[11px] font-semibold text-text-primary">Recommended for you</span>
+              <span className="text-[9px] text-text-muted">Ranked by match</span>
+            </div>
+            {[['Backend Engineer', 'Sunrise Trading · Accra', '92%'], ['Data Analyst', 'MTN Ghana · Accra', '85%'], ['Product Designer', 'Hubtel · Remote', '78%'], ['Marketing Officer', 'Melcom · Tema', '71%']].map(([r, c, m]) => (
+              <div key={r} className="mb-1.5 flex items-center gap-2 rounded-md border border-border bg-bg-subtle px-2.5 py-2">
+                <Briefcase size={13} className="shrink-0 text-accent" />
+                <div className="min-w-0 flex-1">
+                  <div className="truncate text-[10.5px] font-medium text-text-body">{r}</div>
+                  <div className="flex items-center gap-1 truncate text-[9px] text-text-muted"><MapPin size={8} /> {c}</div>
+                </div>
+                <span className="rounded-full bg-success-tint px-1.5 py-0.5 text-[9px] font-semibold text-success-text">{m}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+      {/* floating application-status card */}
+      <div className="absolute -right-3 -bottom-4 w-[190px] rounded-[12px] border border-border bg-bg-surface p-3 shadow-2xl shadow-black/25">
+        <div className="mb-2 text-[9.5px] font-semibold text-text-muted">Your application</div>
+        <div className="flex items-center gap-2">
+          <span className="flex h-7 w-7 items-center justify-center rounded-full bg-accent-2/15 text-accent"><Briefcase size={13} /></span>
+          <div className="flex-1"><div className="text-[11px] font-semibold text-text-primary">Backend Engineer</div><div className="text-[9px] text-text-muted">Sunrise Trading</div></div>
+        </div>
+        <div className="mt-2 flex items-center justify-between rounded-md bg-success-tint px-2 py-1 text-[9px] font-semibold text-success-text">Shortlisted <Check size={11} /></div>
+      </div>
+    </div>
+  )
+}
+
+const AUD = {
+  recruiter: {
+    pill: 'Smarter hiring. Better teams.',
+    titleLead: 'Find the right talent, faster with ',
+    sub: 'Canvett helps organisations find, rank and hire the best candidates with explainable AI. Smarter tools, fairer decisions, better teams.',
+    bullets: ['AI-powered ranking', 'Explainable scores', 'Built for Ghana'],
+    cta: 'Get started',
+    steps: [
+      ['Create a job', 'Add the role, description and requirements.'],
+      ['Review candidates', 'AI matches and ranks the best fits.'],
+      ['Make a decision', 'View detailed insights and compare.'],
+      ['Hire with confidence', 'Bring the right person on board.'],
+    ],
+  },
+  seeker: {
+    pill: 'Smarter applications. Better matches.',
+    titleLead: 'Land your next role, faster with ',
+    sub: 'Canvett matches your CV to roles that fit, shows you exactly how you rank, and lets you apply and track everything in one place.',
+    bullets: ['Matched to the right roles', 'See how you rank', 'Apply & track with ease'],
+    cta: 'Find a job',
+    steps: [
+      ['Build your profile', 'Add your CV or fill a quick form.'],
+      ['Get matched', 'See roles that fit, ranked by match.'],
+      ['Apply in a click', 'Reuse your CV across applications.'],
+      ['Track everything', "Follow each application's progress."],
+    ],
+  },
+}
 export default function Landing() {
   const { pathname } = useLocation()
   const [dark, setDark] = useState(false)
+  const [audience, setAudience] = useState('recruiter')
   useEffect(() => {
     try {
       const isDark = localStorage.getItem('canvett_theme') === 'dark'
@@ -73,9 +217,10 @@ export default function Landing() {
   }
   useEffect(() => { window.scrollTo(0, 0) }, [pathname])
 
+  const a = AUD[audience]
+
   return (
     <div className="brand-bg min-h-screen w-full overflow-x-hidden text-text-primary">
-      {/* ===== First screen: nav + full-height hero ===== */}
       <div className="flex min-h-screen flex-col">
         <header className="relative z-20 mx-auto flex w-full max-w-[1200px] items-center justify-between px-5 py-5 md:px-8">
           <Link to="/" aria-label="Canvett home"><Logo /></Link>
@@ -93,26 +238,32 @@ export default function Landing() {
             <Link to="/register" className="inline-flex h-10 items-center rounded-btn bg-accent-2 px-4 text-[13.5px] font-semibold text-white transition-colors hover:bg-accent-hover focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-accent/30">Sign up</Link>
           </div>
         </header>
-        {/* ---------- Hero (fills the rest of the first screen) ---------- */}
+
         <section className="relative z-10 mx-auto grid w-full max-w-[1200px] flex-1 items-center gap-12 px-5 pb-12 md:grid-cols-2 md:px-8">
           <div>
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-bg-surface px-3.5 py-1.5 text-[12.5px] font-medium text-text-muted">
-              <Sparkles size={14} className="text-accent-2" /> Smarter hiring. Better teams.
+            {/* audience toggle */}
+            <div role="tablist" aria-label="Who are you?" className="mb-6 inline-flex rounded-full border border-border bg-bg-surface p-1 text-[13px] font-medium">
+              <button role="tab" aria-selected={audience === 'recruiter'} onClick={() => setAudience('recruiter')}
+                className={'rounded-full px-4 py-1.5 transition-colors ' + (audience === 'recruiter' ? 'bg-accent-2 text-white' : 'text-text-muted hover:text-text-primary')}>For recruiters</button>
+              <button role="tab" aria-selected={audience === 'seeker'} onClick={() => setAudience('seeker')}
+                className={'rounded-full px-4 py-1.5 transition-colors ' + (audience === 'seeker' ? 'bg-accent-2 text-white' : 'text-text-muted hover:text-text-primary')}>For job seekers</button>
+            </div>
+
+            <span className="flex w-fit items-center gap-1.5 rounded-full border border-border bg-bg-surface px-3.5 py-1.5 text-[12.5px] font-medium text-text-muted">
+              <Sparkles size={14} className="text-accent-2" /> {a.pill}
             </span>
             <h1 className="mt-5 font-outfit text-[42px] font-bold leading-[1.05] tracking-[-1px] text-text-primary sm:text-[52px]">
-              Find the right talent, faster with <span className="text-accent">Canvett</span>
+              {a.titleLead}<span className="text-accent">Canvett</span>
             </h1>
-            <p className="mt-5 max-w-[460px] text-[15px] leading-[1.65] text-text-muted">
-              Canvett is an AI-powered recruitment platform that helps organisations find, rank and hire the best candidates. Smarter tools, fairer decisions, better teams.
-            </p>
+            <p className="mt-5 max-w-[460px] text-[15px] leading-[1.65] text-text-muted">{a.sub}</p>
             <div className="mt-7 flex flex-wrap items-center gap-3">
               <Link to="/register" className="group inline-flex h-12 items-center gap-2 rounded-btn bg-accent-2 px-6 text-[14.5px] font-semibold text-white transition-colors hover:bg-accent-hover focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-accent/30">
-                Get started <ArrowRight size={17} className="transition-transform group-hover:translate-x-0.5" />
+                {a.cta} <ArrowRight size={17} className="transition-transform group-hover:translate-x-0.5" />
               </Link>
               <a href="#features" className="inline-flex h-12 items-center rounded-btn border border-border-strong px-6 text-[14.5px] font-semibold text-text-body transition-colors hover:bg-bg-subtle">Learn more</a>
             </div>
             <div className="mt-7 flex flex-wrap items-center gap-x-6 gap-y-3 text-[13px] text-text-body">
-              {['AI-powered matching', 'Explainable results', 'Built for Ghana'].map((t) => (
+              {a.bullets.map((t) => (
                 <span key={t} className="inline-flex items-center gap-2">
                   <span className="flex h-[18px] w-[18px] items-center justify-center rounded-full bg-accent-2"><Check size={12} strokeWidth={3} className="text-white" /></span>{t}
                 </span>
@@ -120,82 +271,18 @@ export default function Landing() {
             </div>
           </div>
 
-          {/* dashboard mockup */}
-          <div className="relative hidden md:block" aria-hidden="true">
-            <div className="overflow-hidden rounded-[16px] border border-border bg-bg-surface shadow-2xl shadow-black/20">
-              <div className="flex items-center gap-1.5 border-b border-border px-4 py-2.5">
-                <span className="h-2.5 w-2.5 rounded-full bg-text-hint/40" /><span className="h-2.5 w-2.5 rounded-full bg-text-hint/40" /><span className="h-2.5 w-2.5 rounded-full bg-text-hint/40" />
-              </div>
-              <div className="flex">
-                <div className="hidden w-[118px] shrink-0 border-r border-border p-3 text-[11px] text-text-muted lg:block">
-                  <div className="mb-3 flex items-center gap-1.5 font-semibold text-text-primary"><LayoutGrid size={13} className="text-accent" /> Canvett</div>
-                  {[['Home', HomeIcon, true], ['Job Postings', Briefcase], ['Candidates', Users], ['Applications', FileText], ['Settings', SettingsIcon]].map(([l, Ic, active]) => (
-                    <div key={l} className={'mb-1 flex items-center gap-1.5 rounded-md px-2 py-1.5 ' + (active ? 'bg-accent-2/15 text-accent' : 'text-text-muted')}><Ic size={12} /> {l}</div>
-                  ))}
-                </div>
-                <div className="flex-1 p-3.5">
-                  <div className="mb-3 flex items-center gap-2">
-                    <div className="flex h-7 flex-1 items-center gap-1.5 rounded-md border border-border bg-bg-subtle px-2 text-[10px] text-text-hint"><Search size={11} /> Search candidates or postings…</div>
-                    <Bell size={13} className="text-text-hint" />
-                    <span className="h-5 w-5 rounded-full bg-avatar-bg" />
-                  </div>
-                  {/* blue rank card + donut */}
-                  <div className="mb-3 flex items-stretch gap-2.5">
-                    <div className="flex-1 rounded-lg bg-accent-2 p-3 text-white">
-                      <div className="text-[9px] uppercase tracking-wide text-white/70">Good evening, Hunter</div>
-                      <div className="mt-1 text-[13px] font-semibold leading-tight">Rank your next hire with confidence</div>
-                      <div className="mt-2 inline-flex items-center gap-1 rounded-md bg-white/20 px-2 py-1 text-[9.5px] font-medium">Review rankings <ArrowRight size={10} /></div>
-                    </div>
-                    <div className="flex w-[108px] shrink-0 flex-col items-center justify-center rounded-lg border border-border bg-bg-subtle p-2">
-                      <div className="text-[8.5px] text-text-muted">Average match</div>
-                      <svg width="46" height="46" viewBox="0 0 46 46" className="my-1">
-                        <circle cx="23" cy="23" r="18" fill="none" stroke="currentColor" strokeWidth="5" className="text-border" />
-                        <circle cx="23" cy="23" r="18" fill="none" stroke="currentColor" strokeWidth="5" strokeLinecap="round" className="text-accent-2" strokeDasharray="113" strokeDashoffset="35" transform="rotate(-90 23 23)" />
-                        <text x="23" y="26" textAnchor="middle" className="fill-text-primary text-[10px] font-bold">69%</text>
-                      </svg>
-                    </div>
-                  </div>
-                  {/* stat tiles */}
-                  <div className="mb-3 grid grid-cols-3 gap-2">
-                    {[['Active postings', '3'], ['Total applicants', '12'], ['Resumes ranked', '12']].map(([l, v]) => (
-                      <div key={l} className="rounded-lg border border-border bg-bg-subtle p-2">
-                        <div className="text-[8.5px] text-text-muted">{l}</div>
-                        <div className="text-[15px] font-semibold text-text-primary">{v}</div>
-                      </div>
-                    ))}
-                  </div>
-                  {/* recent postings */}
-                  <div className="mb-2 text-[10px] font-semibold text-text-body">Recent job postings</div>
-                  {[['Marketing Director', 'Active'], ['UI/UX Designer', 'In review'], ['Software Engineer', 'Active']].map(([r, st]) => (
-                    <div key={r} className="mb-1.5 flex items-center justify-between rounded-md border border-border bg-bg-subtle px-2 py-1.5">
-                      <span className="text-[10px] text-text-body">{r}</span>
-                      <span className={'rounded-full px-1.5 py-0.5 text-[8px] ' + (st === 'Active' ? 'bg-success-tint text-success-text' : 'bg-warning-tint text-warning-text')}>{st}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-            {/* floating top-candidate card */}
-            <div className="absolute -right-3 -bottom-4 w-[180px] rounded-[12px] border border-border bg-bg-surface p-3 shadow-2xl shadow-black/25">
-              <div className="mb-2 text-[9.5px] font-semibold text-text-muted">Top candidate</div>
-              <div className="flex items-center gap-2">
-                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-avatar-bg text-[10px] font-semibold text-avatar-text">KM</span>
-                <div className="flex-1"><div className="text-[11px] font-semibold text-text-primary">Kwame Mensah</div><div className="text-[9px] text-text-muted">Software Engineer</div></div>
-                <span className="rounded-full bg-success-tint px-1.5 py-0.5 text-[9px] font-semibold text-success-text">100%</span>
-              </div>
-            </div>
-          </div>
+          {audience === 'recruiter' ? <RecruiterMockup /> : <SeekerMockup />}
         </section>
       </div>
       {/* ===== Why Canvett (below the fold) ===== */}
       <section id="features" className="relative z-10 border-t border-border bg-bg-surface/60">
         <div className="mx-auto max-w-[1200px] px-5 py-16 md:px-8">
           <p className="text-[12.5px] font-semibold uppercase tracking-[0.12em] text-accent">Why Canvett</p>
-          <h2 className="mt-2 font-outfit text-[30px] font-bold tracking-[-0.5px] text-text-primary">Everything you need to hire smarter</h2>
+          <h2 className="mt-2 font-outfit text-[30px] font-bold tracking-[-0.5px] text-text-primary">Everything you need to hire — and get hired — smarter</h2>
           <div className="mt-10 flex flex-wrap gap-8">
-            <FeatureCard icon={<Sparkles size={20} />} title="AI-Powered Matching">Find candidates that actually fit your roles using semantic similarity and embeddings.</FeatureCard>
-            <FeatureCard icon={<Eye size={20} />} title="Explainable Results">See clear skill, experience and education breakdowns for every candidate.</FeatureCard>
-            <FeatureCard icon={<SlidersHorizontal size={20} />} title="Customisable Weights">Adjust hiring criteria to match your organisation's priorities, for every role.</FeatureCard>
+            <FeatureCard icon={<Sparkles size={20} />} title="AI-Powered Matching">Candidates and roles matched by meaning, not just keywords, using semantic similarity and embeddings.</FeatureCard>
+            <FeatureCard icon={<Eye size={20} />} title="Explainable Results">Clear skill, experience and education breakdowns, so everyone sees exactly why a match ranks where it does.</FeatureCard>
+            <FeatureCard icon={<SlidersHorizontal size={20} />} title="Customisable Weights">Recruiters tune how much skills, experience and education count, for every role.</FeatureCard>
             <FeatureCard icon={<ShieldCheck size={20} />} title="Secure & Reliable">Your data stays protected with industry best practices and secure hosting.</FeatureCard>
             <FeatureCard icon={<Users size={20} />} title="Built for Ghana">Designed with local context and the Ghanaian job market in mind.</FeatureCard>
           </div>
@@ -203,7 +290,7 @@ export default function Landing() {
           <div className="mt-14 grid gap-8 lg:grid-cols-[minmax(0,420px)_1fr]">
             <div className="rounded-[16px] border border-border bg-bg-surface p-6">
               <div className="grid grid-cols-3 gap-4">
-                {[['Explainable', 'Transparent score breakdowns'], ['Configurable', 'Weighting you control'], ['Local', 'For the Ghanaian market']].map(([h, s]) => (
+                {[['Explainable', 'Transparent score breakdowns'], ['Configurable', 'Weighting recruiters control'], ['Local', 'For the Ghanaian market']].map(([h, s]) => (
                   <div key={h}>
                     <div className="font-outfit text-[18px] font-bold text-accent">{h}</div>
                     <div className="mt-1 text-[11.5px] leading-[1.45] text-text-muted">{s}</div>
@@ -216,30 +303,28 @@ export default function Landing() {
             </div>
 
             <div>
-              <h3 className="font-outfit text-[20px] font-bold text-text-primary">How it works</h3>
-              <p className="mt-1 text-[13px] text-text-muted">Get from job posting to hired, in a few simple steps.</p>
+              <h3 className="font-outfit text-[20px] font-bold text-text-primary">How it works {audience === 'seeker' ? 'for job seekers' : 'for recruiters'}</h3>
+              <p className="mt-1 text-[13px] text-text-muted">{audience === 'seeker' ? 'From profile to offer, in a few simple steps.' : 'From job posting to hired, in a few simple steps.'}</p>
               <div className="mt-6 grid gap-5 sm:grid-cols-4">
-                <Step n="1" title="Create a job">Add the role, description and requirements.</Step>
-                <Step n="2" title="Review candidates">AI matches and ranks the best fits.</Step>
-                <Step n="3" title="Make a decision">View detailed insights and compare.</Step>
-                <Step n="4" title="Hire with confidence" last>Bring the right person on board.</Step>
+                {a.steps.map(([t, d], i) => (
+                  <Step key={t} n={String(i + 1)} title={t} last={i === a.steps.length - 1}>{d}</Step>
+                ))}
               </div>
             </div>
           </div>
 
           <div className="mt-16 flex flex-col items-center justify-between gap-5 rounded-[18px] border border-border bg-accent-2/[0.06] p-8 text-center sm:flex-row sm:text-left">
             <div>
-              <h3 className="font-outfit text-[22px] font-bold text-text-primary">Ready to hire smarter?</h3>
-              <p className="mt-1.5 text-[13.5px] text-text-muted">Create your account and rank your first shortlist in minutes.</p>
+              <h3 className="font-outfit text-[22px] font-bold text-text-primary">{audience === 'seeker' ? 'Ready to find your next role?' : 'Ready to hire smarter?'}</h3>
+              <p className="mt-1.5 text-[13.5px] text-text-muted">{audience === 'seeker' ? 'Create your account and get matched to roles in minutes.' : 'Create your account and rank your first shortlist in minutes.'}</p>
             </div>
             <Link to="/register" className="inline-flex h-12 shrink-0 items-center gap-2 rounded-btn bg-accent-2 px-7 text-[14.5px] font-semibold text-white transition-colors hover:bg-accent-hover focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-accent/30">
-              Get started <ArrowRight size={17} />
+              {a.cta} <ArrowRight size={17} />
             </Link>
           </div>
         </div>
       </section>
 
-      {/* ===== Footer ===== */}
       <footer className="relative z-10 border-t border-border px-5 py-8 md:px-8">
         <div className="mx-auto flex max-w-[1200px] flex-col items-center justify-between gap-4 sm:flex-row">
           <Logo />
