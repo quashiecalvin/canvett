@@ -41,41 +41,41 @@ export default function ResetPassword() {
     }
   }
 
-  const inputCls = "w-full h-12 pl-11 pr-4 rounded-btn text-[14px] text-white placeholder:text-white/30 bg-white/[0.06] border border-white/10 focus:outline-none focus:border-accent-light/60 focus:bg-white/[0.09] focus:ring-4 focus:ring-accent/15 transition-all"
+  const inputCls = "w-full h-12 pl-11 pr-4 rounded-btn text-[14px] text-text-primary placeholder:text-text-primary/30 bg-bg-subtle border border-border focus:outline-none focus:border-accent/60 focus:bg-bg-subtle focus:ring-4 focus:ring-accent/15 transition-all"
 
   return (
     <AuthShell>
       {done ? (
         <div className="text-center">
           <div className="w-12 h-12 rounded-full bg-accent/20 flex items-center justify-center mx-auto">
-            <CheckCircle2 size={24} className="text-accent-light" />
+            <CheckCircle2 size={24} className="text-accent" />
           </div>
-          <h1 className="font-outfit text-[22px] leading-[1.2] font-semibold text-white tracking-[-0.4px] mt-4">
+          <h1 className="font-outfit text-[22px] leading-[1.2] font-semibold text-text-primary tracking-[-0.4px] mt-4">
             Password reset
           </h1>
-          <p className="text-[14px] text-white/60 mt-2 leading-relaxed">
+          <p className="text-[14px] text-text-muted mt-2 leading-relaxed">
             Your password has been updated. Taking you to sign in…
           </p>
-          <Link to="/login" className="inline-flex items-center gap-1.5 mt-7 text-[13.5px] font-medium text-accent-light hover:underline underline-offset-2">
+          <Link to="/login" className="inline-flex items-center gap-1.5 mt-7 text-[13.5px] font-medium text-accent hover:underline underline-offset-2">
             Go to sign in <ArrowRight size={15} />
           </Link>
         </div>
       ) : (
         <>
           <div className="mb-7">
-            <h1 className="font-outfit text-[26px] leading-[1.15] font-semibold text-white tracking-[-0.4px]">
+            <h1 className="font-outfit text-[26px] leading-[1.15] font-semibold text-text-primary tracking-[-0.4px]">
               Set a new password
             </h1>
-            <p className="text-[14px] text-white/50 mt-2">
+            <p className="text-[14px] text-text-muted mt-2">
               Choose a new password for your account.
             </p>
           </div>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <div>
-              <label htmlFor="rp-new" className="block text-[13px] font-medium text-white/75 mb-2">New password</label>
+              <label htmlFor="rp-new" className="block text-[13px] font-medium text-text-body mb-2">New password</label>
               <div className="relative">
-                <Lock size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/30" />
+                <Lock size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-primary/30" />
                 <input
                   id="rp-new"
                   type="password"
@@ -90,9 +90,9 @@ export default function ResetPassword() {
             </div>
 
             <div>
-              <label htmlFor="rp-confirm" className="block text-[13px] font-medium text-white/75 mb-2">Confirm new password</label>
+              <label htmlFor="rp-confirm" className="block text-[13px] font-medium text-text-body mb-2">Confirm new password</label>
               <div className="relative">
-                <Lock size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/30" />
+                <Lock size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-primary/30" />
                 <input
                   id="rp-confirm"
                   type="password"
@@ -107,9 +107,9 @@ export default function ResetPassword() {
             </div>
 
             {error && (
-              <div className="flex items-start gap-2.5 rounded-btn bg-danger/15 border border-danger/25 px-4 py-3">
+              <div className="flex items-start gap-2.5 rounded-btn bg-danger-tint border border-danger/25 px-4 py-3">
                 <span className="w-1.5 h-1.5 rounded-full bg-danger mt-1.5 shrink-0" />
-                <p className="text-[13px] text-red-200">{error}</p>
+                <p className="text-[13px] text-danger-text">{error}</p>
               </div>
             )}
 
@@ -123,8 +123,8 @@ export default function ResetPassword() {
             </button>
           </form>
 
-          <p className="text-[13.5px] text-white/50 text-center mt-7">
-            <Link to="/login" className="text-accent-light font-medium hover:underline underline-offset-2">Back to sign in</Link>
+          <p className="text-[13.5px] text-text-muted text-center mt-7">
+            <Link to="/login" className="text-accent font-medium hover:underline underline-offset-2">Back to sign in</Link>
           </p>
         </>
       )}

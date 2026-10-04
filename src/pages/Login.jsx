@@ -38,31 +38,31 @@ export default function Login() {
     }
   }
 
-  const inputBase = "w-full h-12 pl-11 rounded-btn text-[14px] text-white placeholder:text-white/35 bg-white/[0.06] border focus-visible:outline-none focus-visible:border-accent-light/60 focus-visible:bg-white/[0.09] focus-visible:ring-4 focus-visible:ring-accent/20 transition-all"
+  const inputBase = "w-full h-12 pl-11 rounded-btn text-[14px] text-text-primary placeholder:text-text-hint bg-bg-subtle border focus-visible:outline-none focus-visible:border-accent focus-visible:bg-bg-subtle focus-visible:ring-4 focus-visible:ring-accent/20 transition-all"
 
   return (
     <AuthShell>
       <div className="mb-7">
-        <h1 className="font-outfit text-[26px] leading-[1.15] font-semibold text-white tracking-[-0.4px]">
+        <h1 className="font-outfit text-[26px] leading-[1.15] font-semibold text-text-primary tracking-[-0.4px]">
           Welcome back
         </h1>
-        <p className="text-[14px] text-white/55 mt-2">
+        <p className="text-[14px] text-text-muted mt-2">
           Sign in to continue to Canvett.
         </p>
       </div>
 
       {expired && (
-        <div role="status" className="mb-5 flex items-start gap-2.5 rounded-btn bg-amber-400/10 border border-amber-400/25 px-4 py-3">
-          <span className="w-1.5 h-1.5 rounded-full bg-amber-400 mt-1.5 shrink-0" />
-          <p className="text-[13px] text-amber-100">Your session expired. Please sign in again to continue.</p>
+        <div role="status" className="mb-5 flex items-start gap-2.5 rounded-btn bg-warning-tint border border-warning-text/25 px-4 py-3">
+          <span className="w-1.5 h-1.5 rounded-full bg-warning-text mt-1.5 shrink-0" />
+          <p className="text-[13px] text-warning-text">Your session expired. Please sign in again to continue.</p>
         </div>
       )}
 
       <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
         <div>
-          <label htmlFor="login-email" className="block text-[13px] font-medium text-white/75 mb-2">Email address</label>
+          <label htmlFor="login-email" className="block text-[13px] font-medium text-text-body mb-2">Email address</label>
           <div className="relative">
-            <Mail size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/35" />
+            <Mail size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-hint" />
             <input
               id="login-email"
               type="email"
@@ -74,19 +74,19 @@ export default function Login() {
               placeholder="you@example.com"
               aria-invalid={!!emailErr}
               aria-describedby={emailErr ? 'login-email-err' : undefined}
-              className={`${inputBase} pr-4 ${emailErr ? 'border-danger/60' : 'border-white/10'}`}
+              className={`${inputBase} pr-4 ${emailErr ? 'border-danger/60' : 'border-border'}`}
             />
           </div>
-          {emailErr && <p id="login-email-err" role="alert" className="mt-1.5 text-[12px] text-red-300">{emailErr}</p>}
+          {emailErr && <p id="login-email-err" role="alert" className="mt-1.5 text-[12px] text-danger-text">{emailErr}</p>}
         </div>
 
         <div>
           <div className="flex items-center justify-between mb-2">
-            <label htmlFor="login-password" className="block text-[13px] font-medium text-white/75">Password</label>
-            <Link to="/forgot-password" className="text-[12px] text-accent-light hover:underline underline-offset-2 focus-visible:outline-none focus-visible:underline">Forgot password?</Link>
+            <label htmlFor="login-password" className="block text-[13px] font-medium text-text-body">Password</label>
+            <Link to="/forgot-password" className="text-[12px] text-accent hover:underline underline-offset-2 focus-visible:outline-none focus-visible:underline">Forgot password?</Link>
           </div>
           <div className="relative">
-            <Lock size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/35" />
+            <Lock size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-hint" />
             <input
               id="login-password"
               type={showPassword ? 'text' : 'password'}
@@ -95,13 +95,13 @@ export default function Login() {
               required
               autoComplete="current-password"
               placeholder="Enter your password"
-              className={`${inputBase} pr-11 border-white/10`}
+              className={`${inputBase} pr-11 border-border`}
             />
             <button
               type="button"
               onClick={() => setShowPassword((v) => !v)}
               aria-label={showPassword ? 'Hide password' : 'Show password'}
-              className="absolute right-1.5 top-1/2 -translate-y-1/2 h-11 w-11 flex items-center justify-center text-white/40 hover:text-white/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40 rounded-btn transition-colors"
+              className="absolute right-1.5 top-1/2 -translate-y-1/2 h-11 w-11 flex items-center justify-center text-text-hint hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40 rounded-btn transition-colors"
             >
               {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
             </button>
@@ -109,9 +109,9 @@ export default function Login() {
         </div>
 
         {error && (
-          <div role="alert" className="flex items-start gap-2.5 rounded-btn bg-danger/15 border border-danger/25 px-4 py-3">
+          <div role="alert" className="flex items-start gap-2.5 rounded-btn bg-danger-tint border border-danger/25 px-4 py-3">
             <span className="w-1.5 h-1.5 rounded-full bg-danger mt-1.5 shrink-0" />
-            <p className="text-[13px] text-red-200">{error}</p>
+            <p className="text-[13px] text-danger-text">{error}</p>
           </div>
         )}
 
@@ -127,9 +127,9 @@ export default function Login() {
 
       <GoogleSignIn />
 
-      <p className="text-[13.5px] text-white/55 text-center mt-7">
+      <p className="text-[13.5px] text-text-muted text-center mt-7">
         New to Canvett?{' '}
-        <Link to="/register" className="text-accent-light font-medium hover:underline underline-offset-2 focus-visible:outline-none focus-visible:underline">
+        <Link to="/register" className="text-accent font-medium hover:underline underline-offset-2 focus-visible:outline-none focus-visible:underline">
           Create an account
         </Link>
       </p>

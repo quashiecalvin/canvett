@@ -64,25 +64,25 @@ export default function Register() {
     }
   }
 
-  const inputBase = "w-full h-12 pl-11 pr-4 rounded-btn text-[14px] text-white placeholder:text-white/35 bg-white/[0.06] border focus-visible:outline-none focus-visible:border-accent-light/60 focus-visible:bg-white/[0.09] focus-visible:ring-4 focus-visible:ring-accent/20 transition-all"
-  const inputCls = (field) => `${inputBase} ${showErr(field) ? 'border-danger/60' : 'border-white/10'}`
-  const labelCls = "block text-[13px] font-medium text-white/75 mb-2"
-  const errCls = "mt-1.5 text-[12px] text-red-300"
+  const inputBase = "w-full h-12 pl-11 pr-4 rounded-btn text-[14px] text-text-primary placeholder:text-text-hint bg-bg-subtle border focus-visible:outline-none focus-visible:border-accent focus-visible:bg-bg-subtle focus-visible:ring-4 focus-visible:ring-accent/20 transition-all"
+  const inputCls = (field) => `${inputBase} ${showErr(field) ? 'border-danger/60' : 'border-border'}`
+  const labelCls = "block text-[13px] font-medium text-text-body mb-2"
+  const errCls = "mt-1.5 text-[12px] text-danger-text"
 
   return (
     <AuthShell>
       <div className="mb-7">
-        <h1 className="font-outfit text-[26px] leading-[1.15] font-semibold text-white tracking-[-0.4px]">
+        <h1 className="font-outfit text-[26px] leading-[1.15] font-semibold text-text-primary tracking-[-0.4px]">
           {headline}
         </h1>
-        <p className="text-[14px] text-white/55 mt-2">
+        <p className="text-[14px] text-text-muted mt-2">
           Join Canvett to get started.
         </p>
       </div>
 
       <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
         <div>
-          <span className="block text-[13px] font-medium text-white/75 mb-2">I'm here to</span>
+          <span className="block text-[13px] font-medium text-text-body mb-2">I'm here to</span>
           <div role="radiogroup" aria-label="I am here to" className="grid grid-cols-2 gap-2.5">
             {ROLES.map(({ value, label, desc, Icon }) => {
               const active = form.role === value
@@ -95,14 +95,14 @@ export default function Register() {
                   onClick={() => { update('role', value); markTouched('role') }}
                   className={`relative text-left p-3 rounded-btn border transition-all active:scale-[0.99] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-accent/25
                     ${active
-                      ? 'border-accent-light/60 bg-accent/25 text-white ring-2 ring-accent/20'
-                      : 'border-white/10 bg-white/[0.04] text-white/70 hover:bg-white/[0.08]'
+                      ? 'border-accent/60 bg-accent/25 text-text-primary ring-2 ring-accent/20'
+                      : 'border-border bg-bg-subtle text-text-body hover:bg-bg-subtle'
                     }`}
                 >
-                  {active && <Check size={14} className="absolute top-2.5 right-2.5 text-accent-light" />}
-                  <Icon size={18} className={active ? 'text-accent-light' : 'text-white/50'} />
+                  {active && <Check size={14} className="absolute top-2.5 right-2.5 text-accent" />}
+                  <Icon size={18} className={active ? 'text-accent' : 'text-text-muted'} />
                   <span className="block text-[13px] font-semibold mt-2">{label}</span>
-                  <span className="block text-[11.5px] leading-snug text-white/50 mt-0.5">{desc}</span>
+                  <span className="block text-[11.5px] leading-snug text-text-muted mt-0.5">{desc}</span>
                 </button>
               )
             })}
@@ -113,7 +113,7 @@ export default function Register() {
         <div>
           <label htmlFor="reg-name" className={labelCls}>Full name</label>
           <div className="relative">
-            <User size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/35" />
+            <User size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-hint" />
             <input id="reg-name" type="text" value={form.full_name}
               onChange={(e) => update('full_name', e.target.value)} onBlur={() => markTouched('full_name')}
               autoComplete="name" placeholder="Your full name" className={inputCls('full_name')}
@@ -126,7 +126,7 @@ export default function Register() {
           <div>
             <label htmlFor="reg-company" className={labelCls}>Company name</label>
             <div className="relative">
-              <Building2 size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/35" />
+              <Building2 size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-hint" />
               <input id="reg-company" type="text" value={form.company_name}
                 onChange={(e) => update('company_name', e.target.value)} onBlur={() => markTouched('company_name')}
                 autoComplete="organization" placeholder="Your organisation" className={inputCls('company_name')}
@@ -134,14 +134,14 @@ export default function Register() {
             </div>
             {showErr('company_name')
               ? <p id="reg-company-err" role="alert" className={errCls}>{fieldErrors.company_name}</p>
-              : <p id="reg-company-hint" className="text-[12px] text-white/45 mt-2">Shown to job seekers on every role you post.</p>}
+              : <p id="reg-company-hint" className="text-[12px] text-text-hint mt-2">Shown to job seekers on every role you post.</p>}
           </div>
         )}
 
         <div>
           <label htmlFor="reg-email" className={labelCls}>Email address</label>
           <div className="relative">
-            <Mail size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/35" />
+            <Mail size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-hint" />
             <input id="reg-email" type="email" value={form.email}
               onChange={(e) => update('email', e.target.value)} onBlur={() => markTouched('email')}
               autoComplete="email" placeholder="you@example.com" className={inputCls('email')}
@@ -153,7 +153,7 @@ export default function Register() {
         <div>
           <label htmlFor="reg-password" className={labelCls}>Password</label>
           <div className="relative">
-            <Lock size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/35" />
+            <Lock size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-hint" />
             <input id="reg-password" type={showPassword ? 'text' : 'password'} value={form.password}
               onChange={(e) => update('password', e.target.value)} onBlur={() => markTouched('password')}
               autoComplete="new-password" minLength={8} placeholder="Create a password"
@@ -161,13 +161,13 @@ export default function Register() {
               aria-invalid={!!showErr('password')} aria-describedby={showErr('password') ? 'reg-password-err' : 'reg-password-hint'} />
             <button type="button" onClick={() => setShowPassword((v) => !v)}
               aria-label={showPassword ? 'Hide password' : 'Show password'}
-              className="absolute right-1.5 top-1/2 -translate-y-1/2 h-11 w-11 flex items-center justify-center text-white/40 hover:text-white/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40 rounded-btn transition-colors">
+              className="absolute right-1.5 top-1/2 -translate-y-1/2 h-11 w-11 flex items-center justify-center text-text-hint hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40 rounded-btn transition-colors">
               {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
             </button>
           </div>
           {showErr('password')
             ? <p id="reg-password-err" role="alert" className={errCls}>{fieldErrors.password}</p>
-            : <p id="reg-password-hint" className="text-[12px] text-white/45 mt-2">Use at least 8 characters.</p>}
+            : <p id="reg-password-hint" className="text-[12px] text-text-hint mt-2">Use at least 8 characters.</p>}
         </div>
 
         <div>
@@ -180,22 +180,22 @@ export default function Register() {
               onBlur={() => markTouched('agree')}
               aria-invalid={!!showErr('agree')}
               aria-describedby={showErr('agree') ? 'reg-agree-err' : undefined}
-              className="mt-0.5 h-4 w-4 shrink-0 rounded border-white/25 bg-white/[0.06] accent-[#2563EB] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
+              className="mt-0.5 h-4 w-4 shrink-0 rounded border-border-strong bg-bg-subtle accent-[#2563EB] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
             />
-            <span className="text-[12.5px] leading-snug text-white/65">
+            <span className="text-[12.5px] leading-snug text-text-muted">
               I agree to Canvett's{' '}
-              <a href="/terms" target="_blank" rel="noopener noreferrer" className="text-accent-light hover:underline">Terms of Use</a>{' '}
+              <a href="/terms" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">Terms of Use</a>{' '}
               and{' '}
-              <a href="/privacy" target="_blank" rel="noopener noreferrer" className="text-accent-light hover:underline">Privacy Policy</a>.
+              <a href="/privacy" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">Privacy Policy</a>.
             </span>
           </label>
-          {showErr('agree') && <p id="reg-agree-err" role="alert" className="mt-1.5 text-[12px] text-red-300">{fieldErrors.agree}</p>}
+          {showErr('agree') && <p id="reg-agree-err" role="alert" className="mt-1.5 text-[12px] text-danger-text">{fieldErrors.agree}</p>}
         </div>
 
         {error && (
-          <div role="alert" className="flex items-start gap-2.5 rounded-btn bg-danger/15 border border-danger/25 px-4 py-3">
+          <div role="alert" className="flex items-start gap-2.5 rounded-btn bg-danger-tint border border-danger/25 px-4 py-3">
             <span className="w-1.5 h-1.5 rounded-full bg-danger mt-1.5 shrink-0" />
-            <p className="text-[13px] text-red-200">{error}</p>
+            <p className="text-[13px] text-danger-text">{error}</p>
           </div>
         )}
 
@@ -210,9 +210,9 @@ export default function Register() {
 
       <GoogleSignIn />
 
-      <p className="text-[13.5px] text-white/55 text-center mt-7">
+      <p className="text-[13.5px] text-text-muted text-center mt-7">
         Already have an account?{' '}
-        <Link to="/login" className="text-accent-light font-medium hover:underline underline-offset-2 focus-visible:outline-none focus-visible:underline">
+        <Link to="/login" className="text-accent font-medium hover:underline underline-offset-2 focus-visible:outline-none focus-visible:underline">
           Sign in
         </Link>
       </p>

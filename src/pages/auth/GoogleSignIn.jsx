@@ -145,9 +145,9 @@ export default function GoogleSignIn() {
   return (
     <div className="mt-5">
       <div className="flex items-center gap-3 mb-5">
-        <span className="h-px flex-1 bg-white/10" />
-        <span className="text-[12px] text-white/50">or</span>
-        <span className="h-px flex-1 bg-white/10" />
+        <span className="h-px flex-1 bg-border" />
+        <span className="text-[12px] text-text-muted">or</span>
+        <span className="h-px flex-1 bg-border" />
       </div>
 
       {/* Google's own rendered button - full width of the card, re-rendered on resize. */}
@@ -164,9 +164,9 @@ export default function GoogleSignIn() {
       </div>
 
       {error && !pending && (
-        <div role="alert" className="mt-4 flex items-start gap-2.5 rounded-btn bg-danger/15 border border-danger/25 px-4 py-3">
+        <div role="alert" className="mt-4 flex items-start gap-2.5 rounded-btn bg-danger-tint border border-danger/25 px-4 py-3">
           <span className="w-1.5 h-1.5 rounded-full bg-danger mt-1.5 shrink-0" />
-          <p className="text-[13px] text-red-200">{error}</p>
+          <p className="text-[13px] text-danger-text">{error}</p>
         </div>
       )}
 
@@ -175,18 +175,12 @@ export default function GoogleSignIn() {
              style={{ background: 'rgba(4, 8, 16, 0.75)', backdropFilter: 'blur(6px)', WebkitBackdropFilter: 'blur(6px)' }}>
           <form
             onSubmit={submitRole}
-            className="w-full max-w-[400px] rounded-modal p-7 border shadow-2xl shadow-black/50"
-            style={{
-              background: 'rgba(15, 23, 42, 0.92)',
-              backdropFilter: 'blur(24px)',
-              WebkitBackdropFilter: 'blur(24px)',
-              borderColor: 'rgba(255,255,255,0.12)',
-            }}
+            className="w-full max-w-[400px] rounded-modal border border-border bg-bg-surface p-7 shadow-2xl shadow-black/40"
           >
-            <h2 className="font-outfit text-[20px] font-semibold text-white tracking-[-0.3px]">
+            <h2 className="font-outfit text-[20px] font-semibold text-text-primary tracking-[-0.3px]">
               Welcome, {pending.full_name?.split(' ')[0] || 'there'}
             </h2>
-            <p className="text-[13.5px] text-white/60 mt-1.5">
+            <p className="text-[13.5px] text-text-muted mt-1.5">
               One quick thing: how will you use Canvett?
             </p>
 
@@ -205,8 +199,8 @@ export default function GoogleSignIn() {
                     onClick={() => setRole(value)}
                     className={`h-11 rounded-btn border text-[13px] font-medium transition-all active:scale-[0.99] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-accent/25
                       ${active
-                        ? 'border-accent-light/60 bg-accent/25 text-white ring-2 ring-accent/20'
-                        : 'border-white/10 bg-white/[0.04] text-white/70 hover:bg-white/[0.08]'
+                        ? 'border-accent/60 bg-accent/25 text-text-primary ring-2 ring-accent/20'
+                        : 'border-border bg-bg-subtle text-text-body hover:bg-bg-subtle'
                       }`}
                   >
                     {label}
@@ -217,9 +211,9 @@ export default function GoogleSignIn() {
 
             {role === 'recruiter' && (
               <div className="mt-4">
-                <label htmlFor="g-company" className="block text-[13px] font-medium text-white/75 mb-2">Company name</label>
+                <label htmlFor="g-company" className="block text-[13px] font-medium text-text-body mb-2">Company name</label>
                 <div className="relative">
-                  <Building2 size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/35" />
+                  <Building2 size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-hint" />
                   <input
                     id="g-company"
                     type="text"
@@ -228,17 +222,17 @@ export default function GoogleSignIn() {
                     required
                     autoComplete="organization"
                     placeholder="Your organisation"
-                    className="w-full h-12 pl-11 pr-4 rounded-btn text-[14px] text-white placeholder:text-white/35 bg-white/[0.06] border border-white/10 focus-visible:outline-none focus-visible:border-accent-light/60 focus-visible:bg-white/[0.09] focus-visible:ring-4 focus-visible:ring-accent/20 transition-all"
+                    className="w-full h-12 pl-11 pr-4 rounded-btn text-[14px] text-text-primary placeholder:text-text-hint bg-bg-subtle border border-border focus-visible:outline-none focus-visible:border-accent focus-visible:bg-bg-subtle focus-visible:ring-4 focus-visible:ring-accent/20 transition-all"
                   />
                 </div>
-                <p className="text-[12px] text-white/45 mt-2">Shown to job seekers on every role you post.</p>
+                <p className="text-[12px] text-text-hint mt-2">Shown to job seekers on every role you post.</p>
               </div>
             )}
 
             {error && (
-              <div role="alert" className="mt-4 flex items-start gap-2.5 rounded-btn bg-danger/15 border border-danger/25 px-4 py-3">
+              <div role="alert" className="mt-4 flex items-start gap-2.5 rounded-btn bg-danger-tint border border-danger/25 px-4 py-3">
                 <span className="w-1.5 h-1.5 rounded-full bg-danger mt-1.5 shrink-0" />
-                <p className="text-[13px] text-red-200">{error}</p>
+                <p className="text-[13px] text-danger-text">{error}</p>
               </div>
             )}
 
@@ -252,7 +246,7 @@ export default function GoogleSignIn() {
             <button
               type="button"
               onClick={() => { setPending(null); setError(null); setCompany('') }}
-              className="w-full h-11 mt-2 text-[13px] text-white/60 hover:text-white/90 transition-colors focus-visible:outline-none focus-visible:underline"
+              className="w-full h-11 mt-2 text-[13px] text-text-muted hover:text-text-primary transition-colors focus-visible:outline-none focus-visible:underline"
             >
               Cancel
             </button>

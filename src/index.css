@@ -151,8 +151,8 @@ html { overscroll-behavior-y: none; scrollbar-gutter: stable; }
 .auth-scope input:-webkit-autofill:hover,
 .auth-scope input:-webkit-autofill:focus,
 .auth-scope input:-webkit-autofill:active {
-  -webkit-text-fill-color: #ffffff;
-  caret-color: #ffffff;
+  -webkit-text-fill-color: var(--color-text-primary);
+  caret-color: var(--color-text-primary);
   transition: background-color 9999s ease-in-out 0s;
 }
 
@@ -183,15 +183,28 @@ html { overscroll-behavior-y: none; scrollbar-gutter: stable; }
   }
 }
 
-/* Placeholder contrast on the dark auth screens (>= 60% white). */
-.auth-scope input::placeholder,
-.auth-scope textarea::placeholder {
-  color: rgba(255, 255, 255, 0.6) !important;
-}
+
 
 /* Hide the browser's built-in password reveal / clear controls (Edge shows an
    eye icon, etc.) so only the app's own show/hide toggle appears - no double eye. */
 input::-ms-reveal,
 input::-ms-clear {
   display: none;
+}
+
+
+/* ─────────────────────────────────────────────────────────────
+   Shared marketing / auth background - adapts to the theme.
+   ───────────────────────────────────────────────────────────── */
+.brand-bg {
+  background:
+    radial-gradient(1000px 620px at 85% -8%, rgba(37, 99, 235, 0.10), transparent 60%),
+    radial-gradient(820px 560px at -10% 22%, rgba(37, 99, 235, 0.06), transparent 55%),
+    #eef2f9;
+}
+:root[data-theme="dark"] .brand-bg {
+  background:
+    radial-gradient(1000px 620px at 85% -8%, rgba(37, 99, 235, 0.22), transparent 60%),
+    radial-gradient(820px 560px at -10% 22%, rgba(37, 99, 235, 0.14), transparent 55%),
+    #080e20;
 }

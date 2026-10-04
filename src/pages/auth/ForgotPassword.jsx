@@ -28,34 +28,34 @@ export default function ForgotPassword() {
       {sent ? (
         <div className="text-center">
           <div className="w-12 h-12 rounded-full bg-accent/20 flex items-center justify-center mx-auto">
-            <CheckCircle2 size={24} className="text-accent-light" />
+            <CheckCircle2 size={24} className="text-accent" />
           </div>
-          <h1 className="font-outfit text-[22px] leading-[1.2] font-semibold text-white tracking-[-0.4px] mt-4">
+          <h1 className="font-outfit text-[22px] leading-[1.2] font-semibold text-text-primary tracking-[-0.4px] mt-4">
             Check your email
           </h1>
-          <p className="text-[14px] text-white/60 mt-2 leading-relaxed">
-            If an account exists for <span className="text-white/80">{email}</span>, we've sent a link to reset your password. It expires in one hour — check your spam folder if it doesn't arrive.
+          <p className="text-[14px] text-text-muted mt-2 leading-relaxed">
+            If an account exists for <span className="text-text-body">{email}</span>, we've sent a link to reset your password. It expires in one hour — check your spam folder if it doesn't arrive.
           </p>
-          <Link to="/login" className="inline-flex items-center gap-1.5 mt-7 text-[13.5px] font-medium text-accent-light hover:underline underline-offset-2">
+          <Link to="/login" className="inline-flex items-center gap-1.5 mt-7 text-[13.5px] font-medium text-accent hover:underline underline-offset-2">
             <ArrowLeft size={15} /> Back to sign in
           </Link>
         </div>
       ) : (
         <>
           <div className="mb-7">
-            <h1 className="font-outfit text-[26px] leading-[1.15] font-semibold text-white tracking-[-0.4px]">
+            <h1 className="font-outfit text-[26px] leading-[1.15] font-semibold text-text-primary tracking-[-0.4px]">
               Forgot your password?
             </h1>
-            <p className="text-[14px] text-white/50 mt-2">
+            <p className="text-[14px] text-text-muted mt-2">
               Enter your email and we'll send you a link to reset it.
             </p>
           </div>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <div>
-              <label htmlFor="fp-email" className="block text-[13px] font-medium text-white/75 mb-2">Email address</label>
+              <label htmlFor="fp-email" className="block text-[13px] font-medium text-text-body mb-2">Email address</label>
               <div className="relative">
-                <Mail size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/30" />
+                <Mail size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-primary/30" />
                 <input
                   id="fp-email"
                   type="email"
@@ -64,15 +64,15 @@ export default function ForgotPassword() {
                   required
                   autoComplete="email"
                   placeholder="you@example.com"
-                  className="w-full h-12 pl-11 pr-4 rounded-btn text-[14px] text-white placeholder:text-white/30 bg-white/[0.06] border border-white/10 focus:outline-none focus:border-accent-light/60 focus:bg-white/[0.09] focus:ring-4 focus:ring-accent/15 transition-all"
+                  className="w-full h-12 pl-11 pr-4 rounded-btn text-[14px] text-text-primary placeholder:text-text-primary/30 bg-bg-subtle border border-border focus:outline-none focus:border-accent/60 focus:bg-bg-subtle focus:ring-4 focus:ring-accent/15 transition-all"
                 />
               </div>
             </div>
 
             {error && (
-              <div className="flex items-start gap-2.5 rounded-btn bg-danger/15 border border-danger/25 px-4 py-3">
+              <div className="flex items-start gap-2.5 rounded-btn bg-danger-tint border border-danger/25 px-4 py-3">
                 <span className="w-1.5 h-1.5 rounded-full bg-danger mt-1.5 shrink-0" />
-                <p className="text-[13px] text-red-200">{error}</p>
+                <p className="text-[13px] text-danger-text">{error}</p>
               </div>
             )}
 
@@ -86,8 +86,8 @@ export default function ForgotPassword() {
             </button>
           </form>
 
-          <p className="text-[13.5px] text-white/50 text-center mt-7">
-            <Link to="/login" className="inline-flex items-center gap-1.5 text-accent-light font-medium hover:underline underline-offset-2">
+          <p className="text-[13.5px] text-text-muted text-center mt-7">
+            <Link to="/login" className="inline-flex items-center gap-1.5 text-accent font-medium hover:underline underline-offset-2">
               <ArrowLeft size={14} /> Back to sign in
             </Link>
           </p>
