@@ -1,0 +1,15 @@
+.canvett-public-theme { --color-text-muted: #536178; --color-text-body: #25344c; --color-bg-page: #fff; --color-bg-surface: #fff; --color-bg-subtle: #f4f7fc; background: radial-gradient(ellipse at 88% 25%, #dce9ff80, transparent 55%), linear-gradient(150deg, #fff, #f8faff); color: var(--color-text-primary); }
+.canvett-public-theme.auth-scope { position: relative; isolation: isolate; background: radial-gradient(ellipse at 85% 40%, #dce9ff90, transparent 52%), radial-gradient(ellipse at 12% 90%, #eaf1ff, transparent 50%), #fff; }
+.canvett-public-theme .glass-card { background: #ffffffeb; border: 1px solid #dce5f2; box-shadow: 0 24px 65px #1b57a51c, 0 3px 12px #1b57a508; }
+.canvett-public-theme.public-info > header { background: #ffffffd9; border-color: #e3eaf4; padding-top: 22px; padding-bottom: 22px; }
+.canvett-public-theme.public-info main > div:first-child { background: transparent; }
+.canvett-public-theme.public-info main { position: relative; }
+.canvett-public-theme.public-info > footer { background: #061128; }
+.canvett-public-theme a:focus-visible, .canvett-public-theme button:focus-visible { outline: 3px solid var(--color-accent); outline-offset: 3px; }
+[data-theme='dark'] .canvett-public-theme { --color-text-muted: #a5b5ce; --color-text-body: #cad5e8; --color-bg-page: #060f21; --color-bg-surface: #101c30; --color-bg-subtle: #142137; background: radial-gradient(ellipse at 89% 20%, #073bb650, transparent 55%), linear-gradient(130deg, #061128, #020a1c); }
+[data-theme='dark'] .canvett-public-theme.auth-scope { background: radial-gradient(ellipse at 85% 40%, #073bb665, transparent 57%), radial-gradient(ellipse at 10% 100%, #062c7450, transparent 45%), linear-gradient(130deg, #061128, #020a1c); }
+[data-theme='dark'] .canvett-public-theme .glass-card { background: #0e1a30eb; border-color: #3676e83a; box-shadow: inset 0 1px 0 #81aaff10, 0 25px 80px #0004; }
+[data-theme='dark'] .canvett-public-theme.public-info > header { background: #071227b0; border-color: #27426760; }
+[data-theme='dark'] .canvett-public-theme.auth-scope::before { content: ''; position: absolute; top: 20%; left: 8%; width: 24px; height: 24px; border: 1px solid #72a7ff30; border-radius: 4px; background: #72a7ff08; transform: rotate(-12deg); box-shadow: 70vw 13vh 0 -3px #72a7ff0a, 9vw 57vh 0 -5px #72a7ff0b; z-index: -1; pointer-events: none; }
+@media (max-width: 900px) { .canvett-public-theme.public-info > header nav { gap: 16px; } }
+@media (max-width: 767px) { .canvett-public-theme.public-info > header { padding-top: 16px; padding-bottom: 16px; } .canvett-public-theme.auth-scope { padding-top: 80px; padding-bottom: 36px; } [data-theme='dark'] .canvett-public-theme.auth-scope::before { top: 12%; left: 3%; width: 16px; height: 16px; } }

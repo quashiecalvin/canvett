@@ -1,3 +1,4 @@
+import '../../styles/PublicTheme.css'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowLeft, Sun, Moon } from 'lucide-react'
@@ -6,27 +7,24 @@ import { setThemeColor, THEME_COLORS } from '../../lib/themeColor'
 const CONTACT_EMAIL = 'quashiecalvin13@gmail.com'
 
 export default function AuthShell({ children }) {
-  const [dark, setDark] = useState(false)
-  useEffect(() => {
+  const [dark, setDark] = useState(() => {
     try {
-      const isDark = localStorage.getItem('canvett_theme') === 'dark'
-      setDark(isDark)
-      document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light')
-      setThemeColor(isDark ? THEME_COLORS.dark : THEME_COLORS.light)
-    } catch { /* ignore */ }
-  }, [])
+      const saved = localStorage.getItem('canvett_theme')
+      return saved ? saved === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches
+    } catch { return false }
+  })
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light')
+    setThemeColor(dark ? THEME_COLORS.dark : THEME_COLORS.light)
+  }, [dark])
   function toggleTheme() {
-    setDark((d) => {
-      const nd = !d
-      document.documentElement.setAttribute('data-theme', nd ? 'dark' : 'light')
-      setThemeColor(nd ? THEME_COLORS.dark : THEME_COLORS.light)
-      try { localStorage.setItem('canvett_theme', nd ? 'dark' : 'light') } catch { /* ignore */ }
-      return nd
-    })
+    const next = !dark
+    setDark(next)
+    try { localStorage.setItem('canvett_theme', next ? 'dark' : 'light') } catch { /* ignore */ }
   }
 
   return (
-    <div className="auth-scope brand-bg relative flex min-h-screen w-full items-center justify-center overflow-hidden px-5 py-16 sm:py-12"
+    <div className="canvett-public-theme auth-scope brand-bg relative flex min-h-screen w-full items-center justify-center overflow-hidden px-5 py-16 sm:py-12"
          style={{ minHeight: '100dvh' }}>
 
       {/* top bar: back to home + theme toggle */}
@@ -36,7 +34,7 @@ export default function AuthShell({ children }) {
         </Link>
         <button
           onClick={toggleTheme}
-          aria-label="Toggle theme"
+          aria-label={dark ? "Switch to light theme" : "Switch to dark theme"}
           className="flex h-9 w-9 items-center justify-center rounded-btn border border-border bg-bg-surface/60 text-text-muted transition-colors hover:bg-bg-subtle"
         >
           {dark ? <Sun size={16} /> : <Moon size={16} />}
@@ -44,7 +42,7 @@ export default function AuthShell({ children }) {
       </div>
 
       {/* the card */}
-      <div className="relative w-full max-w-[420px]">
+      <div className="auth-content relative w-full max-w-[420px]">
         <div className="flex items-center justify-center gap-2">
           <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[8px] bg-accent-2">
             <svg width="32" height="32" viewBox="0 0 32 32" fill="none" aria-hidden="true">
@@ -69,6 +67,7 @@ export default function AuthShell({ children }) {
           <span className="text-border" aria-hidden="true">·</span>
           <Link to="/privacy" className="transition-colors hover:text-text-primary focus-visible:outline-none focus-visible:underline">Privacy</Link>
           <span className="text-border" aria-hidden="true">·</span>
+          <Link to="/terms" className="transition-colors hover:text-text-primary">Terms</Link>
           <a href={`mailto:${CONTACT_EMAIL}`} className="transition-colors hover:text-text-primary focus-visible:outline-none focus-visible:underline">Contact</a>
         </nav>
       </div>

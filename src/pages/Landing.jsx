@@ -220,7 +220,9 @@ export default function Landing() {
   return (
     <div className="canvett-landing brand-bg min-h-screen w-full overflow-x-hidden text-text-primary">
       <div className="landing-intro flex flex-col">
-        <div className="hero-corners" aria-hidden="true"><i /><i /></div>
+        <div className="hero-squares" aria-hidden="true">
+          {Array.from({ length: 9 }, (_, i) => <span key={i} />)}
+        </div>
         <header className="landing-header relative z-20 mx-auto flex w-full max-w-[1200px] items-center justify-between px-5 py-5 md:px-8">
           <Link to="/" aria-label="Canvett home"><Logo /></Link>
           <nav aria-label="Main navigation" className="hidden items-center gap-8 text-[14px] text-text-muted md:flex">
@@ -272,12 +274,8 @@ export default function Landing() {
           </div>
 
           <div className="landing-visual">
-            <div className="landing-decor" aria-hidden="true">
-              {Array.from({ length: 3 }, (_, i) => <span key={i} />)}
-            </div>
             <div className="landing-preview-label"><span className="landing-live-dot" /> {audience === 'recruiter' ? 'A clearer view of your next hire' : 'Your job search, all in one place'}<span>PRODUCT PREVIEW</span></div>
             {audience === 'recruiter' ? <RecruiterMockup /> : <SeekerMockup />}
-            <p className="landing-preview-note">Illustrative preview · Built around your workflow</p>
           </div>
         </section>
       </div>

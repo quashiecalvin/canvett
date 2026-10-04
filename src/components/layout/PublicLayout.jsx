@@ -1,3 +1,4 @@
+import '../../styles/PublicTheme.css'
 import { useEffect, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { Sun, Moon } from 'lucide-react'
@@ -28,30 +29,27 @@ function Logo() {
 // with a Home link back to the landing page and a light/dark toggle. (Signed-in
 // viewers of these pages get the full app shell instead - see PublicPage.)
 export default function PublicLayout({ children }) {
-  const [dark, setDark] = useState(false)
-  useEffect(() => {
+  const [dark, setDark] = useState(() => {
     try {
-      const isDark = localStorage.getItem('canvett_theme') === 'dark'
-      setDark(isDark)
-      document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light')
-      setThemeColor(isDark ? THEME_COLORS.dark : THEME_COLORS.light)
-    } catch { /* ignore */ }
-  }, [])
+      const saved = localStorage.getItem('canvett_theme')
+      return saved ? saved === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches
+    } catch { return false }
+  })
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light')
+    setThemeColor(dark ? THEME_COLORS.dark : THEME_COLORS.light)
+  }, [dark])
   function toggleTheme() {
-    setDark((d) => {
-      const nd = !d
-      document.documentElement.setAttribute('data-theme', nd ? 'dark' : 'light')
-      setThemeColor(nd ? THEME_COLORS.dark : THEME_COLORS.light)
-      try { localStorage.setItem('canvett_theme', nd ? 'dark' : 'light') } catch { /* ignore */ }
-      return nd
-    })
+    const next = !dark
+    setDark(next)
+    try { localStorage.setItem('canvett_theme', next ? 'dark' : 'light') } catch { /* ignore */ }
   }
 
   const { pathname } = useLocation()
   useEffect(() => { window.scrollTo(0, 0) }, [pathname])
 
   return (
-    <div className="flex min-h-screen flex-col bg-bg-page">
+    <div className="canvett-public-theme public-info flex min-h-screen flex-col bg-bg-page">
       <header className="border-b border-border bg-bg-surface px-4 py-3 md:px-6">
         <div className="mx-auto flex max-w-[1100px] items-center justify-between">
           <Link to="/" aria-label="Canvett home"><Logo /></Link>
@@ -59,12 +57,13 @@ export default function PublicLayout({ children }) {
             <Link to="/" className="transition-colors hover:text-text-primary">Home</Link>
             <Link to="/about" className="transition-colors hover:text-text-primary">About</Link>
             <Link to="/privacy" className="transition-colors hover:text-text-primary">Privacy</Link>
+            <Link to="/terms" className="transition-colors hover:text-text-primary">Terms</Link>
             <a href={`mailto:${CONTACT_EMAIL}`} className="transition-colors hover:text-text-primary">Contact</a>
           </nav>
           <div className="flex items-center gap-2 md:gap-2.5">
             <button
               onClick={toggleTheme}
-              aria-label="Toggle theme"
+              aria-label={dark ? "Switch to light theme" : "Switch to dark theme"}
               className="flex h-10 w-10 items-center justify-center rounded-btn border border-border text-text-muted transition-colors hover:bg-bg-subtle"
             >
               {dark ? <Sun size={17} /> : <Moon size={17} />}
