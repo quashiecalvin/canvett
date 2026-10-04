@@ -60,7 +60,7 @@ export default function AuthShell({ children }) {
         </div>
         <p className="mb-7 mt-2 text-center text-[13px] text-text-muted">Smarter hiring. Better teams.</p>
 
-        <div className="rounded-modal border border-border bg-bg-surface p-7 shadow-xl shadow-black/5 sm:p-8">
+        <div className="glass-card rounded-modal p-7 shadow-xl shadow-black/10 sm:p-8">
           {children}
         </div>
 
