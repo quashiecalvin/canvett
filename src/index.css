@@ -188,3 +188,10 @@ html { overscroll-behavior-y: none; scrollbar-gutter: stable; }
 .auth-scope textarea::placeholder {
   color: rgba(255, 255, 255, 0.6) !important;
 }
+
+/* Hide the browser's built-in password reveal / clear controls (Edge shows an
+   eye icon, etc.) so only the app's own show/hide toggle appears - no double eye. */
+input::-ms-reveal,
+input::-ms-clear {
+  display: none;
+}

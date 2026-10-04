@@ -152,15 +152,10 @@ export default function GoogleSignIn() {
 
       {/* Google's own rendered button - full width of the card, re-rendered on resize. */}
       <div className="relative w-full h-[44px] [color-scheme:light]">
-        {/* An empty white pill that matches the real button's shape/border/size
-            exactly. It holds the space (and hides Google's multi-pass render)
-            while the button loads, then cross-fades out as the real button
-            fades in - so only Google's real content ever appears, no morph. */}
-        <div
-          className="absolute inset-0 rounded-full bg-white border border-[#dadce0] transition-opacity duration-200 pointer-events-none"
-          aria-hidden="true"
-          style={{ opacity: ready ? 0 : 1 }}
-        />
+        {/* No visible placeholder - just the reserved h-[44px] space below. Google
+            renders its button here while it is still invisible (opacity 0), so its
+            multi-pass render is never seen; once the iframe has loaded we fade the
+            finished button in. No blank pill, no flicker, no morph. */}
         <div
           ref={buttonRef}
           className="relative w-full h-[44px] flex items-center justify-center transition-opacity duration-200"

@@ -6,6 +6,7 @@ import { JobProvider } from './context/JobContext'
 import { ActivityProvider } from './context/ActivityContext'
 import ProtectedRoute from './components/ProtectedRoute'
 import Login from './pages/Login'
+import Landing from './pages/Landing'
 import Register from './pages/Register'
 const ForgotPassword = lazy(() => import('./pages/auth/ForgotPassword'))
 const ResetPassword = lazy(() => import('./pages/auth/ResetPassword'))
@@ -127,7 +128,7 @@ function DocumentTitle() {
 function RootRedirect() {
   const { isAuthenticated, user, loading } = useAuth()
   if (loading) return null
-  if (!isAuthenticated) return <Navigate to="/login" replace />
+  if (!isAuthenticated) return <Landing />
   return <Navigate to={user.role === 'recruiter' ? '/dashboard' : '/seeker/jobs'} replace />
 }
 
