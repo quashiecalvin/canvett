@@ -12,8 +12,8 @@ const CONTACT_EMAIL = 'quashiecalvin13@gmail.com'
 
 function Logo() {
   return (
-    <div className="flex items-center gap-2">
-      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[9px] bg-accent-2">
+    <div className="canvett-logo flex items-center gap-2">
+      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[9px] bg-accent">
         <svg width="30" height="30" viewBox="0 0 28 28" fill="none">
           <rect x="8" y="8" width="5" height="7" rx="1.5" fill="white" fillOpacity="0.95" />
           <rect x="15" y="8" width="5" height="4" rx="1.5" fill="white" fillOpacity="0.6" />

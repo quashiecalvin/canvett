@@ -4,12 +4,12 @@
 .canvett-landing .landing-header { min-height: 92px; }
 .canvett-landing .landing-hero { padding-top: 65px; padding-bottom: 90px; gap: 48px; grid-template-columns: 1fr 1.08fr; }
 .canvett-landing .landing-title { max-width: 530px; font-size: clamp(42px, 4.6vw, 64px); line-height: 1.06; letter-spacing: -2.3px; }
-.canvett-landing .landing-title > span { color: #2960e9; }
+.canvett-landing .landing-title > span { color: #2865b8; }
 .canvett-landing .landing-hero > div:first-child > p { font-size: 16px; line-height: 1.75; }
 .canvett-landing .landing-visual { min-width: 0; position: relative; isolation: isolate; padding: 30px 22px 42px; border-radius: 24px; background: linear-gradient(135deg, #eaf1ff, #d4e2ff); border: 1px solid #cdddf8; box-shadow: inset 0 1px 0 #fff, 0 25px 70px #1e4f9a12; }
 .canvett-landing .landing-preview-label { display: flex; align-items: center; gap: 7px; margin-bottom: 20px; font-size: 11px; font-weight: 600; color: #456086; }
 .canvett-landing .landing-preview-label > span:last-child { margin-left: auto; font-size: 8px; letter-spacing: 1px; }
-.canvett-landing .landing-live-dot { width: 6px; height: 6px; border-radius: 50%; background: #2960e9; }
+.canvett-landing .landing-live-dot { width: 6px; height: 6px; border-radius: 50%; background: #2865b8; }
 .canvett-landing .landing-preview > div:first-child { box-shadow: 0 18px 35px #153e8120; border-color: #c8d4e6; }
 .canvett-landing .landing-preview > div:last-child { right: -10px; bottom: -20px; }
 .canvett-landing .landing-feature { padding: 24px; border: 1px solid var(--color-border); border-radius: 16px; background: var(--color-bg-surface); }
@@ -19,7 +19,7 @@
 [data-theme='dark'] .canvett-landing { background: #060f21; --color-text-muted: #a5b5ce; --color-text-body: #cad5e8; }
 [data-theme='dark'] .canvett-landing .landing-intro { background: #030c20; }
 [data-theme='dark'] .canvett-landing .landing-intro::before { background: radial-gradient(ellipse at 89% 40%, #073bb665, transparent 57%), radial-gradient(ellipse at 10% 100%, #062c7450, transparent 45%), linear-gradient(130deg, #061128, #020a1c); }
-[data-theme='dark'] .canvett-landing .landing-title > span { color: #6b9cff; }
+[data-theme='dark'] .canvett-landing .landing-title > span { color: #80afe3; }
 [data-theme='dark'] .canvett-landing .landing-visual { background: linear-gradient(135deg, #0e2860a0, #071735c0); border-color: #3676e83a; box-shadow: inset 0 1px 0 #81aaff10, 0 25px 80px #0003; }
 [data-theme='dark'] .canvett-landing .landing-preview-label { color: #9ab6e4; }
 [data-theme='dark'] .canvett-landing .landing-preview > div:first-child { box-shadow: 0 20px 40px #0005; border-color: #3274e645; }
@@ -44,3 +44,7 @@
 @media (max-width: 1023px) { .canvett-landing .hero-squares span:nth-child(1) { left: auto; right: 3%; top: 19%; width: 22px; height: 22px; } .canvett-landing .hero-squares span:nth-child(3), .canvett-landing .hero-squares span:nth-child(8) { display: none; } .canvett-landing .hero-squares span:nth-child(2) { left: 3%; top: 49%; } .canvett-landing .hero-squares span:nth-child(5) { top: 55%; width: 24px; height: 24px; } }
 
 :root:not([data-theme='dark']) .canvett-landing .hero-squares { display: none; }
+
+.canvett-landing { --color-accent-2: #245fae; --color-accent-hover: #1d5095; }
+.canvett-landing .canvett-logo { --color-accent-2: #2563eb; --color-accent: #185fa5; }
+[data-theme='dark'] .canvett-landing .canvett-logo { --color-accent: #4585c6; }

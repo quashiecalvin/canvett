@@ -13,3 +13,7 @@
 [data-theme='dark'] .canvett-public-theme.auth-scope::before { content: ''; position: absolute; top: 20%; left: 8%; width: 24px; height: 24px; border: 1px solid #72a7ff30; border-radius: 4px; background: #72a7ff08; transform: rotate(-12deg); box-shadow: 70vw 13vh 0 -3px #72a7ff0a, 9vw 57vh 0 -5px #72a7ff0b; z-index: -1; pointer-events: none; }
 @media (max-width: 900px) { .canvett-public-theme.public-info > header nav { gap: 16px; } }
 @media (max-width: 767px) { .canvett-public-theme.public-info > header { padding-top: 16px; padding-bottom: 16px; } .canvett-public-theme.auth-scope { padding-top: 80px; padding-bottom: 36px; } [data-theme='dark'] .canvett-public-theme.auth-scope::before { top: 12%; left: 3%; width: 16px; height: 16px; } }
+
+.canvett-public-theme { --color-accent-2: #245fae; --color-accent-hover: #1d5095; }
+.canvett-public-theme .canvett-logo { --color-accent-2: #2563eb; --color-accent: #185fa5; }
+[data-theme='dark'] .canvett-public-theme .canvett-logo { --color-accent: #4585c6; }

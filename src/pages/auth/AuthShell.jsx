@@ -43,8 +43,8 @@ export default function AuthShell({ children }) {
 
       {/* the card */}
       <div className="auth-content relative w-full max-w-[420px]">
-        <div className="flex items-center justify-center gap-2">
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[8px] bg-accent-2">
+        <div className="canvett-logo flex items-center justify-center gap-2">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[8px] bg-accent">
             <svg width="32" height="32" viewBox="0 0 32 32" fill="none" aria-hidden="true">
               <rect x="9" y="9" width="6" height="8" rx="1.75" fill="white" fillOpacity="0.9"/>
               <rect x="17" y="9" width="6" height="5" rx="1.75" fill="white" fillOpacity="0.6"/>
