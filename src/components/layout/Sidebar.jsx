@@ -32,7 +32,7 @@ export default function Sidebar({ open = false, onClose = () => {} }) {
       }`}
     >
       <div className="px-5 py-5 flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2 min-w-0">
+        <div className="canvett-logo flex items-center gap-2 min-w-0">
           <div className="w-8 h-8 rounded-[9px] bg-accent flex items-center justify-center shrink-0">
             <svg width="30" height="30" viewBox="0 0 28 28" fill="none">
               <rect x="8" y="8" width="5" height="7" rx="1.5" fill="white" fillOpacity="0.9"/>

@@ -1,3 +1,4 @@
+import '../../styles/WorkspaceTheme.css'
 import { useState, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { Menu, Search, Bell, X, Sun, Moon, LogOut } from 'lucide-react'
@@ -13,7 +14,7 @@ import { setThemeColor, THEME_COLORS } from '../../lib/themeColor'
 
 function Logo() {
   return (
-    <div className="flex items-center gap-2">
+    <div className="canvett-logo flex items-center gap-2">
       <div className="w-7 h-7 rounded-[7px] bg-accent flex items-center justify-center shrink-0">
         <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
           <rect x="8" y="8" width="5" height="7" rx="1.5" fill="white" fillOpacity="0.9"/>
@@ -102,7 +103,7 @@ export default function AppLayout({ children }) {
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-bg-page">
+    <div className="canvett-workspace flex min-h-screen flex-col bg-bg-page">
       {open && (
         <div
           onClick={() => setOpen(false)}

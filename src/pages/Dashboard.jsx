@@ -106,10 +106,10 @@ export default function Dashboard() {
 
           {/* hero */}
           <section
-            className="relative overflow-hidden rounded-modal px-7 py-7 text-white"
+            className="recruiter-hero relative overflow-hidden rounded-modal px-7 py-7 text-white"
             style={{
-              background: 'linear-gradient(120deg, #1B5595 0%, #4338CA 100%)',
-              boxShadow: '0 16px 40px rgba(46,68,150,0.22)',
+              background: 'var(--workspace-recruiter-hero)',
+              boxShadow: '0 16px 40px rgba(23,75,202,0.16)',
             }}
           >
             <svg

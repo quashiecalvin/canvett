@@ -1,0 +1,55 @@
+/* Shared recruiter and seeker palette; status/score colors remain semantic. */
+.canvett-workspace {
+  --color-bg-page: #f8faff;
+  --color-bg-surface: #ffffff;
+  --color-bg-subtle: #f0f4fa;
+  --color-text-primary: #182234;
+  --color-text-body: #25344c;
+  --color-text-muted: #536178;
+  --color-text-hint: #64748b;
+  --color-border: #e0e8f3;
+  --color-border-strong: #c8d5e7;
+  --color-accent: #2960e9;
+  --color-accent-2: #2563eb;
+  --color-accent-hover: #1d4ed8;
+  --color-accent-tint: #edf3ff;
+  --color-accent-light: #85b7eb;
+  --color-avatar-bg: #deebff;
+  --color-avatar-text: #214a94;
+  --color-disabled-bg: #edf1f7;
+  --workspace-recruiter-hero: linear-gradient(120deg, #1555cc, #234ee7);
+  --workspace-seeker-hero: linear-gradient(120deg, #eaf1ff, #dce8ff);
+  background: var(--color-bg-page);
+}
+[data-theme='dark'] .canvett-workspace {
+  --color-bg-page: #061128;
+  --color-bg-surface: #101c30;
+  --color-bg-subtle: #17263e;
+  --color-text-primary: #edf3ff;
+  --color-text-body: #cad5e8;
+  --color-text-muted: #a5b5ce;
+  --color-text-hint: #91a3bf;
+  --color-border: #243650;
+  --color-border-strong: #385174;
+  --color-accent: #6b9cff;
+  --color-accent-2: #2563eb;
+  --color-accent-hover: #3b82f6;
+  --color-accent-tint: #172a49;
+  --color-avatar-bg: #1e3860;
+  --color-avatar-text: #b8d2ff;
+  --color-disabled-bg: #1a2940;
+  --workspace-recruiter-hero: linear-gradient(120deg, #123885, #174dcc);
+  --workspace-seeker-hero: linear-gradient(120deg, #142c56, #102345);
+  background: radial-gradient(ellipse at 95% 0%, #073bb622, transparent 50%), var(--color-bg-page);
+}
+.canvett-workspace .recruiter-hero { border: 1px solid #3274e630; }
+
+/* Preserve the original brand colors independently of workspace accents. */
+.canvett-workspace .canvett-logo {
+  --color-accent: #185fa5;
+  --color-text-primary: #182234;
+}
+[data-theme='dark'] .canvett-workspace .canvett-logo {
+  --color-accent: #4585c6;
+  --color-text-primary: #eceef1;
+}

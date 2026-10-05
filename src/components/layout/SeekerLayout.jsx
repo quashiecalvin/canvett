@@ -1,3 +1,4 @@
+import '../../styles/WorkspaceTheme.css'
 import { useState, useEffect, useRef } from 'react'
 import { NavLink, useNavigate, useLocation } from 'react-router-dom'
 import { Home, Bookmark, FileText, LogOut, Menu, X, Sun, Moon, Search } from 'lucide-react'
@@ -15,7 +16,7 @@ const navItems = [
 
 function Logo() {
   return (
-    <div className="flex items-center gap-2">
+    <div className="canvett-logo flex items-center gap-2">
       <div className="w-8 h-8 rounded-[9px] bg-accent flex items-center justify-center shrink-0">
         <svg width="30" height="30" viewBox="0 0 28 28" fill="none">
           <rect x="8" y="8" width="5" height="7" rx="1.5" fill="white" fillOpacity="0.9"/>
@@ -87,7 +88,7 @@ export default function SeekerLayout({ children }) {
   }, [])
 
   return (
-    <div className="flex min-h-screen flex-col bg-bg-page">
+    <div className="canvett-workspace flex min-h-screen flex-col bg-bg-page">
       {user && user.role === 'seeker' && !user.onboarded && (
         <OnboardingModal user={user} onDone={(u) => updateUser(u)} />
       )}

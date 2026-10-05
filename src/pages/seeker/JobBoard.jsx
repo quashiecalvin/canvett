@@ -304,7 +304,7 @@ export default function JobBoard() {
             <div className="relative px-6 py-7 sm:px-8 sm:py-8 bg-bg-surface overflow-hidden">
               <div
                 className="absolute inset-0 pointer-events-none"
-                style={{ background: 'linear-gradient(120deg, color-mix(in srgb, var(--color-accent) 34%, var(--color-bg-surface)) 0%, color-mix(in srgb, var(--color-accent) 24%, var(--color-bg-surface)) 100%)' }}
+                style={{ background: 'var(--workspace-seeker-hero)' }}
               />
               <div className="relative flex items-start justify-between gap-6">
                 <div className="min-w-0 flex-1 max-w-2xl">
