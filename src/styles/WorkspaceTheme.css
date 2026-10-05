@@ -18,7 +18,7 @@
   --color-avatar-text: #214a94;
   --color-disabled-bg: #edf1f7;
   --workspace-recruiter-hero: linear-gradient(120deg, #205b9f, #286ab6);
-  --workspace-seeker-hero: linear-gradient(120deg, #eaf1ff, #dce8ff);
+  --workspace-seeker-hero: linear-gradient(120deg, #e3effa, #cbdff2);
   background: var(--color-bg-page);
 }
 [data-theme='dark'] .canvett-workspace {
@@ -39,7 +39,7 @@
   --color-avatar-text: #b8d2ff;
   --color-disabled-bg: #1a2940;
   --workspace-recruiter-hero: linear-gradient(120deg, #143a68, #205895);
-  --workspace-seeker-hero: linear-gradient(120deg, #142c56, #102345);
+  --workspace-seeker-hero: linear-gradient(120deg, #1b3855, #17304a);
   background: radial-gradient(ellipse at 95% 0%, #073bb622, transparent 50%), var(--color-bg-page);
 }
 .canvett-workspace .recruiter-hero { border: 1px solid #3274e630; }
