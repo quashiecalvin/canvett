@@ -170,7 +170,7 @@ function SeekerMockup() {
 const AUD = {
   recruiter: {
     pill: 'Smarter hiring. Better teams.',
-    titleLead: 'Great teams start with ',
+    titleLead: 'Find your next great hire with ',
     sub: 'Canvett helps organisations find, rank and hire the best candidates with explainable AI. Smarter tools, fairer decisions, better teams.',
     bullets: ['AI-powered ranking', 'Explainable scores', 'Built for Ghana'],
     cta: 'Start hiring',
