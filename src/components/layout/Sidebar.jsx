@@ -69,7 +69,7 @@ export default function Sidebar({ open = false, onClose = () => {} }) {
                 className={({ isActive }) =>
                   `flex items-center gap-3 px-3 py-2.5 mb-0.5 rounded-btn text-[13.5px] w-full text-left transition-colors
                   ${isActive
-                    ? 'bg-accent text-white font-medium shadow-[0_6px_16px_rgba(24,95,165,0.28)]'
+                    ? 'bg-accent-2 text-white font-medium shadow-[0_4px_12px_rgba(24,95,165,0.18)]'
                     : 'text-text-body hover:bg-bg-subtle font-medium'
                   }`
                 }
