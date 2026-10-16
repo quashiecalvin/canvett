@@ -237,7 +237,7 @@ export default function Landing() {
               {dark ? <Sun size={17} /> : <Moon size={17} />}
             </button>
             <Link to="/login" className="inline-flex h-10 items-center rounded-btn border border-border-strong px-4 text-[13.5px] font-medium text-text-body transition-colors hover:bg-bg-subtle">Log in</Link>
-            <Link to="/register" className="inline-flex h-10 items-center rounded-btn bg-accent-2 px-4 text-[13.5px] font-semibold text-white transition-colors hover:bg-accent-hover focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-accent/30">Sign up</Link>
+            <Link to="/register" className="hidden sm:inline-flex h-10 items-center rounded-btn bg-accent-2 px-4 text-[13.5px] font-semibold text-white transition-colors hover:bg-accent-hover focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-accent/30">Sign up</Link>
           </div>
         </header>
 

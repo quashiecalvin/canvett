@@ -1,7 +1,6 @@
 .canvett-landing { background: #fff; --color-text-muted: #536178; --color-text-body: #25344c; }
 .canvett-landing .landing-intro { position: relative; isolation: isolate; overflow: hidden; background: #fff; }
 .canvett-landing .landing-intro::before { content: ''; position: absolute; inset: 0; z-index: -1; background: radial-gradient(ellipse at 92% 45%, #dce9ff90, transparent 53%), linear-gradient(180deg, #fff 70%, #f8faff); }
-.canvett-landing .landing-header { min-height: 92px; }
 .canvett-landing .landing-hero { padding-top: 65px; padding-bottom: 90px; gap: 48px; grid-template-columns: 1fr 1.08fr; }
 .canvett-landing .landing-title { max-width: 530px; font-size: clamp(42px, 4.6vw, 64px); line-height: 1.06; letter-spacing: -2.3px; }
 .canvett-landing .landing-title > span { color: #2865b8; }
@@ -24,9 +23,9 @@
 [data-theme='dark'] .canvett-landing .landing-preview-label { color: #9ab6e4; }
 [data-theme='dark'] .canvett-landing .landing-preview > div:first-child { box-shadow: 0 20px 40px #0005; border-color: #3274e645; }
 [data-theme='dark'] .canvett-landing #features { background: #0b1526; }
-@media (min-width: 768px) and (max-width: 1023px) { .canvett-landing .landing-hero { grid-template-columns: 1fr; gap: 40px; padding-top: 40px; padding-bottom: 65px; } .canvett-landing .landing-title { font-size: 54px; max-width: 620px; } .canvett-landing .landing-visual { width: 100%; max-width: 650px; justify-self: center; } .canvett-landing .landing-header nav { gap: 18px; } }
-@media (max-width: 767px) { .canvett-landing .landing-header { min-height: 80px; padding: 18px 20px; } .canvett-landing .landing-header > div { gap: 7px; } .canvett-landing .landing-header > div > a { padding: 0 12px; font-size: 12px; } .canvett-landing .landing-hero { grid-template-columns: 1fr; padding-top: 35px; padding-bottom: 45px; gap: 35px; } .canvett-landing .landing-title { max-width: 540px; font-size: clamp(40px, 8vw, 54px); letter-spacing: -1.5px; } .canvett-landing .landing-visual { padding: 20px 12px 35px; border-radius: 18px; } .canvett-landing .landing-preview-label > span:last-child { display: none; } .canvett-landing .landing-preview > div:last-child { right: -4px; } }
-@media (max-width: 380px) { .canvett-landing .landing-header > div > a:last-child { display: none; } }
+@media (min-width: 768px) and (max-width: 1023px) { .canvett-landing .landing-hero { grid-template-columns: 1fr; gap: 40px; padding-top: 40px; padding-bottom: 65px; } .canvett-landing .landing-title { font-size: 54px; max-width: 620px; } .canvett-landing .landing-visual { width: 100%; max-width: 650px; justify-self: center; } }
+@media (max-width: 900px) { .canvett-landing .landing-header nav { gap: 16px; } }
+@media (max-width: 767px) { .canvett-landing .landing-hero { grid-template-columns: 1fr; padding-top: 35px; padding-bottom: 45px; gap: 35px; } .canvett-landing .landing-title { max-width: 540px; font-size: clamp(40px, 8vw, 54px); letter-spacing: -1.5px; } .canvett-landing .landing-visual { padding: 20px 12px 35px; border-radius: 18px; } .canvett-landing .landing-preview-label > span:last-child { display: none; } .canvett-landing .landing-preview > div:last-child { right: -4px; } }
 @media (prefers-reduced-motion: reduce) { .canvett-landing *, .canvett-landing *::before { animation: none !important; transition: none !important; scroll-behavior: auto !important; } }
 
 .canvett-landing .hero-squares { position: absolute; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
