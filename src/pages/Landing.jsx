@@ -13,15 +13,15 @@ const CONTACT_EMAIL = 'quashiecalvin13@gmail.com'
 function Logo() {
   return (
     <div className="canvett-logo flex items-center gap-2">
-      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[9px] bg-accent">
-        <svg width="30" height="30" viewBox="0 0 28 28" fill="none">
+      <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-[7px] bg-accent">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
           <rect x="8" y="8" width="5" height="7" rx="1.5" fill="white" fillOpacity="0.95" />
           <rect x="15" y="8" width="5" height="4" rx="1.5" fill="white" fillOpacity="0.6" />
           <rect x="15" y="14" width="5" height="6" rx="1.5" fill="white" fillOpacity="0.95" />
           <rect x="8" y="17" width="5" height="3" rx="1.5" fill="white" fillOpacity="0.6" />
         </svg>
       </div>
-      <span className="font-outfit text-[20px] font-semibold tracking-[-0.3px] text-text-primary">
+      <span className="font-outfit text-[18px] font-semibold tracking-[-0.2px] text-text-primary">
         Can<span className="text-accent">vett</span>
       </span>
     </div>
@@ -223,16 +223,16 @@ export default function Landing() {
         <div className="hero-squares" aria-hidden="true">
           {Array.from({ length: 9 }, (_, i) => <span key={i} />)}
         </div>
-        <header className="landing-header relative z-20 mx-auto flex w-full max-w-[1200px] items-center justify-between px-5 py-5 md:px-8">
+        <header className="landing-header relative z-20 mx-auto flex w-full max-w-[1148px] items-center justify-between border-b border-transparent px-4 py-4 md:px-6 md:py-[22px]">
           <Link to="/" aria-label="Canvett home"><Logo /></Link>
-          <nav aria-label="Main navigation" className="hidden items-center gap-8 text-[14px] text-text-muted md:flex">
+          <nav aria-label="Main navigation" className="hidden items-center gap-7 text-[14px] text-text-muted md:flex">
             <Link to="/" className="font-medium text-text-primary">Home</Link>
             <Link to="/about" className="transition-colors hover:text-text-primary">About</Link>
             <Link to="/privacy" className="transition-colors hover:text-text-primary">Privacy</Link>
             <Link to="/terms" className="transition-colors hover:text-text-primary">Terms</Link>
             <a href={`mailto:${CONTACT_EMAIL}`} className="transition-colors hover:text-text-primary">Contact</a>
           </nav>
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-2 md:gap-2.5">
             <button onClick={toggleTheme} aria-label={dark ? "Switch to light theme" : "Switch to dark theme"} className="flex h-10 w-10 items-center justify-center rounded-btn border border-border text-text-muted transition-colors hover:bg-bg-subtle">
               {dark ? <Sun size={17} /> : <Moon size={17} />}
             </button>
